@@ -22,6 +22,7 @@ export default function MasterSetup() {
           <TabsTrigger value="evidence_types" className="text-xs px-3 py-1.5 rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">Evidence Types</TabsTrigger>
           <TabsTrigger value="cover_letters" className="text-xs px-3 py-1.5 rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">Cover Letters</TabsTrigger>
           <TabsTrigger value="geography" className="text-xs px-3 py-1.5 rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">Geography</TabsTrigger>
+          <TabsTrigger value="processors" className="text-xs px-3 py-1.5 rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">Processors</TabsTrigger>
         </TabsList>
 
         <TabsContent value="reason_codes" className="mt-4">
