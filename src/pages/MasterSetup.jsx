@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import ReasonCodeManager from "../components/mastersetup/ReasonCodeManager";
-import CustomFieldManager from "../components/mastersetup/CustomFieldManager";
-import EvidenceTypeManager from "../components/mastersetup/EvidenceTypeManager";
-import CoverLetterManager from "../components/mastersetup/CoverLetterManager";
-import GeographyManager from "../components/mastersetup/GeographyManager";
+import ReasonCodeManager from "@/components/mastersetup/ReasonCodeManager";
+import CustomFieldManager from "@/components/mastersetup/CustomFieldManager";
+import EvidenceTypeManager from "@/components/mastersetup/EvidenceTypeManager";
+import CoverLetterManager from "@/components/mastersetup/CoverLetterManager";
+import GeographyManager from "@/components/mastersetup/GeographyManager";
 
 export default function MasterSetup() {
   return (
