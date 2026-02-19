@@ -40,6 +40,9 @@ export default function MasterSetup() {
         <TabsContent value="geography" className="mt-4">
           <GeographyManager />
         </TabsContent>
+        <TabsContent value="processors" className="mt-4">
+          <ProcessorManager />
+        </TabsContent>
       </Tabs>
     </div>
   );
