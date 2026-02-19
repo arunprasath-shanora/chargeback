@@ -5,6 +5,7 @@ import CustomFieldManager from "@/components/mastersetup/CustomFieldManager";
 import EvidenceTypeManager from "@/components/mastersetup/EvidenceTypeManager";
 import CoverLetterManager from "@/components/mastersetup/CoverLetterManager";
 import GeographyManager from "@/components/mastersetup/GeographyManager";
+import ProcessorManager from "@/components/mastersetup/ProcessorManager";
 
 export default function MasterSetup() {
   return (
