@@ -137,7 +137,7 @@ export default function Inventory() {
         card_last4: actionItem.bin_last4,
         merchant_id: actionItem.merchant_id || subUnit?.merchant_id,
         dba_name: subUnit?.dba_name,
-        assigned_to: assignedTo || undefined,
+        assigned_to: analyst,
         status: "new",
       });
       await base44.entities.InventoryItem.update(actionItem.id, { status: "converted" });
