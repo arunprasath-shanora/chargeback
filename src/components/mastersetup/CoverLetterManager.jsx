@@ -5,10 +5,15 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Plus, Pencil, Trash2, X, Check, Upload, FileText, Copy, ChevronDown, ChevronUp } from "lucide-react";
 
-// All available dynamic fields grouped by section
+const RC_GROUPINGS = [
+  "Authorization","Cancelled Recurring","Cancelled Services","Credit Not Processed",
+  "Duplicate Processing","Fraudulent Transaction","Incorrect Amount","Invalid Data",
+  "Late Presentment","Not As Described","Others","Paid By Other Means","Pre-Arbitration",
+  "Retrieval Request","Services Not Provided","Arbitration"
+];
+
 const FIELD_GROUPS = [
   {
     label: "Case Information",
@@ -79,26 +84,23 @@ const FIELD_GROUPS = [
   },
 ];
 
+// Right panel: system fields
 function FieldPanel({ onInsert }) {
   const [openGroups, setOpenGroups] = useState({ "Case Information": true });
   const [copied, setCopied] = useState(null);
-
   const toggle = (label) => setOpenGroups(g => ({ ...g, [label]: !g[label] }));
-
   const handleCopy = (key) => {
-    const tag = `{{${key}}}`;
-    navigator.clipboard.writeText(tag);
+    navigator.clipboard.writeText(`{{${key}}}`);
     setCopied(key);
     setTimeout(() => setCopied(null), 1500);
   };
-
   return (
-    <div className="border border-slate-200 rounded-lg bg-slate-50 overflow-y-auto max-h-[520px]">
-      <div className="px-3 py-2 border-b border-slate-200 bg-white sticky top-0 z-10">
-        <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Available Fields</p>
-        <p className="text-[10px] text-slate-400 mt-0.5">Click field tag to insert, or copy to clipboard</p>
+    <div className="border border-slate-200 rounded-lg bg-slate-50 flex flex-col h-full">
+      <div className="px-3 py-2 border-b border-slate-200 bg-white rounded-t-lg sticky top-0 z-10">
+        <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide">System Fields</p>
+        <p className="text-[10px] text-slate-400 mt-0.5">Click to insert into template</p>
       </div>
-      <div className="divide-y divide-slate-200">
+      <div className="divide-y divide-slate-200 overflow-y-auto flex-1">
         {FIELD_GROUPS.map(group => (
           <div key={group.label}>
             <button
@@ -115,18 +117,11 @@ function FieldPanel({ onInsert }) {
                     <button
                       onClick={() => onInsert && onInsert(`{{${f.key}}}`)}
                       className="flex-1 text-left px-2 py-1 rounded text-xs bg-white border border-slate-200 hover:border-[#0D50B8] hover:text-[#0D50B8] transition-colors font-mono truncate"
-                      title={`Insert {{${f.key}}}`}
                     >
                       {`{{${f.key}}}`}
                     </button>
-                    <button
-                      onClick={() => handleCopy(f.key)}
-                      className="flex-shrink-0 p-1 rounded hover:bg-slate-200 transition-colors"
-                      title="Copy to clipboard"
-                    >
-                      {copied === f.key
-                        ? <Check className="w-3 h-3 text-green-500" />
-                        : <Copy className="w-3 h-3 text-slate-400" />}
+                    <button onClick={() => handleCopy(f.key)} className="flex-shrink-0 p-1 rounded hover:bg-slate-200 transition-colors">
+                      {copied === f.key ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3 text-slate-400" />}
                     </button>
                   </div>
                 ))}
@@ -139,35 +134,124 @@ function FieldPanel({ onInsert }) {
   );
 }
 
-function CoverLetterEditor({ form, setForm, uploading, setUploading }) {
+// Left panel: evidence types + custom fields
+function EvidencePanel({ evidenceTypes, customFields, form, onInsert, toggleItem }) {
+  const [openEvidence, setOpenEvidence] = useState(true);
+  const [openFields, setOpenFields] = useState(true);
+
+  return (
+    <div className="border border-slate-200 rounded-lg bg-slate-50 flex flex-col h-full">
+      <div className="px-3 py-2 border-b border-slate-200 bg-white rounded-t-lg">
+        <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Elements</p>
+        <p className="text-[10px] text-slate-400 mt-0.5">Select & insert into template</p>
+      </div>
+      <div className="overflow-y-auto flex-1 divide-y divide-slate-200">
+        {/* Evidence Types */}
+        <div>
+          <button
+            onClick={() => setOpenEvidence(v => !v)}
+            className="w-full flex items-center justify-between px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition-colors"
+          >
+            Evidence Types
+            {openEvidence ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+          </button>
+          {openEvidence && (
+            <div className="px-2 pb-2 space-y-1">
+              {evidenceTypes.length === 0 ? (
+                <p className="text-[10px] text-slate-400 px-1 py-1">No evidence types configured.</p>
+              ) : evidenceTypes.map(et => {
+                const selected = (form.assigned_evidence_types || []).includes(et.id);
+                return (
+                  <div key={et.id} className="flex items-center gap-1">
+                    <label className="flex items-center gap-1.5 flex-1 min-w-0 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={selected}
+                        onChange={() => toggleItem("assigned_evidence_types", et.id)}
+                        className="accent-[#0D50B8] flex-shrink-0"
+                      />
+                      <span className={`text-xs truncate ${selected ? "text-[#0D50B8] font-medium" : "text-slate-600"}`}>{et.name}</span>
+                    </label>
+                    <button
+                      onClick={() => onInsert && onInsert(`{{evidence:${et.name}}}`)}
+                      className="flex-shrink-0 px-1.5 py-0.5 rounded text-[10px] bg-white border border-slate-200 hover:border-[#0D50B8] hover:text-[#0D50B8] transition-colors font-mono"
+                      title="Insert tag"
+                    >+</button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Custom Fields */}
+        <div>
+          <button
+            onClick={() => setOpenFields(v => !v)}
+            className="w-full flex items-center justify-between px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition-colors"
+          >
+            Custom Fields
+            {openFields ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+          </button>
+          {openFields && (
+            <div className="px-2 pb-2 space-y-1">
+              {customFields.length === 0 ? (
+                <p className="text-[10px] text-slate-400 px-1 py-1">No custom fields configured.</p>
+              ) : customFields.map(cf => {
+                const selected = (form.assigned_custom_fields || []).includes(cf.id);
+                return (
+                  <div key={cf.id} className="flex items-center gap-1">
+                    <label className="flex items-center gap-1.5 flex-1 min-w-0 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={selected}
+                        onChange={() => toggleItem("assigned_custom_fields", cf.id)}
+                        className="accent-[#0D50B8] flex-shrink-0"
+                      />
+                      <span className={`text-xs truncate ${selected ? "text-[#0D50B8] font-medium" : "text-slate-600"}`}>{cf.field_name}</span>
+                    </label>
+                    <button
+                      onClick={() => onInsert && onInsert(`{{custom:${cf.field_key || cf.field_name}}}`)}
+                      className="flex-shrink-0 px-1.5 py-0.5 rounded text-[10px] bg-white border border-slate-200 hover:border-[#0D50B8] hover:text-[#0D50B8] transition-colors font-mono"
+                      title="Insert tag"
+                    >+</button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Center: upload + textarea
+function TemplateEditor({ form, setForm, uploading, setUploading, onInsertRef }) {
   const [dragOver, setDragOver] = useState(false);
   const textareaRef = useRef(null);
   const fileInputRef = useRef(null);
 
+  // Expose insertAtCursor so panels can call it
   const insertAtCursor = (text) => {
     const ta = textareaRef.current;
-    if (!ta) {
-      setForm(f => ({ ...f, content: (f.content || "") + text }));
-      return;
-    }
+    if (!ta) { setForm(f => ({ ...f, content: (f.content || "") + text })); return; }
     const start = ta.selectionStart;
     const end = ta.selectionEnd;
     const current = form.content || "";
-    const updated = current.slice(0, start) + text + current.slice(end);
-    setForm(f => ({ ...f, content: updated }));
-    setTimeout(() => {
-      ta.focus();
-      ta.setSelectionRange(start + text.length, start + text.length);
-    }, 0);
+    setForm(f => ({ ...f, content: current.slice(0, start) + text + current.slice(end) }));
+    setTimeout(() => { ta.focus(); ta.setSelectionRange(start + text.length, start + text.length); }, 0);
   };
+
+  // Share insertAtCursor via ref
+  if (onInsertRef) onInsertRef.current = insertAtCursor;
 
   const handleFileDrop = async (file) => {
     if (!file) return;
     setUploading(true);
-    // Read as text for .txt / plain, upload for .docx
     if (file.name.endsWith(".txt")) {
       const text = await file.text();
-      setForm(f => ({ ...f, content: text, file_url: f.file_url }));
+      setForm(f => ({ ...f, content: text }));
     } else {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
       setForm(f => ({ ...f, file_url }));
@@ -175,74 +259,43 @@ function CoverLetterEditor({ form, setForm, uploading, setUploading }) {
     setUploading(false);
   };
 
-  const handleDrop = (e) => {
-    e.preventDefault();
-    setDragOver(false);
-    const file = e.dataTransfer.files[0];
-    if (file) handleFileDrop(file);
-  };
-
-  const handleFileInput = (e) => {
-    const file = e.target.files[0];
-    if (file) handleFileDrop(file);
-  };
-
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-      {/* Left: editor */}
-      <div className="lg:col-span-2 space-y-3">
-        {/* Upload / drag-drop zone */}
-        <div
-          onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-          onDragLeave={() => setDragOver(false)}
-          onDrop={handleDrop}
-          className={`border-2 border-dashed rounded-lg p-4 text-center transition-colors cursor-pointer ${dragOver ? "border-[#0D50B8] bg-blue-50" : "border-slate-200 hover:border-slate-300"}`}
-          onClick={() => fileInputRef.current?.click()}
-        >
-          <input ref={fileInputRef} type="file" accept=".txt,.docx,.doc" className="hidden" onChange={handleFileInput} />
-          <Upload className="w-5 h-5 mx-auto mb-1 text-slate-400" />
-          <p className="text-xs text-slate-500">
-            {uploading ? "Uploading..." : "Drag & drop a Word / text file, or click to browse"}
-          </p>
-          <p className="text-[10px] text-slate-400 mt-0.5">Supported: .txt, .docx, .doc</p>
-        </div>
-
-        {form.file_url && (
-          <div className="flex items-center gap-2 px-3 py-2 bg-blue-50 border border-blue-200 rounded-lg">
-            <FileText className="w-4 h-4 text-[#0D50B8] flex-shrink-0" />
-            <a href={form.file_url} target="_blank" rel="noreferrer" className="text-xs text-[#0D50B8] hover:underline flex-1 truncate">Uploaded file</a>
-            <button onClick={() => setForm(f => ({ ...f, file_url: "" }))} className="text-slate-400 hover:text-slate-600"><X className="w-3.5 h-3.5" /></button>
-          </div>
-        )}
-
-        <div>
-          <label className="text-xs font-medium text-slate-600 mb-1 block">
-            Template Content <span className="text-slate-400 font-normal">(paste or type — click a field tag on the right to insert)</span>
-          </label>
-          <textarea
-            ref={textareaRef}
-            className="w-full border border-slate-200 rounded-md px-3 py-2 text-sm min-h-[300px] focus:outline-none focus:ring-1 focus:ring-[#0D50B8] resize-y font-mono leading-relaxed"
-            placeholder={`Dear Sir/Madam,\n\nWe are writing to dispute the chargeback for Case ID: {{case_id}}, dated {{dispute_date}}...\n\nAmount: {{dispute_currency}} {{dispute_amount}}\nReason Code: {{reason_code}}\nCardholder: {{cardholder_name}}\n\n...`}
-            value={form.content || ""}
-            onChange={e => setForm(f => ({ ...f, content: e.target.value }))}
-          />
-        </div>
+    <div className="space-y-3 flex flex-col h-full">
+      {/* Upload zone */}
+      <div
+        onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={(e) => { e.preventDefault(); setDragOver(false); const f = e.dataTransfer.files[0]; if (f) handleFileDrop(f); }}
+        className={`border-2 border-dashed rounded-lg p-3 text-center transition-colors cursor-pointer ${dragOver ? "border-[#0D50B8] bg-blue-50" : "border-slate-200 hover:border-slate-300"}`}
+        onClick={() => fileInputRef.current?.click()}
+      >
+        <input ref={fileInputRef} type="file" accept=".txt,.docx,.doc" className="hidden" onChange={(e) => { const f = e.target.files[0]; if (f) handleFileDrop(f); }} />
+        <Upload className="w-4 h-4 mx-auto mb-1 text-slate-400" />
+        <p className="text-xs text-slate-500">{uploading ? "Uploading..." : "Drag & drop or click to upload"}</p>
+        <p className="text-[10px] text-slate-400">.txt, .docx, .doc</p>
       </div>
 
-      {/* Right: field panel */}
-      <div className="lg:col-span-1">
-        <FieldPanel onInsert={insertAtCursor} />
+      {form.file_url && (
+        <div className="flex items-center gap-2 px-3 py-2 bg-blue-50 border border-blue-200 rounded-lg">
+          <FileText className="w-4 h-4 text-[#0D50B8] flex-shrink-0" />
+          <a href={form.file_url} target="_blank" rel="noreferrer" className="text-xs text-[#0D50B8] hover:underline flex-1 truncate">Uploaded file</a>
+          <button onClick={() => setForm(f => ({ ...f, file_url: "" }))} className="text-slate-400 hover:text-slate-600"><X className="w-3.5 h-3.5" /></button>
+        </div>
+      )}
+
+      <div className="flex-1">
+        <label className="text-xs font-medium text-slate-600 mb-1 block">Template Content</label>
+        <textarea
+          ref={textareaRef}
+          className="w-full border border-slate-200 rounded-md px-3 py-2 text-sm min-h-[340px] focus:outline-none focus:ring-1 focus:ring-[#0D50B8] resize-y font-mono leading-relaxed"
+          placeholder={`Dear Sir/Madam,\n\nCase ID: {{case_id}}\nDispute Date: {{dispute_date}}\nAmount: {{dispute_currency}} {{dispute_amount}}\n\nEvidence: {{evidence:Invoice}}\nCustom: {{custom:order_id}}\n\n...`}
+          value={form.content || ""}
+          onChange={e => setForm(f => ({ ...f, content: e.target.value }))}
+        />
       </div>
     </div>
   );
 }
-
-const RC_GROUPINGS = [
-  "Authorization","Cancelled Recurring","Cancelled Services","Credit Not Processed",
-  "Duplicate Processing","Fraudulent Transaction","Incorrect Amount","Invalid Data",
-  "Late Presentment","Not As Described","Others","Paid By Other Means","Pre-Arbitration",
-  "Retrieval Request","Services Not Provided","Arbitration"
-];
 
 export default function CoverLetterManager() {
   const [records, setRecords] = useState([]);
@@ -252,8 +305,11 @@ export default function CoverLetterManager() {
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const insertRef = useRef(null);
+
   const [form, setForm] = useState({
-    name: "", content: "", file_url: "", reason_code_grouping: "",
+    name: "", content: "", file_url: "",
+    reason_code_groupings: [],
     assigned_custom_fields: [], assigned_evidence_types: [], status: "active"
   });
 
@@ -262,24 +318,21 @@ export default function CoverLetterManager() {
     base44.entities.CustomField.filter({ status: "active" }),
     base44.entities.EvidenceType.filter({ status: "active" }),
   ]).then(([cl, cf, et]) => {
-    setRecords(cl);
-    setCustomFields(cf);
-    setEvidenceTypes(et);
-    setLoading(false);
+    setRecords(cl); setCustomFields(cf); setEvidenceTypes(et); setLoading(false);
   }).catch(() => setLoading(false));
 
   useEffect(() => { load(); }, []);
 
   const resetForm = () => setForm({
-    name: "", content: "", file_url: "", reason_code_grouping: "",
+    name: "", content: "", file_url: "",
+    reason_code_groupings: [],
     assigned_custom_fields: [], assigned_evidence_types: [], status: "active"
   });
 
   const save = async () => {
     if (editId) await base44.entities.CoverLetterTemplate.update(editId, form);
     else await base44.entities.CoverLetterTemplate.create(form);
-    setShowForm(false); setEditId(null); resetForm();
-    load();
+    setShowForm(false); setEditId(null); resetForm(); load();
   };
 
   const del = async (id) => { await base44.entities.CoverLetterTemplate.delete(id); load(); };
@@ -289,13 +342,19 @@ export default function CoverLetterManager() {
       name: r.name || "",
       content: r.content || "",
       file_url: r.file_url || "",
-      reason_code_grouping: r.reason_code_grouping || "",
+      reason_code_groupings: r.reason_code_groupings || (r.reason_code_grouping ? [r.reason_code_grouping] : []),
       assigned_custom_fields: r.assigned_custom_fields || [],
       assigned_evidence_types: r.assigned_evidence_types || [],
       status: r.status || "active",
     });
-    setEditId(r.id);
-    setShowForm(true);
+    setEditId(r.id); setShowForm(true);
+  };
+
+  const toggleGrouping = (g) => {
+    setForm(f => {
+      const arr = f.reason_code_groupings || [];
+      return { ...f, reason_code_groupings: arr.includes(g) ? arr.filter(x => x !== g) : [...arr, g] };
+    });
   };
 
   const toggleItem = (field, id) => {
@@ -322,7 +381,7 @@ export default function CoverLetterManager() {
             </CardTitle>
           </CardHeader>
           <CardContent className="p-5 space-y-4">
-            {/* Name + Status row */}
+            {/* Name + Status */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="sm:col-span-2 space-y-1">
                 <label className="text-xs font-medium text-slate-600">Template Name *</label>
@@ -340,89 +399,52 @@ export default function CoverLetterManager() {
               </div>
             </div>
 
-            {/* Reason Code Grouping */}
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-slate-600">Reason Code Grouping</label>
-              <Select value={form.reason_code_grouping || ""} onValueChange={v => setForm(f => ({ ...f, reason_code_grouping: v }))}>
-                <SelectTrigger><SelectValue placeholder="Select grouping..." /></SelectTrigger>
-                <SelectContent>
-                  {RC_GROUPINGS.map(g => <SelectItem key={g} value={g}>{g}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Elements: Custom Fields + Evidence Types */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Custom Fields */}
-              <div className="space-y-2">
-                <label className="text-xs font-medium text-slate-600">Custom Fields</label>
-                {customFields.length === 0 ? (
-                  <p className="text-xs text-slate-400">No custom fields configured.</p>
-                ) : (
-                  <div className="border border-slate-200 rounded-lg p-3 max-h-40 overflow-y-auto bg-slate-50 space-y-1">
-                    {customFields.map(cf => {
-                      const selected = (form.assigned_custom_fields || []).includes(cf.id);
-                      return (
-                        <label key={cf.id} className="flex items-center gap-2 cursor-pointer group">
-                          <input
-                            type="checkbox"
-                            checked={selected}
-                            onChange={() => toggleItem("assigned_custom_fields", cf.id)}
-                            className="rounded border-slate-300 text-[#0D50B8] accent-[#0D50B8]"
-                          />
-                          <span className={`text-xs ${selected ? "text-[#0D50B8] font-medium" : "text-slate-600"}`}>
-                            {cf.field_name}
-                          </span>
-                          <span className="text-[10px] text-slate-400 ml-auto">{cf.field_type}</span>
-                        </label>
-                      );
-                    })}
-                  </div>
+            {/* Reason Code Groupings — multi-select checkboxes */}
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-slate-600">
+                Reason Code Groupings
+                {(form.reason_code_groupings || []).length > 0 && (
+                  <span className="ml-2 text-[#0D50B8] font-normal">{form.reason_code_groupings.length} selected</span>
                 )}
-                {(form.assigned_custom_fields || []).length > 0 && (
-                  <p className="text-[10px] text-slate-400">{form.assigned_custom_fields.length} field(s) selected</p>
-                )}
-              </div>
-
-              {/* Evidence Types */}
-              <div className="space-y-2">
-                <label className="text-xs font-medium text-slate-600">Evidence Types</label>
-                {evidenceTypes.length === 0 ? (
-                  <p className="text-xs text-slate-400">No evidence types configured.</p>
-                ) : (
-                  <div className="border border-slate-200 rounded-lg p-3 max-h-40 overflow-y-auto bg-slate-50 space-y-1">
-                    {evidenceTypes.map(et => {
-                      const selected = (form.assigned_evidence_types || []).includes(et.id);
-                      return (
-                        <label key={et.id} className="flex items-center gap-2 cursor-pointer group">
-                          <input
-                            type="checkbox"
-                            checked={selected}
-                            onChange={() => toggleItem("assigned_evidence_types", et.id)}
-                            className="rounded border-slate-300 text-[#0D50B8] accent-[#0D50B8]"
-                          />
-                          <span className={`text-xs ${selected ? "text-[#0D50B8] font-medium" : "text-slate-600"}`}>
-                            {et.name}
-                          </span>
-                          <span className="text-[10px] text-slate-400 ml-auto">{et.upload_requirement}</span>
-                        </label>
-                      );
-                    })}
-                  </div>
-                )}
-                {(form.assigned_evidence_types || []).length > 0 && (
-                  <p className="text-[10px] text-slate-400">{form.assigned_evidence_types.length} type(s) selected</p>
-                )}
+              </label>
+              <div className="border border-slate-200 rounded-lg p-3 bg-slate-50">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-1.5">
+                  {RC_GROUPINGS.map(g => {
+                    const selected = (form.reason_code_groupings || []).includes(g);
+                    return (
+                      <label key={g} className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={selected}
+                          onChange={() => toggleGrouping(g)}
+                          className="accent-[#0D50B8] flex-shrink-0"
+                        />
+                        <span className={`text-xs ${selected ? "text-[#0D50B8] font-medium" : "text-slate-600"}`}>{g}</span>
+                      </label>
+                    );
+                  })}
+                </div>
               </div>
             </div>
 
-            {/* Editor + Field Panel */}
-            <CoverLetterEditor
-              form={form}
-              setForm={setForm}
-              uploading={uploading}
-              setUploading={setUploading}
-            />
+            {/* 3-column editor: Evidence | Template | Fields */}
+            <div className="grid grid-cols-1 lg:grid-cols-[200px_1fr_200px] gap-4" style={{ minHeight: "460px" }}>
+              <EvidencePanel
+                evidenceTypes={evidenceTypes}
+                customFields={customFields}
+                form={form}
+                onInsert={(tag) => insertRef.current && insertRef.current(tag)}
+                toggleItem={toggleItem}
+              />
+              <TemplateEditor
+                form={form}
+                setForm={setForm}
+                uploading={uploading}
+                setUploading={setUploading}
+                onInsertRef={insertRef}
+              />
+              <FieldPanel onInsert={(tag) => insertRef.current && insertRef.current(tag)} />
+            </div>
 
             <div className="flex gap-2 pt-2 border-t border-slate-100">
               <Button size="sm" onClick={save} className="bg-[#0D50B8] hover:bg-[#0a3d8f]" disabled={!form.name}>
@@ -452,8 +474,12 @@ export default function CoverLetterManager() {
                     <Badge className={r.status === "active" ? "bg-green-100 text-green-800 border-0 text-xs" : "bg-slate-100 text-slate-600 border-0 text-xs"}>{r.status}</Badge>
                     {r.file_url && <Badge className="bg-blue-100 text-blue-800 border-0 text-xs"><FileText className="w-2.5 h-2.5 mr-1 inline" />File attached</Badge>}
                   </div>
-                  {r.reason_code_grouping && (
-                    <span className="px-2 py-0.5 bg-blue-50 text-[#0D50B8] rounded text-[10px] font-medium">{r.reason_code_grouping}</span>
+                  {(r.reason_code_groupings || []).length > 0 && (
+                    <div className="flex flex-wrap gap-1">
+                      {r.reason_code_groupings.map(g => (
+                        <span key={g} className="px-2 py-0.5 bg-blue-50 text-[#0D50B8] rounded text-[10px] font-medium">{g}</span>
+                      ))}
+                    </div>
                   )}
                   <div className="flex flex-wrap gap-1">
                     {(r.assigned_custom_fields || []).length > 0 && (
