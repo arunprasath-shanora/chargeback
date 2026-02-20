@@ -172,6 +172,7 @@ export default function Users() {
   const handleDelete = async (u) => {
     if (!window.confirm(`Deactivate ${u.email}?`)) return;
     await base44.entities.User.update(u.id, { status: "inactive" });
+    await auditLog({ action: "update", resource_type: "User", resource_id: u.id, details: `User ${u.email} deactivated` });
     load();
   };
 
