@@ -323,12 +323,12 @@ export default function Inventory() {
               </Select>
             </div>
             <div className="space-y-1">
-              <Label className="text-xs">Assign to Analyst {actionType === "assign" ? "" : "(optional)"}</Label>
+              <Label className="text-xs">Assign to Analyst (optional)</Label>
               {projectUsers.length > 0 ? (
                 <Select value={assignedTo} onValueChange={setAssignedTo}>
                   <SelectTrigger><SelectValue placeholder="Select analyst..." /></SelectTrigger>
                   <SelectContent>
-                    {actionType === "convert" && <SelectItem value="__none__">— Unassigned —</SelectItem>}
+                    <SelectItem value="__none__">— Unassigned —</SelectItem>
                     {projectUsers.map(u => (
                       <SelectItem key={u.email} value={u.email}>
                         {u.full_name ? `${u.full_name} (${u.email})` : u.email}
