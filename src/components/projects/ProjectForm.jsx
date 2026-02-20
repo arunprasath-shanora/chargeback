@@ -356,6 +356,7 @@ export default function ProjectForm({ project, onSave, onCancel }) {
     portal_credentials: [],
     assigned_users: [], assigned_fields: [], assigned_processors: [],
     reason_code_mappings: [],
+    inventory_automation: { manual_upload_enabled: true },
     notes: "",
   };
 
