@@ -184,7 +184,7 @@ export default function DisputeForm({ dispute, projects, onSave, onCancel }) {
         <F label="3D Secure (3DS)"><Input value={form.three_d_secure} onChange={e => set("three_d_secure", e.target.value)} placeholder="Y / N / A" /></F>
       </SECTION>
 
-      <SECTION title="Transaction Details">
+      <SECTION title="Original Transaction Details">
         <F label="Transaction ID"><Input value={form.transaction_id} onChange={e => set("transaction_id", e.target.value)} /></F>
         <F label="Transaction Date"><Input type="date" value={form.transaction_date} onChange={e => set("transaction_date", e.target.value)} /></F>
         <F label="Transaction Amount"><Input type="number" value={form.transaction_amount} onChange={e => set("transaction_amount", e.target.value)} /></F>
