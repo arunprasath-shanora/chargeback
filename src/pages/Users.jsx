@@ -112,15 +112,29 @@ export default function Users() {
     setForm(f => ({ ...f, email, user_id: uid }));
   };
 
+  const [pwdErrors, setPwdErrors] = useState([]);
+
   const handleSave = async () => {
     if (!form.email) return;
+    if (!editUser && form.temp_password) {
+      const errors = validatePassword(form.temp_password);
+      if (errors.length > 0) { setPwdErrors(errors); return; }
+    }
+    setPwdErrors([]);
     setSaving(true);
     if (editUser) {
       const upd = { role: form.role, department: form.department, user_id: form.user_id };
-      if (form.temp_password) upd.temp_password = form.temp_password;
+      if (form.temp_password) {
+        const errors = validatePassword(form.temp_password);
+        if (errors.length > 0) { setPwdErrors(errors); setSaving(false); return; }
+        upd.temp_password = form.temp_password;
+        upd.must_change_password = true;
+      }
       await base44.entities.User.update(editUser.id, upd);
+      await auditLog({ action: "role_change", resource_type: "User", resource_id: editUser.id, details: `Role set to ${form.role}` });
     } else {
-      await base44.users.inviteUser(form.email, form.role === "super_admin" ? "admin" : form.role === "admin" ? "admin" : "user");
+      await base44.users.inviteUser(form.email, form.role === "super_admin" || form.role === "admin" ? "admin" : "user");
+      await auditLog({ action: "create", resource_type: "User", details: `Invited ${form.email} as ${form.role}` });
     }
     setSaving(false);
     setShowModal(false);
