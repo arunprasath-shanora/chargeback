@@ -420,7 +420,6 @@ export default function CoverLetterManager() {
             <CoverLetterEditor
               form={form}
               setForm={setForm}
-              reasonCodes={reasonCodes}
               uploading={uploading}
               setUploading={setUploading}
             />
