@@ -301,7 +301,6 @@ export default function CoverLetterManager() {
       content: r.content || "",
       file_url: r.file_url || "",
       reason_code_groupings: r.reason_code_groupings || (r.reason_code_grouping ? [r.reason_code_grouping] : []),
-      assigned_custom_fields: r.assigned_custom_fields || [],
       assigned_evidence_types: r.assigned_evidence_types || [],
       status: r.status || "active",
     });
