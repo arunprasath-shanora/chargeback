@@ -340,36 +340,80 @@ export default function CoverLetterManager() {
               </div>
             </div>
 
-            {/* Reason Codes mapping */}
-            <div className="space-y-2">
-              <label className="text-xs font-medium text-slate-600">Map to Reason Codes</label>
-              {reasonCodes.length === 0 ? (
-                <p className="text-xs text-slate-400">No reason codes configured. Add them in the Reason Codes tab.</p>
-              ) : (
-                <div className="border border-slate-200 rounded-lg p-3 max-h-36 overflow-y-auto bg-slate-50">
-                  <div className="flex flex-wrap gap-2">
-                    {reasonCodes.map(rc => {
-                      const selected = (form.reason_codes || []).includes(rc.reason_code);
+            {/* Reason Code Grouping */}
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-slate-600">Reason Code Grouping</label>
+              <Select value={form.reason_code_grouping || ""} onValueChange={v => setForm(f => ({ ...f, reason_code_grouping: v }))}>
+                <SelectTrigger><SelectValue placeholder="Select grouping..." /></SelectTrigger>
+                <SelectContent>
+                  {RC_GROUPINGS.map(g => <SelectItem key={g} value={g}>{g}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Elements: Custom Fields + Evidence Types */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Custom Fields */}
+              <div className="space-y-2">
+                <label className="text-xs font-medium text-slate-600">Custom Fields</label>
+                {customFields.length === 0 ? (
+                  <p className="text-xs text-slate-400">No custom fields configured.</p>
+                ) : (
+                  <div className="border border-slate-200 rounded-lg p-3 max-h-40 overflow-y-auto bg-slate-50 space-y-1">
+                    {customFields.map(cf => {
+                      const selected = (form.assigned_custom_fields || []).includes(cf.id);
                       return (
-                        <button
-                          key={rc.id}
-                          onClick={() => toggleReasonCode(rc.reason_code)}
-                          className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-colors ${
-                            selected
-                              ? "bg-[#0D50B8] text-white border-[#0D50B8]"
-                              : "bg-white text-slate-600 border-slate-300 hover:border-[#0D50B8] hover:text-[#0D50B8]"
-                          }`}
-                        >
-                          {rc.reason_code} <span className={`ml-1 ${selected ? "text-blue-200" : "text-slate-400"}`}>({rc.cb_reason})</span>
-                        </button>
+                        <label key={cf.id} className="flex items-center gap-2 cursor-pointer group">
+                          <input
+                            type="checkbox"
+                            checked={selected}
+                            onChange={() => toggleItem("assigned_custom_fields", cf.id)}
+                            className="rounded border-slate-300 text-[#0D50B8] accent-[#0D50B8]"
+                          />
+                          <span className={`text-xs ${selected ? "text-[#0D50B8] font-medium" : "text-slate-600"}`}>
+                            {cf.field_name}
+                          </span>
+                          <span className="text-[10px] text-slate-400 ml-auto">{cf.field_type}</span>
+                        </label>
                       );
                     })}
                   </div>
-                </div>
-              )}
-              {(form.reason_codes || []).length > 0 && (
-                <p className="text-xs text-slate-400">{form.reason_codes.length} reason code(s) selected</p>
-              )}
+                )}
+                {(form.assigned_custom_fields || []).length > 0 && (
+                  <p className="text-[10px] text-slate-400">{form.assigned_custom_fields.length} field(s) selected</p>
+                )}
+              </div>
+
+              {/* Evidence Types */}
+              <div className="space-y-2">
+                <label className="text-xs font-medium text-slate-600">Evidence Types</label>
+                {evidenceTypes.length === 0 ? (
+                  <p className="text-xs text-slate-400">No evidence types configured.</p>
+                ) : (
+                  <div className="border border-slate-200 rounded-lg p-3 max-h-40 overflow-y-auto bg-slate-50 space-y-1">
+                    {evidenceTypes.map(et => {
+                      const selected = (form.assigned_evidence_types || []).includes(et.id);
+                      return (
+                        <label key={et.id} className="flex items-center gap-2 cursor-pointer group">
+                          <input
+                            type="checkbox"
+                            checked={selected}
+                            onChange={() => toggleItem("assigned_evidence_types", et.id)}
+                            className="rounded border-slate-300 text-[#0D50B8] accent-[#0D50B8]"
+                          />
+                          <span className={`text-xs ${selected ? "text-[#0D50B8] font-medium" : "text-slate-600"}`}>
+                            {et.name}
+                          </span>
+                          <span className="text-[10px] text-slate-400 ml-auto">{et.upload_requirement}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                )}
+                {(form.assigned_evidence_types || []).length > 0 && (
+                  <p className="text-[10px] text-slate-400">{form.assigned_evidence_types.length} type(s) selected</p>
+                )}
+              </div>
             </div>
 
             {/* Editor + Field Panel */}
