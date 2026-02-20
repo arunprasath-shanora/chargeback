@@ -47,6 +47,7 @@
  *
  * The mainPage value must match a key in the PAGES object exactly.
  */
+import AuditLog from './pages/AuditLog';
 import Dashboard from './pages/Dashboard';
 import Disputes from './pages/Disputes';
 import Inventory from './pages/Inventory';
@@ -54,11 +55,11 @@ import MasterSetup from './pages/MasterSetup';
 import Projects from './pages/Projects';
 import Reports from './pages/Reports';
 import Users from './pages/Users';
-import AuditLog from './pages/AuditLog';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
+    "AuditLog": AuditLog,
     "Dashboard": Dashboard,
     "Disputes": Disputes,
     "Inventory": Inventory,
@@ -66,7 +67,6 @@ export const PAGES = {
     "Projects": Projects,
     "Reports": Reports,
     "Users": Users,
-    "AuditLog": AuditLog,
 }
 
 export const pagesConfig = {

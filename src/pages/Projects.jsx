@@ -97,12 +97,17 @@ export default function Projects() {
                   {p.status}
                 </Badge>
               </div>
-              {p.sub_unit_name && <p className="text-xs text-slate-500">{p.sub_unit_name}</p>}
-              <div className="space-y-1 text-sm text-slate-600">
-                {p.merchant_id && <p><span className="text-slate-400 text-xs">MID:</span> {p.merchant_id}</p>}
-                {p.processor && <p><span className="text-slate-400 text-xs">Processor:</span> {p.processor}</p>}
-                {p.dba_name && <p><span className="text-slate-400 text-xs">DBA:</span> {p.dba_name}</p>}
-                {p.currency && <p><span className="text-slate-400 text-xs">Currency:</span> {p.currency}</p>}
+              {p.sub_units?.length > 0 && (
+                <div className="flex flex-wrap gap-1">
+                  {p.sub_units.slice(0, 3).map((u, i) => (
+                    <span key={i} className="px-2 py-0.5 rounded bg-blue-50 text-blue-700 text-xs">{u.sub_unit_name || u.merchant_id || `Unit ${i+1}`}</span>
+                  ))}
+                  {p.sub_units.length > 3 && <span className="text-xs text-slate-400">+{p.sub_units.length - 3} more</span>}
+                </div>
+              )}
+              <div className="space-y-1 text-xs text-slate-500">
+                {p.sub_units?.[0]?.processor && <p><span className="text-slate-400">Processor:</span> {p.sub_units[0].processor}{p.sub_units.length > 1 ? ` +${p.sub_units.length - 1}` : ""}</p>}
+                {p.client_contacts?.[0]?.contact_name && <p><span className="text-slate-400">Contact:</span> {p.client_contacts[0].contact_name}</p>}
               </div>
               {p.assigned_users?.length > 0 && (
                 <p className="text-xs text-slate-400">{p.assigned_users.length} user(s) assigned</p>
