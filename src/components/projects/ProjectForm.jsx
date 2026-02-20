@@ -371,8 +371,8 @@ export default function ProjectForm({ project, onSave, onCancel }) {
     sub_units: [],
     client_contacts: [],
     portal_credentials: [],
-    assigned_users: [], assigned_fields: [], assigned_evidence_types: [],
-    assigned_cover_letter: "", assigned_reason_codes: [], assigned_processors: [],
+    assigned_users: [], assigned_fields: [], assigned_processors: [],
+    reason_code_mappings: [],
     notes: "",
   };
 
@@ -384,8 +384,8 @@ export default function ProjectForm({ project, onSave, onCancel }) {
       sub_units: project.sub_units || [],
       client_contacts: project.client_contacts || [],
       portal_credentials: project.portal_credentials || [],
-      assigned_reason_codes: project.assigned_reason_codes || [],
       assigned_processors: project.assigned_processors || [],
+      reason_code_mappings: project.reason_code_mappings || [],
     };
   });
 
