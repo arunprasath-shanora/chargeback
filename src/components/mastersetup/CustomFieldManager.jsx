@@ -23,8 +23,20 @@ export default function CustomFieldManager() {
     if (editId) await base44.entities.CustomField.update(editId, form);
     else await base44.entities.CustomField.create(form);
     setShowForm(false); setEditId(null);
-    setForm({ field_name: "", field_key: "", field_type: "text", category: "other", is_mandatory: false, status: "active" });
+    setForm({ field_name: "", field_key: "", field_type: "text", category: "other", is_mandatory: false, status: "active", dropdown_options: [] });
+    setNewOption("");
     load();
+  };
+
+  const addOption = () => {
+    const opt = newOption.trim();
+    if (!opt || (form.dropdown_options || []).includes(opt)) return;
+    setForm(f => ({ ...f, dropdown_options: [...(f.dropdown_options || []), opt] }));
+    setNewOption("");
+  };
+
+  const removeOption = (opt) => {
+    setForm(f => ({ ...f, dropdown_options: (f.dropdown_options || []).filter(o => o !== opt) }));
   };
 
   const del = async (id) => { await base44.entities.CustomField.delete(id); load(); };
