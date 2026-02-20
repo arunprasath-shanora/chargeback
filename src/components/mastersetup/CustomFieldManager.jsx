@@ -42,7 +42,8 @@ export default function CustomFieldManager() {
   const del = async (id) => { await base44.entities.CustomField.delete(id); load(); };
 
   const edit = (r) => {
-    setForm({ field_name: r.field_name, field_key: r.field_key, field_type: r.field_type, category: r.category, is_mandatory: r.is_mandatory, status: r.status });
+    setForm({ field_name: r.field_name, field_key: r.field_key, field_type: r.field_type, category: r.category, is_mandatory: r.is_mandatory, status: r.status, dropdown_options: r.dropdown_options || [] });
+    setNewOption("");
     setEditId(r.id); setShowForm(true);
   };
 
