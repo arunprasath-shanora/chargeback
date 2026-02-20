@@ -284,7 +284,7 @@ export default function CoverLetterManager() {
   const resetForm = () => setForm({
     name: "", content: "", file_url: "",
     reason_code_groupings: [],
-    assigned_custom_fields: [], assigned_evidence_types: [], status: "active"
+    assigned_evidence_types: [], status: "active"
   });
 
   const save = async () => {
