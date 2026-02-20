@@ -144,6 +144,16 @@ export default function Inventory() {
     // Update inventory to converted
     await base44.entities.InventoryItem.update(actionItem.id, { status: "converted" });
 
+    // Log the action
+    auditLog({
+      action: "update",
+      resource_type: "InventoryItem",
+      resource_id: actionItem.id,
+      old_value: `status: ${actionItem.status}`,
+      new_value: `status: converted, assigned_to: ${analyst || "none"}`,
+      details: `Converted inventory case ${actionItem.case_id} to dispute and assigned to ${analyst || "unassigned"}`
+    });
+
     setSaving(false);
     setActionItem(null);
     setActionType(null);
