@@ -57,17 +57,18 @@ export default function DisputeForm({ dispute, projects, onSave, onCancel }) {
   const handleProjectChange = (pid) => {
     const p = projects.find(x => x.id === pid);
     if (p) {
+      const firstUnit = p.sub_units?.[0];
       setForm(f => ({
         ...f,
         project_id: pid,
         business_unit: p.name,
-        sub_unit_name: p.sub_unit_name || f.sub_unit_name,
-        processor: p.processor || f.processor,
-        merchant_id: p.merchant_id || f.merchant_id,
-        merchant_alias: p.mid_alias || f.merchant_alias,
-        dba_name: p.dba_name || f.dba_name,
-        dispute_currency: p.currency || f.dispute_currency,
-        transaction_currency: p.currency || f.transaction_currency,
+        sub_unit_name: firstUnit?.sub_unit_name || f.sub_unit_name,
+        processor: firstUnit?.processor || f.processor,
+        merchant_id: firstUnit?.merchant_id || f.merchant_id,
+        merchant_alias: firstUnit?.mid_alias || f.merchant_alias,
+        dba_name: firstUnit?.dba_name || f.dba_name,
+        dispute_currency: firstUnit?.currency || f.dispute_currency,
+        transaction_currency: firstUnit?.currency || f.transaction_currency,
       }));
     } else {
       set("project_id", pid);
