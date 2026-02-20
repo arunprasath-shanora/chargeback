@@ -13,7 +13,8 @@ export default function CustomFieldManager() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState(null);
-  const [form, setForm] = useState({ field_name: "", field_key: "", field_type: "text", category: "other", is_mandatory: false, status: "active" });
+  const [form, setForm] = useState({ field_name: "", field_key: "", field_type: "text", category: "other", is_mandatory: false, status: "active", dropdown_options: [] });
+  const [newOption, setNewOption] = useState("");
 
   const load = () => base44.entities.CustomField.list().then(d => { setRecords(d); setLoading(false); });
   useEffect(() => { load(); }, []);
