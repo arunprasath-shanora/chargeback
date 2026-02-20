@@ -7,8 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Search, UserPlus, X, Eye, EyeOff, RefreshCw, Shield, Copy, Check,
-  MoreVertical, Pencil, Trash2, KeyRound, ChevronDown
+  MoreVertical, Pencil, Trash2, KeyRound, ChevronDown, AlertTriangle
 } from "lucide-react";
+import { generateCompliantPassword, validatePassword } from "@/components/security/roleAccess";
+import { auditLog } from "@/components/security/auditLogger";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter
 } from "@/components/ui/dialog";
