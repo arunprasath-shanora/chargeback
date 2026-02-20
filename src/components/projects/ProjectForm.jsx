@@ -182,10 +182,39 @@ function PortalTab({ credentials, onChange }) {
 
 // ─── Assignments Tab ──────────────────────────────────────────────────────────
 function AssignmentsTab({ form, set, toggleArray, allUsers, allFields, allEvidenceTypes, allCoverLetters, allReasonCodes, allProcessors }) {
-  const [rcSearch, setRcSearch] = useState("");
-  const filteredRC = allReasonCodes.filter(rc =>
-    !rcSearch || rc.reason_code?.toLowerCase().includes(rcSearch.toLowerCase()) || rc.reason_code_description?.toLowerCase().includes(rcSearch.toLowerCase())
+  const [procSearch, setProcSearch] = useState("");
+  const [activeGrouping, setActiveGrouping] = useState(null);
+
+  const allGroupings = [...new Set(allReasonCodes.map(rc => rc.reason_code_grouping).filter(Boolean))];
+
+  const getMappingForGrouping = (grouping) => {
+    const mappings = form.reason_code_mappings || [];
+    return mappings.find(m => m.rc_grouping === grouping) || { rc_grouping: grouping, assigned_reason_codes: [], assigned_evidence_types: [], assigned_cover_letter: "" };
+  };
+
+  const updateMapping = (grouping, key, value) => {
+    const mappings = [...(form.reason_code_mappings || [])];
+    const idx = mappings.findIndex(m => m.rc_grouping === grouping);
+    if (idx >= 0) {
+      mappings[idx] = { ...mappings[idx], [key]: value };
+    } else {
+      mappings.push({ rc_grouping: grouping, assigned_reason_codes: [], assigned_evidence_types: [], assigned_cover_letter: "", [key]: value });
+    }
+    set("reason_code_mappings", mappings);
+  };
+
+  const toggleMappingArray = (grouping, key, value) => {
+    const m = getMappingForGrouping(grouping);
+    const arr = m[key] || [];
+    updateMapping(grouping, key, arr.includes(value) ? arr.filter(x => x !== value) : [...arr, value]);
+  };
+
+  const filteredProc = allProcessors.filter(p =>
+    !procSearch || p.name?.toLowerCase().includes(procSearch.toLowerCase()) || p.type?.toLowerCase().includes(procSearch.toLowerCase())
   );
+
+  const allFieldIds = allFields.map(f => f.id);
+  const allFieldsSelected = allFieldIds.length > 0 && allFieldIds.every(id => (form.assigned_fields || []).includes(id));
 
   return (
     <div className="space-y-6">
@@ -206,9 +235,16 @@ function AssignmentsTab({ form, set, toggleArray, allUsers, allFields, allEviden
 
       <hr className="border-slate-100" />
 
-      {/* Custom Fields */}
+      {/* Custom Fields with Select All */}
       <div>
-        <SectionTitle>Custom Fields</SectionTitle>
+        <div className="flex items-center justify-between mb-2">
+          <SectionTitle>Custom Fields ({(form.assigned_fields || []).length} selected)</SectionTitle>
+          {allFields.length > 0 && (
+            <button onClick={() => set("assigned_fields", allFieldsSelected ? [] : allFieldIds)} className="text-xs text-[#0D50B8] hover:underline font-medium">
+              {allFieldsSelected ? "Deselect All" : "Select All"}
+            </button>
+          )}
+        </div>
         {allFields.length === 0 ? <p className="text-sm text-slate-400">No custom fields configured. Add them in Master Setup.</p> : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
             {allFields.map(f => (
@@ -223,66 +259,104 @@ function AssignmentsTab({ form, set, toggleArray, allUsers, allFields, allEviden
 
       <hr className="border-slate-100" />
 
-      {/* Evidence Types */}
+      {/* Processors with Search */}
       <div>
-        <SectionTitle>Evidence Types</SectionTitle>
-        {allEvidenceTypes.length === 0 ? <p className="text-sm text-slate-400">No evidence types configured. Add them in Master Setup.</p> : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-            {allEvidenceTypes.map(et => (
-              <label key={et.id} className="flex items-center gap-2 cursor-pointer p-2 rounded-lg hover:bg-slate-50">
-                <Checkbox checked={(form.assigned_evidence_types || []).includes(et.id)} onCheckedChange={() => toggleArray("assigned_evidence_types", et.id)} />
-                <span className="text-sm text-slate-700">{et.name} <span className="text-xs text-slate-400">({et.upload_requirement})</span></span>
-              </label>
-            ))}
-          </div>
-        )}
-      </div>
-
-      <hr className="border-slate-100" />
-
-      {/* Cover Letter */}
-      <div>
-        <SectionTitle>Default Cover Letter Template</SectionTitle>
-        <Select value={form.assigned_cover_letter || ""} onValueChange={v => set("assigned_cover_letter", v)}>
-          <SelectTrigger className="w-full max-w-sm"><SelectValue placeholder="Select template..." /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value={null}>None</SelectItem>
-            {allCoverLetters.map(cl => <SelectItem key={cl.id} value={cl.id}>{cl.name}</SelectItem>)}
-          </SelectContent>
-        </Select>
-      </div>
-
-      <hr className="border-slate-100" />
-
-      {/* Reason Codes */}
-      <div>
-        <SectionTitle>Reason Codes ({(form.assigned_reason_codes || []).length} selected)</SectionTitle>
-        <Input className="mb-3 max-w-xs" placeholder="Search reason codes..." value={rcSearch} onChange={e => setRcSearch(e.target.value)} />
-        {allReasonCodes.length === 0 ? <p className="text-sm text-slate-400">No reason codes configured. Add them in Master Setup.</p> : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 max-h-64 overflow-y-auto pr-1">
-            {filteredRC.map(rc => (
-              <label key={rc.id} className="flex items-center gap-2 cursor-pointer p-2 rounded-lg hover:bg-slate-50">
-                <Checkbox checked={(form.assigned_reason_codes || []).includes(rc.id)} onCheckedChange={() => toggleArray("assigned_reason_codes", rc.id)} />
-                <span className="text-sm text-slate-700">{rc.reason_code} <span className="text-xs text-slate-400">{rc.card_mandate}</span></span>
-              </label>
-            ))}
-          </div>
-        )}
-      </div>
-
-      <hr className="border-slate-100" />
-
-      {/* Processors */}
-      <div>
-        <SectionTitle>Processors</SectionTitle>
+        <SectionTitle>Processors ({(form.assigned_processors || []).length} selected)</SectionTitle>
+        <Input className="mb-3 max-w-xs" placeholder="Search processors..." value={procSearch} onChange={e => setProcSearch(e.target.value)} />
         {allProcessors.length === 0 ? <p className="text-sm text-slate-400">No processors configured. Add them in Master Setup.</p> : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-            {allProcessors.map(p => (
+            {filteredProc.map(p => (
               <label key={p.id} className="flex items-center gap-2 cursor-pointer p-2 rounded-lg hover:bg-slate-50">
                 <Checkbox checked={(form.assigned_processors || []).includes(p.id)} onCheckedChange={() => toggleArray("assigned_processors", p.id)} />
                 <span className="text-sm text-slate-700">{p.name} <span className="text-xs text-slate-400">({p.type})</span></span>
               </label>
             ))}
+          </div>
+        )}
+      </div>
+
+      <hr className="border-slate-100" />
+
+      {/* Reason Code Grouping → Evidence + Cover Letter Mapping */}
+      <div>
+        <SectionTitle>Reason Code Grouping Mappings</SectionTitle>
+        <p className="text-xs text-slate-400 mb-3">For each grouping, select reason codes, then map evidence types and cover letter template.</p>
+        {allGroupings.length === 0 ? <p className="text-sm text-slate-400">No reason codes configured. Add them in Master Setup.</p> : (
+          <div className="space-y-2">
+            {allGroupings.map(grouping => {
+              const mapping = getMappingForGrouping(grouping);
+              const rcCount = (mapping.assigned_reason_codes || []).length;
+              const etCount = (mapping.assigned_evidence_types || []).length;
+              const isOpen = activeGrouping === grouping;
+              const rcForGrouping = allReasonCodes.filter(rc => rc.reason_code_grouping === grouping);
+
+              return (
+                <Card key={grouping} className="border-slate-100">
+                  <button
+                    className="w-full flex items-center justify-between p-4 text-left hover:bg-slate-50 rounded-xl transition-colors"
+                    onClick={() => setActiveGrouping(isOpen ? null : grouping)}
+                  >
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <span className="text-sm font-medium text-slate-800">{grouping}</span>
+                      {rcCount > 0 && <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded">{rcCount} codes</span>}
+                      {etCount > 0 && <span className="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded">{etCount} evidence</span>}
+                      {mapping.assigned_cover_letter && <span className="text-xs bg-purple-50 text-purple-700 px-2 py-0.5 rounded">Cover letter set</span>}
+                    </div>
+                    <span className="text-slate-400 text-xs ml-2">{isOpen ? "▲" : "▼"}</span>
+                  </button>
+
+                  {isOpen && (
+                    <CardContent className="px-4 pb-4 pt-0 border-t border-slate-100 space-y-4 mt-0">
+                      {/* Reason Codes */}
+                      <div>
+                        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2 mt-3">Reason Codes ({rcForGrouping.length} available)</p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1.5 max-h-48 overflow-y-auto">
+                          {rcForGrouping.map(rc => (
+                            <label key={rc.id} className="flex items-center gap-2 cursor-pointer p-2 rounded-lg hover:bg-slate-50">
+                              <Checkbox
+                                checked={(mapping.assigned_reason_codes || []).includes(rc.id)}
+                                onCheckedChange={() => toggleMappingArray(grouping, "assigned_reason_codes", rc.id)}
+                              />
+                              <span className="text-xs text-slate-700">{rc.reason_code} <span className="text-slate-400">{rc.card_mandate}</span></span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Evidence Types */}
+                      <div>
+                        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Evidence Types</p>
+                        {allEvidenceTypes.length === 0 ? <p className="text-xs text-slate-400">No evidence types configured.</p> : (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1.5">
+                            {allEvidenceTypes.map(et => (
+                              <label key={et.id} className="flex items-center gap-2 cursor-pointer p-2 rounded-lg hover:bg-slate-50">
+                                <Checkbox
+                                  checked={(mapping.assigned_evidence_types || []).includes(et.id)}
+                                  onCheckedChange={() => toggleMappingArray(grouping, "assigned_evidence_types", et.id)}
+                                />
+                                <span className="text-xs text-slate-700">{et.name} <span className="text-slate-400">({et.upload_requirement})</span></span>
+                              </label>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Cover Letter */}
+                      <div>
+                        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Cover Letter Template</p>
+                        <Select value={mapping.assigned_cover_letter || ""} onValueChange={v => updateMapping(grouping, "assigned_cover_letter", v)}>
+                          <SelectTrigger className="w-full max-w-sm"><SelectValue placeholder="Select template..." /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value={null}>None</SelectItem>
+                            {allCoverLetters.map(cl => <SelectItem key={cl.id} value={cl.id}>{cl.name}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </CardContent>
+                  )}
+                </Card>
+              );
+            })}
           </div>
         )}
       </div>
