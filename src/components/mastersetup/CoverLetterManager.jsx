@@ -139,7 +139,7 @@ function FieldPanel({ onInsert }) {
   );
 }
 
-function CoverLetterEditor({ form, setForm, reasonCodes, uploading, setUploading }) {
+function CoverLetterEditor({ form, setForm, uploading, setUploading }) {
   const [dragOver, setDragOver] = useState(false);
   const textareaRef = useRef(null);
   const fileInputRef = useRef(null);
