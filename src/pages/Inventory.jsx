@@ -107,8 +107,9 @@ export default function Inventory() {
   const handleAction = async () => {
     setSaving(true);
     const projId = selectedProject || actionItem.project_id;
+    const analyst = assignedTo === "__none__" ? undefined : assignedTo || undefined;
     if (actionType === "assign") {
-      await base44.entities.InventoryItem.update(actionItem.id, { status: "assigned", project_id: projId });
+      await base44.entities.InventoryItem.update(actionItem.id, { status: "assigned", project_id: projId, assigned_to: analyst });
     } else if (actionType === "convert") {
       const project = projects.find(p => p.id === projId);
       // Find matching sub-unit from project if available
