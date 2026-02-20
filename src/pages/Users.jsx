@@ -253,6 +253,18 @@ export default function Users() {
                   <td className="px-4 py-3 text-slate-500 text-xs">{u.department || "—"}</td>
                   <td className="px-4 py-3"><RoleBadge role={u.role} /></td>
                   <td className="px-4 py-3">
+                    {(() => {
+                      const assigned = projects.filter(p => p.assigned_users?.includes(u.email));
+                      return assigned.length === 0
+                        ? <span className="text-slate-300 text-xs">—</span>
+                        : <div className="flex flex-wrap gap-1">
+                            {assigned.map(p => (
+                              <span key={p.id} className="px-2 py-0.5 rounded bg-blue-50 text-blue-700 text-xs font-medium whitespace-nowrap">{p.name}</span>
+                            ))}
+                          </div>;
+                    })()}
+                  </td>
+                  <td className="px-4 py-3">
                     {u.temp_password ? (
                       <div className="flex items-center gap-1">
                         <span className="font-mono text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded">{u.temp_password}</span>
