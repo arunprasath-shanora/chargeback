@@ -308,22 +308,6 @@ function AssignmentsTab({ form, set, toggleArray, allUsers, allFields, allEviden
 
                   {isOpen && (
                     <CardContent className="px-4 pb-4 pt-0 border-t border-slate-100 space-y-4 mt-0">
-                      {/* Reason Codes */}
-                      <div>
-                        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2 mt-3">Reason Codes ({rcForGrouping.length} available)</p>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1.5 max-h-48 overflow-y-auto">
-                          {rcForGrouping.map(rc => (
-                            <label key={rc.id} className="flex items-center gap-2 cursor-pointer p-2 rounded-lg hover:bg-slate-50">
-                              <Checkbox
-                                checked={(mapping.assigned_reason_codes || []).includes(rc.id)}
-                                onCheckedChange={() => toggleMappingArray(grouping, "assigned_reason_codes", rc.id)}
-                              />
-                              <span className="text-xs text-slate-700">{rc.reason_code} <span className="text-slate-400">{rc.card_mandate}</span></span>
-                            </label>
-                          ))}
-                        </div>
-                      </div>
-
                       {/* Evidence Types */}
                       <div>
                         <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Evidence Types</p>
