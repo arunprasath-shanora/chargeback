@@ -59,12 +59,8 @@ function generateUserId(email) {
   return `${local}${suffix}`;
 }
 
-function generatePassword() {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789@#$!";
-  let pwd = "";
-  for (let i = 0; i < 10; i++) pwd += chars[Math.floor(Math.random() * chars.length)];
-  return pwd;
-}
+// Use PCI-compliant password generator from roleAccess
+const generatePassword = generateCompliantPassword;
 
 function RoleBadge({ role }) {
   const r = ROLES.find(r => r.value === role) || { label: role, color: "bg-slate-100 text-slate-600" };
