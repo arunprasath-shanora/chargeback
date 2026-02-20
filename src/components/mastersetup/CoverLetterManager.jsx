@@ -206,6 +206,17 @@ function TemplateEditor({ form, setForm, uploading, setUploading, onInsertRef })
   // Share insertAtCursor via ref
   if (onInsertRef) onInsertRef.current = insertAtCursor;
 
+  const wrapSelection = (before, after) => {
+    const ta = textareaRef.current;
+    if (!ta) return;
+    const start = ta.selectionStart, end = ta.selectionEnd;
+    const current = form.content || "";
+    const selected = current.slice(start, end) || "text";
+    const newContent = current.slice(0, start) + before + selected + after + current.slice(end);
+    setForm(f => ({ ...f, content: newContent }));
+    setTimeout(() => { ta.focus(); ta.setSelectionRange(start + before.length, start + before.length + selected.length); }, 0);
+  };
+
   const handleFileDrop = async (file) => {
     if (!file) return;
     setUploading(true);
