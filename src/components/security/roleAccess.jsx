@@ -2,8 +2,8 @@
 // PCI DSS Requirement 7: Restrict access to system components based on business need
 
 export const ROLE_PAGES = {
-  super_admin: ["Dashboard", "Disputes", "Inventory", "Projects", "MasterSetup", "Reports", "Users"],
-  admin:       ["Dashboard", "Disputes", "Inventory", "Projects", "Reports", "Users"],
+  super_admin: ["Dashboard", "Disputes", "Inventory", "Projects", "MasterSetup", "Reports", "Users", "AuditLog"],
+  admin:       ["Dashboard", "Disputes", "Inventory", "Projects", "Reports", "Users", "AuditLog"],
   manager:     ["Dashboard", "Disputes", "Inventory", "Users", "Reports"],
   analyst:     ["Dashboard", "Disputes"],
   user:        ["Dashboard", "Disputes"],
