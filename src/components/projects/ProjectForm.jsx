@@ -286,10 +286,8 @@ function AssignmentsTab({ form, set, toggleArray, allUsers, allFields, allEviden
           <div className="space-y-2">
             {allGroupings.map(grouping => {
               const mapping = getMappingForGrouping(grouping);
-              const rcCount = (mapping.assigned_reason_codes || []).length;
               const etCount = (mapping.assigned_evidence_types || []).length;
               const isOpen = activeGrouping === grouping;
-              const rcForGrouping = allReasonCodes.filter(rc => rc.reason_code_grouping === grouping);
 
               return (
                 <Card key={grouping} className="border-slate-100">
