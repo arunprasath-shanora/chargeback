@@ -95,6 +95,35 @@ export default function CustomFieldManager() {
                 </Select>
               </div>
             </div>
+            {form.field_type === "dropdown" && (
+              <div className="space-y-2">
+                <label className="text-xs font-medium text-slate-600 block">Dropdown Options</label>
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Add option..."
+                    value={newOption}
+                    onChange={e => setNewOption(e.target.value)}
+                    onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addOption(); } }}
+                    className="h-8 text-sm"
+                  />
+                  <Button size="sm" variant="outline" onClick={addOption} className="h-8 px-3">
+                    <Plus className="w-3.5 h-3.5" />
+                  </Button>
+                </div>
+                {(form.dropdown_options || []).length > 0 && (
+                  <div className="flex flex-wrap gap-1.5">
+                    {form.dropdown_options.map(opt => (
+                      <span key={opt} className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-50 text-[#0D50B8] rounded text-xs font-medium">
+                        {opt}
+                        <button onClick={() => removeOption(opt)} className="hover:text-red-500 transition-colors">
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
             <div className="flex items-center gap-3">
               <Switch checked={form.is_mandatory} onCheckedChange={v => setForm(f => ({ ...f, is_mandatory: v }))} />
               <label className="text-xs text-slate-600">Mandatory</label>
