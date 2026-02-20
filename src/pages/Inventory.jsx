@@ -11,6 +11,7 @@ import { Search, Plus, ArrowRightLeft, Upload, Zap, AlertTriangle, RefreshCw } f
 import InventoryUploadModal from "@/components/inventory/InventoryUploadModal";
 import InventoryAddModal from "@/components/inventory/InventoryAddModal";
 import ApiInfoModal from "@/components/inventory/ApiInfoModal";
+import { auditLog } from "@/components/security/auditLogger";
 
 const statusColors = {
   received:  "bg-yellow-100 text-yellow-800",
