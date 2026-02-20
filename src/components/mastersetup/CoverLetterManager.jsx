@@ -269,15 +269,14 @@ export default function CoverLetterManager() {
   const [form, setForm] = useState({
     name: "", content: "", file_url: "",
     reason_code_groupings: [],
-    assigned_custom_fields: [], assigned_evidence_types: [], status: "active"
+    assigned_evidence_types: [], status: "active"
   });
 
   const load = () => Promise.all([
     base44.entities.CoverLetterTemplate.list(),
-    base44.entities.CustomField.filter({ status: "active" }),
     base44.entities.EvidenceType.filter({ status: "active" }),
-  ]).then(([cl, cf, et]) => {
-    setRecords(cl); setCustomFields(cf); setEvidenceTypes(et); setLoading(false);
+  ]).then(([cl, et]) => {
+    setRecords(cl); setEvidenceTypes(et); setLoading(false);
   }).catch(() => setLoading(false));
 
   useEffect(() => { load(); }, []);
