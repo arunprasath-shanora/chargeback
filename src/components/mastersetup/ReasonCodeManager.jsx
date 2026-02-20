@@ -175,6 +175,8 @@ export default function ReasonCodeManager() {
   const [typeFilter, setTypeFilter] = useState("all");
   const [importing, setImporting] = useState(false);
   const [importMsg, setImportMsg] = useState("");
+  const [uploadMsg, setUploadMsg] = useState("");
+  const uploadRef = React.useRef();
 
   const load = () => base44.entities.ReasonCode.list().then(d => { setRecords(d); setLoading(false); }).catch(() => setLoading(false));
   useEffect(() => { load(); }, []);
