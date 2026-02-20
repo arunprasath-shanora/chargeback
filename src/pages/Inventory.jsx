@@ -285,16 +285,11 @@ export default function Inventory() {
                         ) : "—"}
                       </td>
                       <td className="px-4 py-3">
-                        <div className="flex gap-1">
-                          {i.status === "received" && (
-                            <Button size="sm" variant="outline" className="h-7 text-xs px-2" onClick={() => openAction(i, "assign")}>Assign</Button>
-                          )}
-                          {(i.status === "received" || i.status === "assigned") && (
-                            <Button size="sm" className="h-7 text-xs px-2 bg-[#0D50B8] hover:bg-[#0a3d8f]" onClick={() => openAction(i, "convert")}>
-                              <ArrowRightLeft className="w-3 h-3 mr-1" /> Convert
-                            </Button>
-                          )}
-                        </div>
+                        {(i.status === "received" || i.status === "assigned") && (
+                          <Button size="sm" className="h-7 text-xs px-2 bg-[#0D50B8] hover:bg-[#0a3d8f]" onClick={() => openAction(i)}>
+                            <ArrowRightLeft className="w-3 h-3 mr-1" /> Assign & Convert
+                          </Button>
+                        )}
                       </td>
                     </tr>
                   );
