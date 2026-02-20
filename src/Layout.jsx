@@ -196,7 +196,15 @@ export default function Layout({ children, currentPageName }) {
         </header>
 
         <main className="flex-1 overflow-y-auto">
-          {children}
+          {accessDenied ? (
+            <div className="flex flex-col items-center justify-center h-full text-center p-12">
+              <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mb-4">
+                <ShieldOff className="w-8 h-8 text-red-400" />
+              </div>
+              <h2 className="text-lg font-bold text-slate-800 mb-1">Access Denied</h2>
+              <p className="text-slate-500 text-sm max-w-xs">You don't have permission to access this page. Contact your administrator if you need access.</p>
+            </div>
+          ) : children}
         </main>
       </div>
     </div>
