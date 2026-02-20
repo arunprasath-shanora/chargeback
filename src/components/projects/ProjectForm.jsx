@@ -496,6 +496,13 @@ export default function ProjectForm({ project, onSave, onCancel }) {
           </Card>
         </TabsContent>
 
+        <TabsContent value="inventory_automation" className="mt-4">
+          <ProjectInventoryAutomationTab
+            config={{ ...(form.inventory_automation || {}), _project_id: project?.id }}
+            onChange={v => set("inventory_automation", v)}
+          />
+        </TabsContent>
+
         <TabsContent value="notes" className="mt-4">
           <Card className="border-slate-100">
             <CardContent className="p-5">
