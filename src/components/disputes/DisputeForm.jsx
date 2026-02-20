@@ -144,37 +144,44 @@ export default function DisputeForm({ dispute, projects, onSave, onCancel }) {
         </F>
       </SECTION>
 
-      <SECTION title="Dispute Details">
-        <F label="Dispute Date"><Input type="date" value={form.dispute_date} onChange={e => set("dispute_date", e.target.value)} /></F>
-        <F label="Dispute Amount"><Input type="number" value={form.dispute_amount} onChange={e => set("dispute_amount", e.target.value)} placeholder="0.00" /></F>
-        <F label="Dispute Currency"><Input value={form.dispute_currency} onChange={e => set("dispute_currency", e.target.value)} placeholder="USD" /></F>
+      <SECTION title="Chargeback Details">
+        <F label="Chargeback Date"><Input type="date" value={form.chargeback_date} onChange={e => set("chargeback_date", e.target.value)} /></F>
+        <F label="Chargeback Amount"><Input type="number" value={form.chargeback_amount} onChange={e => set("chargeback_amount", e.target.value)} placeholder="0.00" /></F>
+        <F label="Chargeback Currency"><Input value={form.chargeback_currency} onChange={e => set("chargeback_currency", e.target.value)} placeholder="USD" /></F>
         <F label="Reason Code">
           <Select value={form.reason_code} onValueChange={handleReasonCodeChange}>
             <SelectTrigger><SelectValue placeholder="Select reason code..." /></SelectTrigger>
             <SelectContent>
-              {reasonCodes.map(r => <SelectItem key={r.id} value={r.reason_code}>{r.reason_code}</SelectItem>)}
+              {reasonCodes.map(r => <SelectItem key={r.id} value={r.reason_code}>{r.reason_code} — {r.reason_code_description}</SelectItem>)}
             </SelectContent>
           </Select>
         </F>
         <F label="Reason Category"><Input value={form.reason_category} onChange={e => set("reason_category", e.target.value)} placeholder="Auto-filled from reason code" /></F>
-        <F label="ARN Number"><Input value={form.arn_number} onChange={e => set("arn_number", e.target.value)} /></F>
+        <F label="ARN (Acquirer Reference Number)"><Input value={form.arn_number} onChange={e => set("arn_number", e.target.value)} /></F>
       </SECTION>
 
       <SECTION title="Card & Authorization">
-        <F label="Card Type">
-          <Select value={form.card_type} onValueChange={v => set("card_type", v)}>
+        <F label="Card Network">
+          <Select value={form.card_network} onValueChange={v => set("card_network", v)}>
             <SelectTrigger><SelectValue placeholder="Select..." /></SelectTrigger>
             <SelectContent>{["Visa","Mastercard","American Express","Discover","Other"].map(v => <SelectItem key={v} value={v}>{v}</SelectItem>)}</SelectContent>
           </Select>
         </F>
-        <F label="Card BIN (First 6)"><Input value={form.card_bin_first6} onChange={e => set("card_bin_first6", e.target.value)} maxLength={6} /></F>
-        <F label="Card Last 4"><Input value={form.card_last4} onChange={e => set("card_last4", e.target.value)} maxLength={4} /></F>
+        <F label="Card Type (Funding)">
+          <Select value={form.card_type} onValueChange={v => set("card_type", v)}>
+            <SelectTrigger><SelectValue placeholder="Select..." /></SelectTrigger>
+            <SelectContent>{["Credit","Debit","Prepaid","Corporate","Other"].map(v => <SelectItem key={v} value={v}>{v}</SelectItem>)}</SelectContent>
+          </Select>
+        </F>
+        <F label="Card BIN (First 6 digits)"><Input value={form.card_bin_first6} onChange={e => set("card_bin_first6", e.target.value)} maxLength={6} placeholder="411111" /></F>
+        <F label="Card Last 4 digits"><Input value={form.card_last4} onChange={e => set("card_last4", e.target.value)} maxLength={4} placeholder="1234" /></F>
         <F label="Cardholder Name"><Input value={form.cardholder_name} onChange={e => set("cardholder_name", e.target.value)} /></F>
-        <F label="Authorization Date"><Input type="date" value={form.authorization_date} onChange={e => set("authorization_date", e.target.value)} /></F>
-        <F label="Authorization Amount"><Input type="number" value={form.authorization_amount} onChange={e => set("authorization_amount", e.target.value)} /></F>
-        <F label="AVS Match"><Input value={form.avs_match} onChange={e => set("avs_match", e.target.value)} /></F>
-        <F label="CVV Match"><Input value={form.cvv_match} onChange={e => set("cvv_match", e.target.value)} /></F>
-        <F label="3D Secure"><Input value={form.three_d_secure} onChange={e => set("three_d_secure", e.target.value)} /></F>
+        <F label="Auth Code (Approval Code)"><Input value={form.authorization_code} onChange={e => set("authorization_code", e.target.value)} /></F>
+        <F label="Auth Date"><Input type="date" value={form.authorization_date} onChange={e => set("authorization_date", e.target.value)} /></F>
+        <F label="Auth Amount"><Input type="number" value={form.authorization_amount} onChange={e => set("authorization_amount", e.target.value)} /></F>
+        <F label="AVS Result"><Input value={form.avs_match} onChange={e => set("avs_match", e.target.value)} placeholder="Y / N / P" /></F>
+        <F label="CVV Result"><Input value={form.cvv_match} onChange={e => set("cvv_match", e.target.value)} placeholder="M / N / P" /></F>
+        <F label="3D Secure (3DS)"><Input value={form.three_d_secure} onChange={e => set("three_d_secure", e.target.value)} placeholder="Y / N / A" /></F>
       </SECTION>
 
       <SECTION title="Transaction Details">
