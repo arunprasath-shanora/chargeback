@@ -263,24 +263,26 @@ Write a formal, concise cover letter defending against this chargeback. Include 
             <InfoRow label="DBA Name" value={currentDispute.dba_name} />
           </SectionGrid>
 
-          <SectionGrid title="Dispute Details">
-            <InfoRow label="Dispute Date" value={currentDispute.dispute_date} />
-            <InfoRow label="Dispute Amount" value={`${currentDispute.dispute_currency || ""} ${currentDispute.dispute_amount?.toLocaleString() || "—"}`} />
+          <SectionGrid title="Chargeback Details">
+            <InfoRow label="Chargeback Date" value={currentDispute.chargeback_date} />
+            <InfoRow label="Chargeback Amount" value={`${currentDispute.chargeback_currency || ""} ${currentDispute.chargeback_amount?.toLocaleString() || "—"}`} />
             <InfoRow label="Reason Code" value={currentDispute.reason_code} />
             <InfoRow label="Reason Category" value={currentDispute.reason_category} />
-            <InfoRow label="ARN Number" value={currentDispute.arn_number} />
+            <InfoRow label="ARN (Acquirer Ref No.)" value={currentDispute.arn_number} />
             <InfoRow label="Cardholder Name" value={currentDispute.cardholder_name} />
           </SectionGrid>
 
           <SectionGrid title="Card & Authorization">
-            <InfoRow label="Card Type" value={currentDispute.card_type} />
-            <InfoRow label="Card BIN" value={currentDispute.card_bin_first6} />
-            <InfoRow label="Card Last 4" value={currentDispute.card_last4} />
+            <InfoRow label="Card Network" value={currentDispute.card_network} />
+            <InfoRow label="Card Type (Funding)" value={currentDispute.card_type} />
+            <InfoRow label="Card BIN (First 6)" value={currentDispute.card_bin_first6} />
+            <InfoRow label="Card Last 4 digits" value={currentDispute.card_last4} />
+            <InfoRow label="Auth Code" value={currentDispute.authorization_code} />
             <InfoRow label="Auth Date" value={currentDispute.authorization_date} />
             <InfoRow label="Auth Amount" value={currentDispute.authorization_amount} />
-            <InfoRow label="AVS Match" value={currentDispute.avs_match} />
-            <InfoRow label="CVV Match" value={currentDispute.cvv_match} />
-            <InfoRow label="3D Secure" value={currentDispute.three_d_secure} />
+            <InfoRow label="AVS Result" value={currentDispute.avs_match} />
+            <InfoRow label="CVV Result" value={currentDispute.cvv_match} />
+            <InfoRow label="3D Secure (3DS)" value={currentDispute.three_d_secure} />
           </SectionGrid>
 
           <SectionGrid title="Transaction">
