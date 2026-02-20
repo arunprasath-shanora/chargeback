@@ -7,7 +7,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Plus, Pencil, Trash2, X, Check } from "lucide-react";
-import { Badge as BadgeUI } from "@/components/ui/badge";
 
 export default function CustomFieldManager() {
   const [records, setRecords] = useState([]);
