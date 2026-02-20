@@ -89,7 +89,10 @@ export default function Users() {
 
   const load = () => {
     setLoading(true);
-    base44.entities.User.list().then(u => { setUsers(u); setLoading(false); }).catch(() => setLoading(false));
+    Promise.all([
+      base44.entities.User.list(),
+      base44.entities.Project.list(),
+    ]).then(([u, p]) => { setUsers(u); setProjects(p); setLoading(false); }).catch(() => setLoading(false));
   };
 
   useEffect(() => { load(); }, []);
