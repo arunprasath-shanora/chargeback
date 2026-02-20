@@ -50,10 +50,10 @@
 import Dashboard from './pages/Dashboard';
 import Disputes from './pages/Disputes';
 import Inventory from './pages/Inventory';
+import MasterSetup from './pages/MasterSetup';
 import Projects from './pages/Projects';
 import Reports from './pages/Reports';
 import Users from './pages/Users';
-import MasterSetup from './pages/MasterSetup';
 import __Layout from './Layout.jsx';
 
 
@@ -61,10 +61,10 @@ export const PAGES = {
     "Dashboard": Dashboard,
     "Disputes": Disputes,
     "Inventory": Inventory,
+    "MasterSetup": MasterSetup,
     "Projects": Projects,
     "Reports": Reports,
     "Users": Users,
-    "MasterSetup": MasterSetup,
 }
 
 export const pagesConfig = {
