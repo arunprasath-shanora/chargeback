@@ -89,9 +89,9 @@ export default function Inventory() {
     setProjectUsers(allUsers.filter(u => assignedEmails.includes(u.email)));
   };
 
-  const openAction = (item, type) => {
+  const openAction = (item) => {
     setActionItem(item);
-    setActionType(type);
+    setActionType("assign");
     const projId = item.project_id || "";
     setSelectedProject(projId);
     setAssignedTo("");
@@ -107,41 +107,42 @@ export default function Inventory() {
   const handleAction = async () => {
     setSaving(true);
     const projId = selectedProject || actionItem.project_id;
-    const analyst = assignedTo === "__none__" ? undefined : assignedTo || undefined;
-    if (actionType === "assign") {
-      await base44.entities.InventoryItem.update(actionItem.id, { status: "assigned", project_id: projId, assigned_to: analyst });
-    } else if (actionType === "convert") {
-      const project = projects.find(p => p.id === projId);
-      // Find matching sub-unit from project if available
-      const subUnit = project?.sub_units?.find(s => s.sub_unit_name === actionItem.sub_unit_name || s.merchant_id === actionItem.merchant_id);
-      await base44.entities.Dispute.create({
-        case_id: actionItem.case_id,
-        project_id: projId,
-        business_unit: project?.name || actionItem.business_unit,
-        sub_unit_name: actionItem.sub_unit_name || subUnit?.sub_unit_name,
-        case_type: actionItem.case_type,
-        arn_number: actionItem.arn_number,
-        reason_code: actionItem.reason_code,
-        reason_category: actionItem.reason_category,
-        transaction_date: actionItem.transaction_date,
-        transaction_amount: actionItem.transaction_amount,
-        transaction_currency: actionItem.currency,
-        chargeback_date: actionItem.chargeback_date,
-        chargeback_amount: actionItem.chargeback_amount,
-        chargeback_currency: actionItem.currency,
-        sla_deadline: actionItem.due_date,
-        processor: actionItem.processor || subUnit?.processor,
-        card_network: actionItem.card_network,
-        card_type: actionItem.card_type,
-        card_bin_first6: actionItem.bin_first6,
-        card_last4: actionItem.bin_last4,
-        merchant_id: actionItem.merchant_id || subUnit?.merchant_id,
-        dba_name: subUnit?.dba_name,
-        assigned_to: analyst,
-        status: "new",
-      });
-      await base44.entities.InventoryItem.update(actionItem.id, { status: "converted" });
-    }
+    const analyst = assignedTo || undefined;
+    const project = projects.find(p => p.id === projId);
+    // Find matching sub-unit from project if available
+    const subUnit = project?.sub_units?.find(s => s.sub_unit_name === actionItem.sub_unit_name || s.merchant_id === actionItem.merchant_id);
+
+    // Create dispute automatically
+    await base44.entities.Dispute.create({
+      case_id: actionItem.case_id,
+      project_id: projId,
+      business_unit: project?.name || actionItem.business_unit,
+      sub_unit_name: actionItem.sub_unit_name || subUnit?.sub_unit_name,
+      case_type: actionItem.case_type,
+      arn_number: actionItem.arn_number,
+      reason_code: actionItem.reason_code,
+      reason_category: actionItem.reason_category,
+      transaction_date: actionItem.transaction_date,
+      transaction_amount: actionItem.transaction_amount,
+      transaction_currency: actionItem.currency,
+      chargeback_date: actionItem.chargeback_date,
+      chargeback_amount: actionItem.chargeback_amount,
+      chargeback_currency: actionItem.currency,
+      sla_deadline: actionItem.due_date,
+      processor: actionItem.processor || subUnit?.processor,
+      card_network: actionItem.card_network,
+      card_type: actionItem.card_type,
+      card_bin_first6: actionItem.bin_first6,
+      card_last4: actionItem.bin_last4,
+      merchant_id: actionItem.merchant_id || subUnit?.merchant_id,
+      dba_name: subUnit?.dba_name,
+      assigned_to: analyst,
+      status: "new",
+    });
+
+    // Update inventory to converted
+    await base44.entities.InventoryItem.update(actionItem.id, { status: "converted" });
+
     setSaving(false);
     setActionItem(null);
     setActionType(null);
