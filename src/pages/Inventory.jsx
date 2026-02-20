@@ -234,8 +234,14 @@ export default function Inventory() {
                   return (
                     <tr key={i.id} className="border-b border-slate-50 hover:bg-slate-50 transition-colors">
                       <td className="px-4 py-3 font-medium text-slate-800 whitespace-nowrap">{i.case_id}</td>
+                      <td className="px-4 py-3 text-slate-600 text-xs whitespace-nowrap">{i.case_type || "—"}</td>
+                      <td className="px-4 py-3 text-slate-500 text-xs font-mono">{i.arn_number || "—"}</td>
+                      <td className="px-4 py-3">
+                        <div className="text-xs"><span className="font-medium text-slate-700">{i.reason_code || "—"}</span>{i.reason_category && <span className="block text-slate-400 text-[11px]">{i.reason_category}</span>}</div>
+                      </td>
                       <td className="px-4 py-3 text-slate-600 text-xs whitespace-nowrap">{proj?.name || <span className="text-slate-300 italic">Unassigned</span>}</td>
                       <td className="px-4 py-3 text-slate-500 text-xs">{i.sub_unit_name || "—"}</td>
+                      <td className="px-4 py-3 text-slate-500 text-xs font-mono">{i.merchant_id || "—"}</td>
                       <td className="px-4 py-3">
                         <Badge className={`${statusColors[i.status] || "bg-slate-100 text-slate-700"} text-xs border-0`}>{i.status}</Badge>
                       </td>
@@ -245,10 +251,17 @@ export default function Inventory() {
                           <Badge className={`${networkColors[i.card_network] || "bg-slate-100 text-slate-700"} text-xs border-0`}>{i.card_network}</Badge>
                         ) : <span className="text-slate-300">—</span>}
                       </td>
-                      <td className="px-4 py-3 text-slate-600 text-xs">{i.processor || "—"}</td>
-                      <td className="px-4 py-3 text-slate-600 text-xs whitespace-nowrap">{i.currency} {i.chargeback_amount?.toLocaleString() || "—"}</td>
+                      <td className="px-4 py-3 text-slate-500 text-xs">{i.card_type || "—"}</td>
+                      <td className="px-4 py-3 text-slate-500 text-xs font-mono">{i.bin_first6 ? `${i.bin_first6}••••${i.bin_last4}` : "—"}</td>
+                      <td className="px-4 py-3 text-slate-700 text-xs font-medium whitespace-nowrap">{i.chargeback_amount?.toLocaleString() || "—"}</td>
+                      <td className="px-4 py-3 text-slate-500 text-xs">{i.currency || "—"}</td>
                       <td className="px-4 py-3 text-slate-500 text-xs whitespace-nowrap">{i.chargeback_date || "—"}</td>
-                      <td className="px-4 py-3 text-slate-500 text-xs whitespace-nowrap">{i.due_date || "—"}</td>
+                      <td className="px-4 py-3 text-slate-500 text-xs whitespace-nowrap">{i.transaction_date || "—"}</td>
+                      <td className="px-4 py-3">
+                        {i.due_date ? (
+                          <span className={`text-xs font-medium ${new Date(i.due_date) < new Date() ? "text-red-500" : new Date(i.due_date) < new Date(Date.now() + 3*86400000) ? "text-amber-600" : "text-slate-500"}`}>{i.due_date}</span>
+                        ) : "—"}
+                      </td>
                       <td className="px-4 py-3">
                         <div className="flex gap-1">
                           {i.status === "received" && (
