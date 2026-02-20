@@ -237,29 +237,43 @@ function CoverLetterEditor({ form, setForm, reasonCodes, uploading, setUploading
   );
 }
 
+const RC_GROUPINGS = [
+  "Authorization","Cancelled Recurring","Cancelled Services","Credit Not Processed",
+  "Duplicate Processing","Fraudulent Transaction","Incorrect Amount","Invalid Data",
+  "Late Presentment","Not As Described","Others","Paid By Other Means","Pre-Arbitration",
+  "Retrieval Request","Services Not Provided","Arbitration"
+];
+
 export default function CoverLetterManager() {
   const [records, setRecords] = useState([]);
-  const [reasonCodes, setReasonCodes] = useState([]);
+  const [customFields, setCustomFields] = useState([]);
+  const [evidenceTypes, setEvidenceTypes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [form, setForm] = useState({
-    name: "", content: "", file_url: "", reason_codes: [], status: "active"
+    name: "", content: "", file_url: "", reason_code_grouping: "",
+    assigned_custom_fields: [], assigned_evidence_types: [], status: "active"
   });
 
   const load = () => Promise.all([
     base44.entities.CoverLetterTemplate.list(),
-    base44.entities.ReasonCode.filter({ status: "active" }),
-  ]).then(([cl, rc]) => {
+    base44.entities.CustomField.filter({ status: "active" }),
+    base44.entities.EvidenceType.filter({ status: "active" }),
+  ]).then(([cl, cf, et]) => {
     setRecords(cl);
-    setReasonCodes(rc);
+    setCustomFields(cf);
+    setEvidenceTypes(et);
     setLoading(false);
   }).catch(() => setLoading(false));
 
   useEffect(() => { load(); }, []);
 
-  const resetForm = () => setForm({ name: "", content: "", file_url: "", reason_codes: [], status: "active" });
+  const resetForm = () => setForm({
+    name: "", content: "", file_url: "", reason_code_grouping: "",
+    assigned_custom_fields: [], assigned_evidence_types: [], status: "active"
+  });
 
   const save = async () => {
     if (editId) await base44.entities.CoverLetterTemplate.update(editId, form);
@@ -275,17 +289,19 @@ export default function CoverLetterManager() {
       name: r.name || "",
       content: r.content || "",
       file_url: r.file_url || "",
-      reason_codes: r.reason_codes || [],
+      reason_code_grouping: r.reason_code_grouping || "",
+      assigned_custom_fields: r.assigned_custom_fields || [],
+      assigned_evidence_types: r.assigned_evidence_types || [],
       status: r.status || "active",
     });
     setEditId(r.id);
     setShowForm(true);
   };
 
-  const toggleReasonCode = (code) => {
+  const toggleItem = (field, id) => {
     setForm(f => {
-      const arr = f.reason_codes || [];
-      return { ...f, reason_codes: arr.includes(code) ? arr.filter(x => x !== code) : [...arr, code] };
+      const arr = f[field] || [];
+      return { ...f, [field]: arr.includes(id) ? arr.filter(x => x !== id) : [...arr, id] };
     });
   };
 
