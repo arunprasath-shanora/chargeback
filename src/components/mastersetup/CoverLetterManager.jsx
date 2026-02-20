@@ -391,10 +391,7 @@ export default function CoverLetterManager() {
             <div className="grid grid-cols-1 lg:grid-cols-[200px_1fr_200px] gap-4" style={{ minHeight: "460px" }}>
               <EvidencePanel
                 evidenceTypes={evidenceTypes}
-                customFields={customFields}
-                form={form}
                 onInsert={(tag) => insertRef.current && insertRef.current(tag)}
-                toggleItem={toggleItem}
               />
               <TemplateEditor
                 form={form}
