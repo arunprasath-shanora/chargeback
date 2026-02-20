@@ -219,7 +219,7 @@ export default function Inventory() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-100 bg-slate-50">
-                  {["Case ID","Project","Sub Unit","Status","Source","Card Network","Processor","CB Amount","CB Date","Due Date","Actions"].map(h => (
+                  {["Case ID","Case Type","ARN","Reason Code","Project","Sub Unit","MID","Status","Source","Card Network","Card Type","BIN","CB Amount","Currency","CB Date","Txn Date","Due Date","Actions"].map(h => (
                     <th key={h} className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase tracking-wide whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
