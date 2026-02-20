@@ -24,9 +24,28 @@ const navItems = [
 export default function Layout({ children, currentPageName }) {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [accessDenied, setAccessDenied] = useState(false);
 
-  const handleLogout = () => base44.auth.logout();
+  useEffect(() => {
+    base44.auth.me().then(u => {
+      setCurrentUser(u);
+      if (u && !canAccessPage(u.role, currentPageName)) {
+        setAccessDenied(true);
+        auditLog({ action: "view", resource_type: currentPageName, status: "denied", details: `Role ${u.role} attempted to access ${currentPageName}` });
+      } else {
+        setAccessDenied(false);
+      }
+    }).catch(() => {});
+  }, [currentPageName]);
+
+  const handleLogout = () => {
+    auditLog({ action: "logout", resource_type: "Session" });
+    base44.auth.logout();
+  };
   const currentNav = navItems.find(n => n.page === currentPageName);
+  const allowedPages = currentUser ? getAllowedPages(currentUser.role) : navItems.map(n => n.page);
+  const visibleNavItems = navItems.filter(n => allowedPages.includes(n.page));
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
