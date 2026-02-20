@@ -149,9 +149,15 @@ export default function Users() {
     setShowPwdModal(true);
   };
 
+  const [resetPwdErrors, setResetPwdErrors] = useState([]);
+
   const handleResetPwd = async () => {
+    const errors = validatePassword(newPwd);
+    if (errors.length > 0) { setResetPwdErrors(errors); return; }
+    setResetPwdErrors([]);
     setSaving(true);
     await base44.entities.User.update(pwdTarget.id, { temp_password: newPwd, must_change_password: true });
+    await auditLog({ action: "password_reset", resource_type: "User", resource_id: pwdTarget.id, details: `Password reset for ${pwdTarget.email}` });
     setSaving(false);
     setShowPwdModal(false);
     load();
