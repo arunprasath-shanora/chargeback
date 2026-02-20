@@ -318,19 +318,33 @@ export default function Inventory() {
             <p className="text-sm text-slate-500">Case ID: <span className="font-medium text-slate-800">{actionItem?.case_id}</span></p>
             <div className="space-y-1">
               <Label className="text-xs">Active Project</Label>
-              <Select value={selectedProject} onValueChange={setSelectedProject}>
+              <Select value={selectedProject} onValueChange={handleProjectChange}>
                 <SelectTrigger><SelectValue placeholder="Select active project..." /></SelectTrigger>
                 <SelectContent>
                   {activeProjects.map(p => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
-            {actionType === "convert" && (
-              <div className="space-y-1">
-                <Label className="text-xs">Assign To (optional)</Label>
-                <Input placeholder="Analyst email..." value={assignedTo} onChange={e => setAssignedTo(e.target.value)} />
-              </div>
-            )}
+            <div className="space-y-1">
+              <Label className="text-xs">Assign to Analyst {actionType === "assign" ? "" : "(optional)"}</Label>
+              {projectUsers.length > 0 ? (
+                <Select value={assignedTo} onValueChange={setAssignedTo}>
+                  <SelectTrigger><SelectValue placeholder="Select analyst..." /></SelectTrigger>
+                  <SelectContent>
+                    {actionType === "convert" && <SelectItem value="__none__">— Unassigned —</SelectItem>}
+                    {projectUsers.map(u => (
+                      <SelectItem key={u.email} value={u.email}>
+                        {u.full_name ? `${u.full_name} (${u.email})` : u.email}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <p className="text-xs text-slate-400 italic py-1.5">
+                  {selectedProject ? "No analysts assigned to this project. Add users in Project Settings." : "Select a project first."}
+                </p>
+              )}
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => { setActionItem(null); setActionType(null); }}>Cancel</Button>
