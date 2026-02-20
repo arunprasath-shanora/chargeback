@@ -346,7 +346,7 @@ export default function Inventory() {
           <DialogFooter>
             <Button variant="outline" onClick={() => { setActionItem(null); setActionType(null); }}>Cancel</Button>
             <Button className="bg-[#0D50B8] hover:bg-[#0a3d8f]" onClick={handleAction} disabled={saving}>
-              {saving ? "Saving..." : actionType === "assign" ? "Assign" : "Convert to Dispute"}
+              {saving ? "Converting..." : "Assign & Convert"}
             </Button>
           </DialogFooter>
         </DialogContent>
