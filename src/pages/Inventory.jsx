@@ -79,11 +79,29 @@ export default function Inventory() {
   const counts = { received: 0, assigned: 0, converted: 0, expired: 0 };
   items.forEach(i => { if (counts[i.status] !== undefined) counts[i.status]++; });
 
+  const loadProjectUsers = async (projId) => {
+    if (!projId) { setProjectUsers([]); return; }
+    const project = projects.find(p => p.id === projId);
+    const assignedEmails = project?.assigned_users || [];
+    if (assignedEmails.length === 0) { setProjectUsers([]); return; }
+    // Fetch users and filter to those assigned to this project
+    const allUsers = await base44.entities.User.list();
+    setProjectUsers(allUsers.filter(u => assignedEmails.includes(u.email)));
+  };
+
   const openAction = (item, type) => {
     setActionItem(item);
     setActionType(type);
-    setSelectedProject(item.project_id || "");
+    const projId = item.project_id || "";
+    setSelectedProject(projId);
     setAssignedTo("");
+    loadProjectUsers(projId);
+  };
+
+  const handleProjectChange = (projId) => {
+    setSelectedProject(projId);
+    setAssignedTo("");
+    loadProjectUsers(projId);
   };
 
   const handleAction = async () => {
