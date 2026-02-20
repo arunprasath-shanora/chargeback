@@ -226,7 +226,7 @@ export default function Inventory() {
               </thead>
               <tbody>
                 {loading ? (
-                  <tr><td colSpan={11} className="px-4 py-10 text-center text-slate-400">Loading...</td></tr>
+                  <tr><td colSpan={18} className="px-4 py-10 text-center text-slate-400">Loading...</td></tr>
                 ) : filtered.length === 0 ? (
                 <tr><td colSpan={18} className="px-4 py-10 text-center text-slate-400">No inventory items found</td></tr>
                 ) : filtered.map(i => {
