@@ -453,13 +453,17 @@ export default function CoverLetterManager() {
                     <Badge className={r.status === "active" ? "bg-green-100 text-green-800 border-0 text-xs" : "bg-slate-100 text-slate-600 border-0 text-xs"}>{r.status}</Badge>
                     {r.file_url && <Badge className="bg-blue-100 text-blue-800 border-0 text-xs"><FileText className="w-2.5 h-2.5 mr-1 inline" />File attached</Badge>}
                   </div>
-                  {r.reason_codes?.length > 0 && (
-                    <div className="flex flex-wrap gap-1">
-                      {r.reason_codes.map(rc => (
-                        <span key={rc} className="px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded text-[10px] font-mono">{rc}</span>
-                      ))}
-                    </div>
+                  {r.reason_code_grouping && (
+                    <span className="px-2 py-0.5 bg-blue-50 text-[#0D50B8] rounded text-[10px] font-medium">{r.reason_code_grouping}</span>
                   )}
+                  <div className="flex flex-wrap gap-1">
+                    {(r.assigned_custom_fields || []).length > 0 && (
+                      <span className="px-1.5 py-0.5 bg-purple-50 text-purple-700 rounded text-[10px]">{r.assigned_custom_fields.length} custom field(s)</span>
+                    )}
+                    {(r.assigned_evidence_types || []).length > 0 && (
+                      <span className="px-1.5 py-0.5 bg-amber-50 text-amber-700 rounded text-[10px]">{r.assigned_evidence_types.length} evidence type(s)</span>
+                    )}
+                  </div>
                   {r.content && <p className="text-xs text-slate-400 line-clamp-1 font-mono">{r.content.slice(0, 100)}...</p>}
                 </div>
                 <div className="flex gap-1 flex-shrink-0">
