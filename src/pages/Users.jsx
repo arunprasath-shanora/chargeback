@@ -69,6 +69,7 @@ function RoleBadge({ role }) {
 
 export default function Users() {
   const [users, setUsers] = useState([]);
+  const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [filterRole, setFilterRole] = useState("all");
