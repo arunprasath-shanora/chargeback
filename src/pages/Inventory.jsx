@@ -305,11 +305,11 @@ export default function Inventory() {
         </CardContent>
       </Card>
 
-      {/* Assign / Convert Dialog */}
+      {/* Assign & Convert Dialog */}
       <Dialog open={!!actionItem} onOpenChange={() => { setActionItem(null); setActionType(null); }}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>{actionType === "assign" ? "Assign to Project" : "Convert to Dispute"}</DialogTitle>
+            <DialogTitle>Assign to Analyst & Convert to Dispute</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <p className="text-sm text-slate-500">Case ID: <span className="font-medium text-slate-800">{actionItem?.case_id}</span></p>
