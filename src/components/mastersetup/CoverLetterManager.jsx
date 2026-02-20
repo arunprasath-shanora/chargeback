@@ -314,13 +314,6 @@ export default function CoverLetterManager() {
     });
   };
 
-  const toggleItem = (field, id) => {
-    setForm(f => {
-      const arr = f[field] || [];
-      return { ...f, [field]: arr.includes(id) ? arr.filter(x => x !== id) : [...arr, id] };
-    });
-  };
-
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
