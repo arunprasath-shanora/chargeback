@@ -246,8 +246,8 @@ export default function Users() {
               ) : filtered.length === 0 ? (
                 <tr><td colSpan={8} className="px-4 py-8 text-center text-slate-400">No users found</td></tr>
               ) : filtered.map(u => (
-                <tr key={u.id} className="border-b border-slate-50 hover:bg-slate-50">
-                  <td className="px-4 py-3 font-medium text-slate-800 whitespace-nowrap">{u.full_name || "—"}</td>
+                 <tr key={u.id} className="border-b border-slate-50 hover:bg-slate-50 align-top">
+                   <td className="px-4 py-3 font-medium text-slate-800 whitespace-nowrap">{u.full_name || "—"}</td>
                   <td className="px-4 py-3 text-slate-500 font-mono text-xs">{u.user_id || "—"}</td>
                   <td className="px-4 py-3 text-slate-600">{u.email}</td>
                   <td className="px-4 py-3 text-slate-500 text-xs">{u.department || "—"}</td>
