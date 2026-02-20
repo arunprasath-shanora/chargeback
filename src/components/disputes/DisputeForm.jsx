@@ -144,7 +144,7 @@ export default function DisputeForm({ dispute, projects, onSave, onCancel }) {
         </F>
       </SECTION>
 
-      <SECTION title="Chargeback Details">
+      <SECTION title="Chargeback Details (from Processor Portal)">
         <F label="Chargeback Date"><Input type="date" value={form.chargeback_date} onChange={e => set("chargeback_date", e.target.value)} /></F>
         <F label="Chargeback Amount"><Input type="number" value={form.chargeback_amount} onChange={e => set("chargeback_amount", e.target.value)} placeholder="0.00" /></F>
         <F label="Chargeback Currency"><Input value={form.chargeback_currency} onChange={e => set("chargeback_currency", e.target.value)} placeholder="USD" /></F>
