@@ -134,90 +134,50 @@ function FieldPanel({ onInsert }) {
   );
 }
 
-// Left panel: evidence types + custom fields
-function EvidencePanel({ evidenceTypes, customFields, form, onInsert, toggleItem }) {
-  const [openEvidence, setOpenEvidence] = useState(true);
-  const [openFields, setOpenFields] = useState(true);
+// Left panel: evidence types (same style as FieldPanel)
+function EvidencePanel({ evidenceTypes, onInsert }) {
+  const [open, setOpen] = useState(true);
+  const [copied, setCopied] = useState(null);
+
+  const handleCopy = (name) => {
+    navigator.clipboard.writeText(`{{evidence:${name}}}`);
+    setCopied(name);
+    setTimeout(() => setCopied(null), 1500);
+  };
 
   return (
     <div className="border border-slate-200 rounded-lg bg-slate-50 flex flex-col h-full">
-      <div className="px-3 py-2 border-b border-slate-200 bg-white rounded-t-lg">
-        <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Elements</p>
-        <p className="text-[10px] text-slate-400 mt-0.5">Select & insert into template</p>
+      <div className="px-3 py-2 border-b border-slate-200 bg-white rounded-t-lg sticky top-0 z-10">
+        <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Evidence Types</p>
+        <p className="text-[10px] text-slate-400 mt-0.5">Click to insert into template</p>
       </div>
-      <div className="overflow-y-auto flex-1 divide-y divide-slate-200">
-        {/* Evidence Types */}
+      <div className="divide-y divide-slate-200 overflow-y-auto flex-1">
         <div>
           <button
-            onClick={() => setOpenEvidence(v => !v)}
+            onClick={() => setOpen(v => !v)}
             className="w-full flex items-center justify-between px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition-colors"
           >
             Evidence Types
-            {openEvidence ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+            {open ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
           </button>
-          {openEvidence && (
+          {open && (
             <div className="px-2 pb-2 space-y-1">
               {evidenceTypes.length === 0 ? (
                 <p className="text-[10px] text-slate-400 px-1 py-1">No evidence types configured.</p>
-              ) : evidenceTypes.map(et => {
-                const selected = (form.assigned_evidence_types || []).includes(et.id);
-                return (
-                  <div key={et.id} className="flex items-center gap-1">
-                    <label className="flex items-center gap-1.5 flex-1 min-w-0 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={selected}
-                        onChange={() => toggleItem("assigned_evidence_types", et.id)}
-                        className="accent-[#0D50B8] flex-shrink-0"
-                      />
-                      <span className={`text-xs truncate ${selected ? "text-[#0D50B8] font-medium" : "text-slate-600"}`}>{et.name}</span>
-                    </label>
-                    <button
-                      onClick={() => onInsert && onInsert(`{{evidence:${et.name}}}`)}
-                      className="flex-shrink-0 px-1.5 py-0.5 rounded text-[10px] bg-white border border-slate-200 hover:border-[#0D50B8] hover:text-[#0D50B8] transition-colors font-mono"
-                      title="Insert tag"
-                    >+</button>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        {/* Custom Fields */}
-        <div>
-          <button
-            onClick={() => setOpenFields(v => !v)}
-            className="w-full flex items-center justify-between px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition-colors"
-          >
-            Custom Fields
-            {openFields ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-          </button>
-          {openFields && (
-            <div className="px-2 pb-2 space-y-1">
-              {customFields.length === 0 ? (
-                <p className="text-[10px] text-slate-400 px-1 py-1">No custom fields configured.</p>
-              ) : customFields.map(cf => {
-                const selected = (form.assigned_custom_fields || []).includes(cf.id);
-                return (
-                  <div key={cf.id} className="flex items-center gap-1">
-                    <label className="flex items-center gap-1.5 flex-1 min-w-0 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={selected}
-                        onChange={() => toggleItem("assigned_custom_fields", cf.id)}
-                        className="accent-[#0D50B8] flex-shrink-0"
-                      />
-                      <span className={`text-xs truncate ${selected ? "text-[#0D50B8] font-medium" : "text-slate-600"}`}>{cf.field_name}</span>
-                    </label>
-                    <button
-                      onClick={() => onInsert && onInsert(`{{custom:${cf.field_key || cf.field_name}}}`)}
-                      className="flex-shrink-0 px-1.5 py-0.5 rounded text-[10px] bg-white border border-slate-200 hover:border-[#0D50B8] hover:text-[#0D50B8] transition-colors font-mono"
-                      title="Insert tag"
-                    >+</button>
-                  </div>
-                );
-              })}
+              ) : evidenceTypes.map(et => (
+                <div key={et.id} className="flex items-center gap-1">
+                  <button
+                    onClick={() => onInsert && onInsert(`{{evidence:${et.name}}}`)}
+                    className="flex-1 text-left px-2 py-1 rounded text-xs bg-white border border-slate-200 hover:border-[#0D50B8] hover:text-[#0D50B8] transition-colors font-mono truncate"
+                    title={`Insert {{evidence:${et.name}}}`}
+                  >
+                    {`{{evidence:${et.name}}}`}
+                  </button>
+                  <button onClick={() => handleCopy(et.name)} className="flex-shrink-0 p-1 rounded hover:bg-slate-200 transition-colors">
+                    {copied === et.name ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3 text-slate-400" />}
+                  </button>
+                </div>
+              ))}
             </div>
           )}
         </div>
