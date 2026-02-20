@@ -46,6 +46,7 @@ export default function Inventory() {
   const [selectedProject, setSelectedProject] = useState("");
   const [assignedTo, setAssignedTo] = useState("");
   const [saving, setSaving] = useState(false);
+  const [projectUsers, setProjectUsers] = useState([]); // analysts for selected project
 
   const load = () => {
     Promise.all([
