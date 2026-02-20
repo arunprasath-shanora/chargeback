@@ -19,6 +19,7 @@ const navItems = [
   { label: "Master Setup",icon: Settings,         page: "MasterSetup" },
   { label: "Reports",     icon: BookOpen,         page: "Reports" },
   { label: "Users",       icon: Users,            page: "Users" },
+  { label: "Audit Log",   icon: ShieldCheck,      page: "AuditLog" },
 ];
 
 export default function Layout({ children, currentPageName }) {
