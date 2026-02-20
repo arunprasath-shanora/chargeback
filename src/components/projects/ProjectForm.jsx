@@ -459,6 +459,7 @@ export default function ProjectForm({ project, onSave, onCancel }) {
           <TabsTrigger value="portal" className="text-xs">Portal Credentials</TabsTrigger>
           <TabsTrigger value="assignments" className="text-xs">Assignments</TabsTrigger>
           <TabsTrigger value="cover_letters" className="text-xs">Cover Letters</TabsTrigger>
+          <TabsTrigger value="inventory_automation" className="text-xs">Inventory Automation</TabsTrigger>
           <TabsTrigger value="notes" className="text-xs">Notes</TabsTrigger>
         </TabsList>
 
