@@ -174,9 +174,23 @@ function TemplateEditor({ form, setForm, uploading, setUploading, textareaRef })
           <button onClick={() => setForm(f => ({ ...f, file_url: "" }))} className="text-slate-400 hover:text-slate-600"><X className="w-3.5 h-3.5" /></button>
         </div>
       )}
+      {/* Formatting toolbar */}
+      <div className="flex items-center gap-1 px-2 py-1.5 border border-b-0 border-slate-200 rounded-t-md bg-slate-50">
+        <button type="button" title="Bold — wraps selection with **...**" onClick={() => wrapSelection("**", "**")} className="p-1.5 rounded hover:bg-slate-200 text-slate-600 transition-colors">
+          <Bold className="w-3.5 h-3.5" />
+        </button>
+        <button type="button" title="Italic — wraps selection with _..._" onClick={() => wrapSelection("_", "_")} className="p-1.5 rounded hover:bg-slate-200 text-slate-600 transition-colors">
+          <Italic className="w-3.5 h-3.5" />
+        </button>
+        <button type="button" title="Underline — wraps selection with __...__" onClick={() => wrapSelection("__", "__")} className="p-1.5 rounded hover:bg-slate-200 text-slate-600 transition-colors">
+          <Underline className="w-3.5 h-3.5" />
+        </button>
+        <div className="w-px h-4 bg-slate-300 mx-1" />
+        <span className="text-[10px] text-slate-400">Select text then click a format button</span>
+      </div>
       <textarea
         ref={textareaRef}
-        className="w-full border border-slate-200 rounded-md px-3 py-2 text-sm min-h-[360px] focus:outline-none focus:ring-1 focus:ring-[#0D50B8] resize-y font-mono leading-relaxed"
+        className="w-full border border-slate-200 rounded-b-md px-3 py-2 text-sm min-h-[360px] focus:outline-none focus:ring-1 focus:ring-[#0D50B8] resize-y font-mono leading-relaxed rounded-t-none"
         placeholder={"Dear Sir/Madam,\n\nCase ID: {{case_id}}\nDispute Date: {{dispute_date}}\nAmount: {{dispute_currency}} {{dispute_amount}}\n\nEvidence: {{evidence:Invoice}}\n\n..."}
         value={form.content || ""}
         onChange={e => setForm(f => ({ ...f, content: e.target.value }))}
