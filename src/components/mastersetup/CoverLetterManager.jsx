@@ -429,9 +429,6 @@ export default function CoverLetterManager() {
                     </div>
                   )}
                   <div className="flex flex-wrap gap-1">
-                    {(r.assigned_custom_fields || []).length > 0 && (
-                      <span className="px-1.5 py-0.5 bg-purple-50 text-purple-700 rounded text-[10px]">{r.assigned_custom_fields.length} custom field(s)</span>
-                    )}
                     {(r.assigned_evidence_types || []).length > 0 && (
                       <span className="px-1.5 py-0.5 bg-amber-50 text-amber-700 rounded text-[10px]">{r.assigned_evidence_types.length} evidence type(s)</span>
                     )}
