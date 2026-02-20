@@ -259,7 +259,6 @@ function TemplateEditor({ form, setForm, uploading, setUploading, onInsertRef })
 
 export default function CoverLetterManager() {
   const [records, setRecords] = useState([]);
-  const [customFields, setCustomFields] = useState([]);
   const [evidenceTypes, setEvidenceTypes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
