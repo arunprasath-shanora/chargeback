@@ -7,13 +7,23 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Search, Plus, ArrowRightLeft } from "lucide-react";
+import { Search, Plus, ArrowRightLeft, Upload, Zap, AlertTriangle, RefreshCw } from "lucide-react";
+import InventoryUploadModal from "@/components/inventory/InventoryUploadModal";
+import InventoryAddModal from "@/components/inventory/InventoryAddModal";
+import ApiInfoModal from "@/components/inventory/ApiInfoModal";
 
 const statusColors = {
-  received: "bg-yellow-100 text-yellow-800",
-  assigned: "bg-blue-100 text-blue-800",
+  received:  "bg-yellow-100 text-yellow-800",
+  assigned:  "bg-blue-100 text-blue-800",
   converted: "bg-green-100 text-green-800",
-  expired: "bg-red-100 text-red-800",
+  expired:   "bg-red-100 text-red-800",
+};
+
+const networkColors = {
+  Visa:               "bg-blue-100 text-blue-800",
+  Mastercard:         "bg-orange-100 text-orange-800",
+  "American Express": "bg-sky-100 text-sky-800",
+  Discover:           "bg-amber-100 text-amber-800",
 };
 
 export default function Inventory() {
@@ -22,16 +32,25 @@ export default function Inventory() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [actionItem, setActionItem] = useState(null); // item being assigned/converted
-  const [actionType, setActionType] = useState(null); // 'assign' or 'convert'
+  const [projectFilter, setProjectFilter] = useState("all");
+  const [networkFilter, setNetworkFilter] = useState("all");
+
+  // Modals
+  const [showUpload, setShowUpload] = useState(false);
+  const [showAdd, setShowAdd] = useState(false);
+  const [showApi, setShowApi] = useState(false);
+
+  // Assign / Convert dialog
+  const [actionItem, setActionItem] = useState(null);
+  const [actionType, setActionType] = useState(null);
   const [selectedProject, setSelectedProject] = useState("");
   const [assignedTo, setAssignedTo] = useState("");
   const [saving, setSaving] = useState(false);
 
   const load = () => {
     Promise.all([
-      base44.entities.InventoryItem.list("-created_date", 200),
-      base44.entities.Project.list(),
+      base44.entities.InventoryItem.list("-created_date", 500),
+      base44.entities.Project.filter({ status: "active" }),
     ]).then(([d, p]) => {
       setItems(d);
       setProjects(p);
@@ -42,13 +61,22 @@ export default function Inventory() {
   useEffect(() => { load(); }, []);
 
   const filtered = items.filter(i => {
+    const q = search.toLowerCase();
     const matchSearch = !search ||
-      i.case_id?.toLowerCase().includes(search.toLowerCase()) ||
-      i.reason_code?.toLowerCase().includes(search.toLowerCase()) ||
-      i.business_unit?.toLowerCase().includes(search.toLowerCase());
+      i.case_id?.toLowerCase().includes(q) ||
+      i.reason_code?.toLowerCase().includes(q) ||
+      i.arn_number?.toLowerCase().includes(q) ||
+      i.processor?.toLowerCase().includes(q) ||
+      i.sub_unit_name?.toLowerCase().includes(q);
     const matchStatus = statusFilter === "all" || i.status === statusFilter;
-    return matchSearch && matchStatus;
+    const matchProject = projectFilter === "all" || i.project_id === projectFilter;
+    const matchNetwork = networkFilter === "all" || i.card_network === networkFilter;
+    return matchSearch && matchStatus && matchProject && matchNetwork;
   });
+
+  // Summary counts
+  const counts = { received: 0, assigned: 0, converted: 0, expired: 0 };
+  items.forEach(i => { if (counts[i.status] !== undefined) counts[i.status]++; });
 
   const openAction = (item, type) => {
     setActionItem(item);
@@ -59,19 +87,18 @@ export default function Inventory() {
 
   const handleAction = async () => {
     setSaving(true);
+    const projId = selectedProject || actionItem.project_id;
     if (actionType === "assign") {
-      await base44.entities.InventoryItem.update(actionItem.id, {
-        status: "assigned",
-        project_id: selectedProject || actionItem.project_id,
-      });
+      await base44.entities.InventoryItem.update(actionItem.id, { status: "assigned", project_id: projId });
     } else if (actionType === "convert") {
-      // Create a dispute from this inventory item
-      const project = projects.find(p => p.id === (selectedProject || actionItem.project_id));
+      const project = projects.find(p => p.id === projId);
+      // Find matching sub-unit from project if available
+      const subUnit = project?.sub_units?.find(s => s.sub_unit_name === actionItem.sub_unit_name || s.merchant_id === actionItem.merchant_id);
       await base44.entities.Dispute.create({
         case_id: actionItem.case_id,
-        project_id: selectedProject || actionItem.project_id,
+        project_id: projId,
         business_unit: project?.name || actionItem.business_unit,
-        sub_unit_name: actionItem.sub_unit_name,
+        sub_unit_name: actionItem.sub_unit_name || subUnit?.sub_unit_name,
         case_type: actionItem.case_type,
         arn_number: actionItem.arn_number,
         reason_code: actionItem.reason_code,
@@ -83,10 +110,12 @@ export default function Inventory() {
         dispute_amount: actionItem.chargeback_amount,
         dispute_currency: actionItem.currency,
         sla_deadline: actionItem.due_date,
-        processor: actionItem.processor,
-        card_type: actionItem.card_type,
+        processor: actionItem.processor || subUnit?.processor,
+        card_type: actionItem.card_network || actionItem.card_type,
         card_bin_first6: actionItem.bin_first6,
         card_last4: actionItem.bin_last4,
+        merchant_id: actionItem.merchant_id || subUnit?.merchant_id,
+        dba_name: subUnit?.dba_name,
         assigned_to: assignedTo || undefined,
         status: "new",
       });
@@ -98,22 +127,81 @@ export default function Inventory() {
     load();
   };
 
+  const activeProjects = projects; // already filtered to active on load
+
   return (
     <div className="p-6 space-y-5">
-      <div className="flex items-center justify-between">
+      {/* Header */}
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">Inventory</h1>
-          <p className="text-slate-500 text-sm mt-1">Incoming chargeback inventory</p>
+          <p className="text-slate-500 text-sm mt-0.5">Incoming chargeback inventory — linked to active projects only</p>
+        </div>
+        <div className="flex gap-2 flex-wrap">
+          <Button size="sm" variant="outline" onClick={() => setShowApi(true)} className="gap-1.5 text-xs">
+            <Zap className="w-3.5 h-3.5" /> API / Automation
+          </Button>
+          <Button size="sm" variant="outline" onClick={() => setShowUpload(true)} className="gap-1.5 text-xs">
+            <Upload className="w-3.5 h-3.5" /> Bulk Upload
+          </Button>
+          <Button size="sm" className="bg-[#0D50B8] hover:bg-[#0a3d8f] gap-1.5 text-xs" onClick={() => setShowAdd(true)}>
+            <Plus className="w-3.5 h-3.5" /> Add Manual
+          </Button>
+          <Button size="sm" variant="ghost" onClick={load} className="gap-1.5 text-xs text-slate-500">
+            <RefreshCw className="w-3.5 h-3.5" />
+          </Button>
         </div>
       </div>
 
-      <div className="flex gap-3 flex-wrap">
-        <div className="relative flex-1 min-w-[200px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-          <Input className="pl-9" placeholder="Search inventory..." value={search} onChange={e => setSearch(e.target.value)} />
+      {/* Summary chips */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {[
+          { label: "Received",  key: "received",  color: "bg-yellow-50 border-yellow-200 text-yellow-800" },
+          { label: "Assigned",  key: "assigned",  color: "bg-blue-50 border-blue-200 text-blue-800" },
+          { label: "Converted", key: "converted", color: "bg-green-50 border-green-200 text-green-800" },
+          { label: "Expired",   key: "expired",   color: "bg-red-50 border-red-200 text-red-800" },
+        ].map(({ label, key, color }) => (
+          <button
+            key={key}
+            onClick={() => setStatusFilter(statusFilter === key ? "all" : key)}
+            className={`stat-chip border rounded-xl px-4 py-3 text-left transition-all ${statusFilter === key ? color + " ring-2 ring-offset-1 ring-current/30" : "border-slate-200 hover:border-slate-300"}`}
+          >
+            <p className="text-2xl font-bold">{counts[key]}</p>
+            <p className="text-xs font-medium mt-0.5 text-slate-500">{label}</p>
+          </button>
+        ))}
+      </div>
+
+      {/* No active projects warning */}
+      {!loading && activeProjects.length === 0 && (
+        <div className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800">
+          <AlertTriangle className="w-5 h-5 flex-shrink-0" />
+          <span>No active projects found. Please activate a project first — inventory items must be linked to an active project.</span>
         </div>
+      )}
+
+      {/* Filters */}
+      <div className="flex gap-3 flex-wrap">
+        <div className="relative flex-1 min-w-[180px]">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Input className="pl-9" placeholder="Search case ID, ARN, processor..." value={search} onChange={e => setSearch(e.target.value)} />
+        </div>
+        <Select value={projectFilter} onValueChange={setProjectFilter}>
+          <SelectTrigger className="w-44"><SelectValue placeholder="All Projects" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Projects</SelectItem>
+            {activeProjects.map(p => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
+          </SelectContent>
+        </Select>
+        <Select value={networkFilter} onValueChange={setNetworkFilter}>
+          <SelectTrigger className="w-44"><SelectValue placeholder="Card Network" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Networks</SelectItem>
+            {["Visa","Mastercard","American Express","Discover","Other"].map(n => <SelectItem key={n} value={n}>{n}</SelectItem>)}
+          </SelectContent>
+        </Select>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-40"><SelectValue placeholder="All Status" /></SelectTrigger>
+          <SelectTrigger className="w-36"><SelectValue placeholder="All Status" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Status</SelectItem>
             <SelectItem value="received">Received</SelectItem>
@@ -124,52 +212,66 @@ export default function Inventory() {
         </Select>
       </div>
 
+      {/* Table */}
       <Card className="border-slate-100">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-100 bg-slate-50">
-                  {["Case ID", "Status", "Source", "Processor", "CB Amount", "CB Date", "Due Date", "Actions"].map(h => (
+                  {["Case ID","Project","Sub Unit","Status","Source","Card Network","Processor","CB Amount","CB Date","Due Date","Actions"].map(h => (
                     <th key={h} className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase tracking-wide whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {loading ? (
-                  <tr><td colSpan={8} className="px-4 py-10 text-center text-slate-400">Loading...</td></tr>
+                  <tr><td colSpan={11} className="px-4 py-10 text-center text-slate-400">Loading...</td></tr>
                 ) : filtered.length === 0 ? (
-                  <tr><td colSpan={8} className="px-4 py-10 text-center text-slate-400">No inventory items found</td></tr>
-                ) : filtered.map(i => (
-                  <tr key={i.id} className="border-b border-slate-50 hover:bg-slate-50 transition-colors">
-                    <td className="px-4 py-3 font-medium text-slate-800">{i.case_id}</td>
-                    <td className="px-4 py-3">
-                      <Badge className={`${statusColors[i.status] || "bg-slate-100 text-slate-700"} text-xs border-0`}>{i.status}</Badge>
-                    </td>
-                    <td className="px-4 py-3 text-slate-600">{i.source || "—"}</td>
-                    <td className="px-4 py-3 text-slate-600">{i.processor || "—"}</td>
-                    <td className="px-4 py-3 text-slate-600">{i.currency} {i.chargeback_amount?.toLocaleString() || "—"}</td>
-                    <td className="px-4 py-3 text-slate-500">{i.chargeback_date || "—"}</td>
-                    <td className="px-4 py-3 text-slate-500">{i.due_date || "—"}</td>
-                    <td className="px-4 py-3">
-                      <div className="flex gap-1">
-                        {i.status === "received" && (
-                          <Button size="sm" variant="outline" className="h-7 text-xs px-2" onClick={() => openAction(i, "assign")}>
-                            Assign
-                          </Button>
-                        )}
-                        {(i.status === "received" || i.status === "assigned") && (
-                          <Button size="sm" className="h-7 text-xs px-2 bg-[#0D50B8] hover:bg-[#0a3d8f]" onClick={() => openAction(i, "convert")}>
-                            <ArrowRightLeft className="w-3 h-3 mr-1" /> Convert
-                          </Button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                  <tr><td colSpan={11} className="px-4 py-10 text-center text-slate-400">No inventory items found</td></tr>
+                ) : filtered.map(i => {
+                  const proj = activeProjects.find(p => p.id === i.project_id);
+                  return (
+                    <tr key={i.id} className="border-b border-slate-50 hover:bg-slate-50 transition-colors">
+                      <td className="px-4 py-3 font-medium text-slate-800 whitespace-nowrap">{i.case_id}</td>
+                      <td className="px-4 py-3 text-slate-600 text-xs whitespace-nowrap">{proj?.name || <span className="text-slate-300 italic">Unassigned</span>}</td>
+                      <td className="px-4 py-3 text-slate-500 text-xs">{i.sub_unit_name || "—"}</td>
+                      <td className="px-4 py-3">
+                        <Badge className={`${statusColors[i.status] || "bg-slate-100 text-slate-700"} text-xs border-0`}>{i.status}</Badge>
+                      </td>
+                      <td className="px-4 py-3 text-slate-500 text-xs">{i.source || "—"}</td>
+                      <td className="px-4 py-3">
+                        {i.card_network ? (
+                          <Badge className={`${networkColors[i.card_network] || "bg-slate-100 text-slate-700"} text-xs border-0`}>{i.card_network}</Badge>
+                        ) : <span className="text-slate-300">—</span>}
+                      </td>
+                      <td className="px-4 py-3 text-slate-600 text-xs">{i.processor || "—"}</td>
+                      <td className="px-4 py-3 text-slate-600 text-xs whitespace-nowrap">{i.currency} {i.chargeback_amount?.toLocaleString() || "—"}</td>
+                      <td className="px-4 py-3 text-slate-500 text-xs whitespace-nowrap">{i.chargeback_date || "—"}</td>
+                      <td className="px-4 py-3 text-slate-500 text-xs whitespace-nowrap">{i.due_date || "—"}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex gap-1">
+                          {i.status === "received" && (
+                            <Button size="sm" variant="outline" className="h-7 text-xs px-2" onClick={() => openAction(i, "assign")}>Assign</Button>
+                          )}
+                          {(i.status === "received" || i.status === "assigned") && (
+                            <Button size="sm" className="h-7 text-xs px-2 bg-[#0D50B8] hover:bg-[#0a3d8f]" onClick={() => openAction(i, "convert")}>
+                              <ArrowRightLeft className="w-3 h-3 mr-1" /> Convert
+                            </Button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
+          {filtered.length > 0 && (
+            <div className="px-4 py-2.5 border-t border-slate-100 text-xs text-slate-400">
+              Showing {filtered.length} of {items.length} items
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -182,11 +284,11 @@ export default function Inventory() {
           <div className="space-y-4 py-2">
             <p className="text-sm text-slate-500">Case ID: <span className="font-medium text-slate-800">{actionItem?.case_id}</span></p>
             <div className="space-y-1">
-              <Label className="text-xs">Project</Label>
+              <Label className="text-xs">Active Project</Label>
               <Select value={selectedProject} onValueChange={setSelectedProject}>
-                <SelectTrigger><SelectValue placeholder="Select project..." /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="Select active project..." /></SelectTrigger>
                 <SelectContent>
-                  {projects.map(p => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
+                  {activeProjects.map(p => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
@@ -205,6 +307,11 @@ export default function Inventory() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Sub-modals */}
+      <InventoryUploadModal open={showUpload} onClose={() => setShowUpload(false)} projects={activeProjects} onSuccess={load} />
+      <InventoryAddModal    open={showAdd}    onClose={() => setShowAdd(false)}    projects={activeProjects} onSuccess={load} />
+      <ApiInfoModal         open={showApi}    onClose={() => setShowApi(false)} />
     </div>
   );
 }
