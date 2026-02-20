@@ -5,15 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Plus, Pencil, Trash2, X, Check, Upload, FileText, Copy, ChevronDown, ChevronUp } from "lucide-react";
 
-const RC_GROUPINGS = [
-  "Authorization","Cancelled Recurring","Cancelled Services","Credit Not Processed",
-  "Duplicate Processing","Fraudulent Transaction","Incorrect Amount","Invalid Data",
-  "Late Presentment","Not As Described","Others","Paid By Other Means","Pre-Arbitration",
-  "Retrieval Request","Services Not Provided","Arbitration"
-];
-
+// All available dynamic fields grouped by section
 const FIELD_GROUPS = [
   {
     label: "Case Information",
@@ -84,34 +79,27 @@ const FIELD_GROUPS = [
   },
 ];
 
-function FieldPanel({ onInsert, customFields, evidenceTypes }) {
+function FieldPanel({ onInsert }) {
   const [openGroups, setOpenGroups] = useState({ "Case Information": true });
   const [copied, setCopied] = useState(null);
 
   const toggle = (label) => setOpenGroups(g => ({ ...g, [label]: !g[label] }));
 
   const handleCopy = (key) => {
-    navigator.clipboard.writeText(`{{${key}}}`);
+    const tag = `{{${key}}}`;
+    navigator.clipboard.writeText(tag);
     setCopied(key);
     setTimeout(() => setCopied(null), 1500);
   };
-
-  const allGroups = [
-    ...FIELD_GROUPS,
-    ...(customFields.length > 0 ? [{
-      label: "Custom Fields",
-      fields: customFields.map(cf => ({ key: cf.field_key || cf.id, label: cf.field_name }))
-    }] : []),
-  ];
 
   return (
     <div className="border border-slate-200 rounded-lg bg-slate-50 overflow-y-auto max-h-[520px]">
       <div className="px-3 py-2 border-b border-slate-200 bg-white sticky top-0 z-10">
         <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Available Fields</p>
-        <p className="text-[10px] text-slate-400 mt-0.5">Click tag to insert, or copy to clipboard</p>
+        <p className="text-[10px] text-slate-400 mt-0.5">Click field tag to insert, or copy to clipboard</p>
       </div>
       <div className="divide-y divide-slate-200">
-        {allGroups.map(group => (
+        {FIELD_GROUPS.map(group => (
           <div key={group.label}>
             <button
               onClick={() => toggle(group.label)}
@@ -134,6 +122,7 @@ function FieldPanel({ onInsert, customFields, evidenceTypes }) {
                     <button
                       onClick={() => handleCopy(f.key)}
                       className="flex-shrink-0 p-1 rounded hover:bg-slate-200 transition-colors"
+                      title="Copy to clipboard"
                     >
                       {copied === f.key
                         ? <Check className="w-3 h-3 text-green-500" />
@@ -150,28 +139,35 @@ function FieldPanel({ onInsert, customFields, evidenceTypes }) {
   );
 }
 
-function CoverLetterEditor({ form, setForm, customFields, evidenceTypes, uploading, setUploading }) {
+function CoverLetterEditor({ form, setForm, reasonCodes, uploading, setUploading }) {
   const [dragOver, setDragOver] = useState(false);
   const textareaRef = useRef(null);
   const fileInputRef = useRef(null);
 
   const insertAtCursor = (text) => {
     const ta = textareaRef.current;
-    if (!ta) { setForm(f => ({ ...f, content: (f.content || "") + text })); return; }
+    if (!ta) {
+      setForm(f => ({ ...f, content: (f.content || "") + text }));
+      return;
+    }
     const start = ta.selectionStart;
     const end = ta.selectionEnd;
     const current = form.content || "";
     const updated = current.slice(0, start) + text + current.slice(end);
     setForm(f => ({ ...f, content: updated }));
-    setTimeout(() => { ta.focus(); ta.setSelectionRange(start + text.length, start + text.length); }, 0);
+    setTimeout(() => {
+      ta.focus();
+      ta.setSelectionRange(start + text.length, start + text.length);
+    }, 0);
   };
 
   const handleFileDrop = async (file) => {
     if (!file) return;
     setUploading(true);
+    // Read as text for .txt / plain, upload for .docx
     if (file.name.endsWith(".txt")) {
       const text = await file.text();
-      setForm(f => ({ ...f, content: text }));
+      setForm(f => ({ ...f, content: text, file_url: f.file_url }));
     } else {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
       setForm(f => ({ ...f, file_url }));
@@ -179,12 +175,23 @@ function CoverLetterEditor({ form, setForm, customFields, evidenceTypes, uploadi
     setUploading(false);
   };
 
-  const handleDrop = (e) => { e.preventDefault(); setDragOver(false); const file = e.dataTransfer.files[0]; if (file) handleFileDrop(file); };
-  const handleFileInput = (e) => { const file = e.target.files[0]; if (file) handleFileDrop(file); };
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setDragOver(false);
+    const file = e.dataTransfer.files[0];
+    if (file) handleFileDrop(file);
+  };
+
+  const handleFileInput = (e) => {
+    const file = e.target.files[0];
+    if (file) handleFileDrop(file);
+  };
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      {/* Left: editor */}
       <div className="lg:col-span-2 space-y-3">
+        {/* Upload / drag-drop zone */}
         <div
           onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
           onDragLeave={() => setDragOver(false)}
@@ -194,7 +201,9 @@ function CoverLetterEditor({ form, setForm, customFields, evidenceTypes, uploadi
         >
           <input ref={fileInputRef} type="file" accept=".txt,.docx,.doc" className="hidden" onChange={handleFileInput} />
           <Upload className="w-5 h-5 mx-auto mb-1 text-slate-400" />
-          <p className="text-xs text-slate-500">{uploading ? "Uploading..." : "Drag & drop a Word / text file, or click to browse"}</p>
+          <p className="text-xs text-slate-500">
+            {uploading ? "Uploading..." : "Drag & drop a Word / text file, or click to browse"}
+          </p>
           <p className="text-[10px] text-slate-400 mt-0.5">Supported: .txt, .docx, .doc</p>
         </div>
 
@@ -202,113 +211,61 @@ function CoverLetterEditor({ form, setForm, customFields, evidenceTypes, uploadi
           <div className="flex items-center gap-2 px-3 py-2 bg-blue-50 border border-blue-200 rounded-lg">
             <FileText className="w-4 h-4 text-[#0D50B8] flex-shrink-0" />
             <a href={form.file_url} target="_blank" rel="noreferrer" className="text-xs text-[#0D50B8] hover:underline flex-1 truncate">Uploaded file</a>
-            <button onClick={() => setForm(f => ({ ...f, file_url: "" }))}><X className="w-3.5 h-3.5 text-slate-400 hover:text-slate-600" /></button>
+            <button onClick={() => setForm(f => ({ ...f, file_url: "" }))} className="text-slate-400 hover:text-slate-600"><X className="w-3.5 h-3.5" /></button>
           </div>
         )}
 
         <div>
           <label className="text-xs font-medium text-slate-600 mb-1 block">
-            Template Content <span className="text-slate-400 font-normal">(click a field tag on the right to insert)</span>
+            Template Content <span className="text-slate-400 font-normal">(paste or type — click a field tag on the right to insert)</span>
           </label>
           <textarea
             ref={textareaRef}
             className="w-full border border-slate-200 rounded-md px-3 py-2 text-sm min-h-[300px] focus:outline-none focus:ring-1 focus:ring-[#0D50B8] resize-y font-mono leading-relaxed"
-            placeholder={`Dear Sir/Madam,\n\nWe are writing to dispute Case ID: {{case_id}}, dated {{dispute_date}}...\n\nAmount: {{dispute_currency}} {{dispute_amount}}\nReason Code: {{reason_code}}\n...`}
+            placeholder={`Dear Sir/Madam,\n\nWe are writing to dispute the chargeback for Case ID: {{case_id}}, dated {{dispute_date}}...\n\nAmount: {{dispute_currency}} {{dispute_amount}}\nReason Code: {{reason_code}}\nCardholder: {{cardholder_name}}\n\n...`}
             value={form.content || ""}
             onChange={e => setForm(f => ({ ...f, content: e.target.value }))}
           />
         </div>
       </div>
-      <div className="lg:col-span-1">
-        <FieldPanel onInsert={insertAtCursor} customFields={customFields} evidenceTypes={evidenceTypes} />
-      </div>
-    </div>
-  );
-}
 
-// Multi-select toggle component
-function MultiSelectList({ label, items, selected, onToggle, idKey, labelKey, secondaryKey }) {
-  return (
-    <div className="space-y-1.5">
-      <label className="text-xs font-medium text-slate-600">{label}</label>
-      {items.length === 0 ? (
-        <p className="text-xs text-slate-400 italic">No {label.toLowerCase()} configured yet.</p>
-      ) : (
-        <div className="border border-slate-200 rounded-lg p-3 max-h-40 overflow-y-auto bg-slate-50">
-          <div className="flex flex-wrap gap-1.5">
-            {items.map(item => {
-              const id = item[idKey] || item.id;
-              const isSelected = (selected || []).includes(id);
-              return (
-                <button
-                  key={id}
-                  onClick={() => onToggle(id)}
-                  className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-colors ${
-                    isSelected
-                      ? "bg-[#0D50B8] text-white border-[#0D50B8]"
-                      : "bg-white text-slate-600 border-slate-300 hover:border-[#0D50B8] hover:text-[#0D50B8]"
-                  }`}
-                >
-                  {item[labelKey]}
-                  {secondaryKey && item[secondaryKey] && (
-                    <span className={`ml-1 ${isSelected ? "text-blue-200" : "text-slate-400"}`}>
-                      ({item[secondaryKey]})
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      )}
-      {(selected || []).length > 0 && (
-        <p className="text-[10px] text-slate-400">{selected.length} selected</p>
-      )}
+      {/* Right: field panel */}
+      <div className="lg:col-span-1">
+        <FieldPanel onInsert={insertAtCursor} />
+      </div>
     </div>
   );
 }
 
 export default function CoverLetterManager() {
   const [records, setRecords] = useState([]);
-  const [customFields, setCustomFields] = useState([]);
-  const [evidenceTypes, setEvidenceTypes] = useState([]);
+  const [reasonCodes, setReasonCodes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [form, setForm] = useState({
-    name: "", content: "", file_url: "",
-    reason_code_grouping: "",
-    custom_fields_mapping: [],
-    evidence_types_mapping: [],
-    status: "active"
+    name: "", content: "", file_url: "", reason_codes: [], status: "active"
   });
 
   const load = () => Promise.all([
     base44.entities.CoverLetterTemplate.list(),
-    base44.entities.CustomField.filter({ status: "active" }),
-    base44.entities.EvidenceType.filter({ status: "active" }),
-  ]).then(([cl, cf, et]) => {
+    base44.entities.ReasonCode.filter({ status: "active" }),
+  ]).then(([cl, rc]) => {
     setRecords(cl);
-    setCustomFields(cf);
-    setEvidenceTypes(et);
+    setReasonCodes(rc);
     setLoading(false);
   }).catch(() => setLoading(false));
 
   useEffect(() => { load(); }, []);
 
-  const resetForm = () => setForm({
-    name: "", content: "", file_url: "",
-    reason_code_grouping: "",
-    custom_fields_mapping: [],
-    evidence_types_mapping: [],
-    status: "active"
-  });
+  const resetForm = () => setForm({ name: "", content: "", file_url: "", reason_codes: [], status: "active" });
 
   const save = async () => {
     if (editId) await base44.entities.CoverLetterTemplate.update(editId, form);
     else await base44.entities.CoverLetterTemplate.create(form);
-    setShowForm(false); setEditId(null); resetForm(); load();
+    setShowForm(false); setEditId(null); resetForm();
+    load();
   };
 
   const del = async (id) => { await base44.entities.CoverLetterTemplate.delete(id); load(); };
@@ -318,19 +275,17 @@ export default function CoverLetterManager() {
       name: r.name || "",
       content: r.content || "",
       file_url: r.file_url || "",
-      reason_code_grouping: r.reason_code_grouping || "",
-      custom_fields_mapping: r.custom_fields_mapping || [],
-      evidence_types_mapping: r.evidence_types_mapping || [],
+      reason_codes: r.reason_codes || [],
       status: r.status || "active",
     });
     setEditId(r.id);
     setShowForm(true);
   };
 
-  const toggleItem = (field, id) => {
+  const toggleReasonCode = (code) => {
     setForm(f => {
-      const arr = f[field] || [];
-      return { ...f, [field]: arr.includes(id) ? arr.filter(x => x !== id) : [...arr, id] };
+      const arr = f.reason_codes || [];
+      return { ...f, reason_codes: arr.includes(code) ? arr.filter(x => x !== code) : [...arr, code] };
     });
   };
 
@@ -351,21 +306,11 @@ export default function CoverLetterManager() {
             </CardTitle>
           </CardHeader>
           <CardContent className="p-5 space-y-4">
-            {/* Name + Grouping + Status */}
+            {/* Name + Status row */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className="space-y-1">
+              <div className="sm:col-span-2 space-y-1">
                 <label className="text-xs font-medium text-slate-600">Template Name *</label>
                 <Input placeholder="e.g. Fraud Dispute Template" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
-              </div>
-              <div className="space-y-1">
-                <label className="text-xs font-medium text-slate-600">Reason Code Grouping</label>
-                <Select value={form.reason_code_grouping || "__none__"} onValueChange={v => setForm(f => ({ ...f, reason_code_grouping: v === "__none__" ? "" : v }))}>
-                  <SelectTrigger><SelectValue placeholder="Select grouping..." /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="__none__">— None —</SelectItem>
-                    {RC_GROUPINGS.map(g => <SelectItem key={g} value={g}>{g}</SelectItem>)}
-                  </SelectContent>
-                </Select>
               </div>
               <div className="space-y-1">
                 <label className="text-xs font-medium text-slate-600">Status</label>
@@ -379,35 +324,43 @@ export default function CoverLetterManager() {
               </div>
             </div>
 
-            {/* Elements: Custom Fields + Evidence Types */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-slate-50 rounded-lg border border-slate-200">
-              <p className="sm:col-span-2 text-xs font-semibold text-slate-700 uppercase tracking-wide -mb-1">Elements Mapping</p>
-              <MultiSelectList
-                label="Custom Fields"
-                items={customFields}
-                selected={form.custom_fields_mapping}
-                onToggle={(id) => toggleItem("custom_fields_mapping", id)}
-                idKey="id"
-                labelKey="field_name"
-                secondaryKey="field_type"
-              />
-              <MultiSelectList
-                label="Evidence Types"
-                items={evidenceTypes}
-                selected={form.evidence_types_mapping}
-                onToggle={(id) => toggleItem("evidence_types_mapping", id)}
-                idKey="id"
-                labelKey="name"
-                secondaryKey="upload_requirement"
-              />
+            {/* Reason Codes mapping */}
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-slate-600">Map to Reason Codes</label>
+              {reasonCodes.length === 0 ? (
+                <p className="text-xs text-slate-400">No reason codes configured. Add them in the Reason Codes tab.</p>
+              ) : (
+                <div className="border border-slate-200 rounded-lg p-3 max-h-36 overflow-y-auto bg-slate-50">
+                  <div className="flex flex-wrap gap-2">
+                    {reasonCodes.map(rc => {
+                      const selected = (form.reason_codes || []).includes(rc.reason_code);
+                      return (
+                        <button
+                          key={rc.id}
+                          onClick={() => toggleReasonCode(rc.reason_code)}
+                          className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-colors ${
+                            selected
+                              ? "bg-[#0D50B8] text-white border-[#0D50B8]"
+                              : "bg-white text-slate-600 border-slate-300 hover:border-[#0D50B8] hover:text-[#0D50B8]"
+                          }`}
+                        >
+                          {rc.reason_code} <span className={`ml-1 ${selected ? "text-blue-200" : "text-slate-400"}`}>({rc.cb_reason})</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+              {(form.reason_codes || []).length > 0 && (
+                <p className="text-xs text-slate-400">{form.reason_codes.length} reason code(s) selected</p>
+              )}
             </div>
 
             {/* Editor + Field Panel */}
             <CoverLetterEditor
               form={form}
               setForm={setForm}
-              customFields={customFields}
-              evidenceTypes={evidenceTypes}
+              reasonCodes={reasonCodes}
               uploading={uploading}
               setUploading={setUploading}
             />
@@ -438,21 +391,15 @@ export default function CoverLetterManager() {
                   <div className="flex items-center gap-2 flex-wrap">
                     <h3 className="font-medium text-slate-800 text-sm">{r.name}</h3>
                     <Badge className={r.status === "active" ? "bg-green-100 text-green-800 border-0 text-xs" : "bg-slate-100 text-slate-600 border-0 text-xs"}>{r.status}</Badge>
-                    {r.reason_code_grouping && <Badge className="bg-blue-100 text-blue-800 border-0 text-xs">{r.reason_code_grouping}</Badge>}
-                    {r.file_url && <Badge className="bg-purple-100 text-purple-800 border-0 text-xs"><FileText className="w-2.5 h-2.5 mr-1 inline" />File attached</Badge>}
+                    {r.file_url && <Badge className="bg-blue-100 text-blue-800 border-0 text-xs"><FileText className="w-2.5 h-2.5 mr-1 inline" />File attached</Badge>}
                   </div>
-                  <div className="flex flex-wrap gap-2 text-[10px] text-slate-500">
-                    {(r.custom_fields_mapping || []).length > 0 && (
-                      <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-full border border-emerald-200">
-                        {r.custom_fields_mapping.length} custom field(s)
-                      </span>
-                    )}
-                    {(r.evidence_types_mapping || []).length > 0 && (
-                      <span className="px-2 py-0.5 bg-amber-50 text-amber-700 rounded-full border border-amber-200">
-                        {r.evidence_types_mapping.length} evidence type(s)
-                      </span>
-                    )}
-                  </div>
+                  {r.reason_codes?.length > 0 && (
+                    <div className="flex flex-wrap gap-1">
+                      {r.reason_codes.map(rc => (
+                        <span key={rc} className="px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded text-[10px] font-mono">{rc}</span>
+                      ))}
+                    </div>
+                  )}
                   {r.content && <p className="text-xs text-slate-400 line-clamp-1 font-mono">{r.content.slice(0, 100)}...</p>}
                 </div>
                 <div className="flex gap-1 flex-shrink-0">
