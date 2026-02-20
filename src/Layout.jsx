@@ -71,7 +71,7 @@ export default function Layout({ children, currentPageName }) {
 
       {/* Nav items */}
       <nav className="flex-1 px-3 pt-1 space-y-0.5 overflow-y-auto">
-        {navItems.map(({ label, icon: Icon, page }) => {
+        {visibleNavItems.map(({ label, icon: Icon, page }) => {
           const active = currentPageName === page;
           return (
             <Link
