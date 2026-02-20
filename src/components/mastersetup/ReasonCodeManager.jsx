@@ -201,6 +201,48 @@ export default function ReasonCodeManager() {
     setTimeout(() => setImportMsg(""), 4000);
   };
 
+  // Export current records as CSV
+  const exportCSV = () => {
+    const headers = ["reason_code","reason_code_description","reason_code_category","reason_code_grouping","reason_code_type","card_mandate","deadline","status"];
+    const rows = records.map(r => headers.map(h => {
+      const val = r[h] ?? "";
+      return `"${String(val).replace(/"/g, '""')}"`;
+    }).join(","));
+    const csv = [headers.join(","), ...rows].join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = "reason_codes.csv"; a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  // Upload CSV and upsert records
+  const handleUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async (ev) => {
+      const text = ev.target.result;
+      const lines = text.trim().split("\n");
+      const headers = lines[0].split(",").map(h => h.replace(/^"|"$/g, "").trim());
+      const parsed = lines.slice(1).map(line => {
+        const vals = line.match(/(".*?"|[^,]+)(?=,|$)/g) || [];
+        const obj = {};
+        headers.forEach((h, i) => { obj[h] = (vals[i] || "").replace(/^"|"$/g, "").trim(); });
+        if (obj.deadline) obj.deadline = Number(obj.deadline);
+        return obj;
+      }).filter(r => r.reason_code);
+      if (parsed.length === 0) { setUploadMsg("No valid rows found."); return; }
+      setImporting(true);
+      await base44.entities.ReasonCode.bulkCreate(parsed);
+      setUploadMsg(`Uploaded ${parsed.length} rows successfully.`);
+      load(); setImporting(false);
+      setTimeout(() => setUploadMsg(""), 5000);
+    };
+    reader.readAsText(file);
+    e.target.value = "";
+  };
+
   const filtered = records.filter(r => {
     const q = search.toLowerCase();
     const matchSearch = !search || r.reason_code?.toLowerCase().includes(q) || r.reason_code_description?.toLowerCase().includes(q) || r.reason_code_category?.toLowerCase().includes(q);
