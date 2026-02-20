@@ -36,25 +36,67 @@ export default function DisputeDetail({ dispute, projects, onBack, onUpdate }) {
   const [editing, setEditing] = useState(false);
   const [evidence, setEvidence] = useState([]);
   const [evidenceTypes, setEvidenceTypes] = useState([]);
+  const [allEvidenceTypes, setAllEvidenceTypes] = useState([]);
   const [coverLetter, setCoverLetter] = useState(dispute.cover_letter_content || "");
   const [coverTemplates, setCoverTemplates] = useState([]);
+  const [allCoverTemplates, setAllCoverTemplates] = useState([]);
   const [selectedTemplate, setSelectedTemplate] = useState("");
   const [uploading, setUploading] = useState(false);
   const [generatingCL, setGeneratingCL] = useState(false);
   const [savingCL, setSavingCL] = useState(false);
   const [currentDispute, setCurrentDispute] = useState(dispute);
+  const [projectInfo, setProjectInfo] = useState(null);
+  const [allReasonCodes, setAllReasonCodes] = useState([]);
 
   useEffect(() => {
     Promise.all([
       base44.entities.DisputeEvidence.filter({ dispute_id: dispute.id }),
       base44.entities.EvidenceType.list(),
       base44.entities.CoverLetterTemplate.list(),
-    ]).then(([ev, et, ct]) => {
+      base44.entities.ReasonCode.list(),
+    ]).then(([ev, et, ct, rc]) => {
+      setAllEvidenceTypes(et);
+      setAllCoverTemplates(ct);
+      setAllReasonCodes(rc);
       setEvidence(ev);
-      setEvidenceTypes(et);
-      setCoverTemplates(ct);
+
+      // Find the project and apply its mappings
+      const project = projects.find(p => p.id === dispute.project_id);
+      setProjectInfo(project);
+      applyProjectMappings(project, dispute.reason_code, et, ct, rc);
     }).catch(() => {});
   }, [dispute.id]);
+
+  const applyProjectMappings = (project, reasonCode, et, ct, rc) => {
+    if (!project || !project.reason_code_mappings?.length) {
+      setEvidenceTypes(et);
+      setCoverTemplates(ct);
+      return;
+    }
+    // Find which grouping the dispute's reason code belongs to
+    const matchedRC = rc.find(r => r.reason_code === reasonCode);
+    const grouping = matchedRC?.reason_code_grouping;
+    const mapping = grouping ? project.reason_code_mappings.find(m => m.rc_grouping === grouping) : null;
+
+    if (mapping) {
+      // Filter evidence types to those assigned to this grouping
+      const assignedET = mapping.assigned_evidence_types || [];
+      const filteredET = assignedET.length > 0 ? et.filter(e => assignedET.includes(e.id)) : et;
+      setEvidenceTypes(filteredET);
+
+      // Filter cover templates
+      if (mapping.assigned_cover_letter) {
+        const tpl = ct.find(t => t.id === mapping.assigned_cover_letter);
+        setCoverTemplates(tpl ? [tpl] : ct);
+        if (tpl) setSelectedTemplate(tpl.id);
+      } else {
+        setCoverTemplates(ct);
+      }
+    } else {
+      setEvidenceTypes(et);
+      setCoverTemplates(ct);
+    }
+  };
 
   const handleFileUpload = async (e, evidenceTypeName) => {
     const file = e.target.files[0];
