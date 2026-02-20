@@ -275,9 +275,10 @@ export default function ReasonCodeManager() {
       </div>
 
       {importMsg && (
-        <p className="text-xs text-emerald-600 font-medium flex items-center gap-1">
-          <Check className="w-3.5 h-3.5" /> {importMsg}
-        </p>
+        <p className="text-xs text-emerald-600 font-medium flex items-center gap-1"><Check className="w-3.5 h-3.5" /> {importMsg}</p>
+      )}
+      {uploadMsg && (
+        <p className="text-xs text-emerald-600 font-medium flex items-center gap-1"><Check className="w-3.5 h-3.5" /> {uploadMsg}</p>
       )}
 
       {/* Form */}
