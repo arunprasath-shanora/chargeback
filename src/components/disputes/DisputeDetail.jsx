@@ -211,6 +211,45 @@ Write a formal, concise cover letter defending against this chargeback. Include 
         </TabsList>
 
         <TabsContent value="details" className="mt-4 space-y-5">
+          {/* Project Info Panel */}
+          {projectInfo && (
+            <Card className="border-blue-100 bg-blue-50/40">
+              <CardContent className="p-4">
+                <h3 className="text-xs font-semibold text-blue-700 uppercase tracking-wide mb-3">Project: {projectInfo.name}</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {projectInfo.sub_units?.length > 0 && (
+                    <div>
+                      <p className="text-xs text-slate-400 mb-1">Sub Units</p>
+                      <div className="flex flex-wrap gap-1">
+                        {projectInfo.sub_units.map((u, i) => (
+                          <span key={i} className="text-xs bg-white border border-slate-200 rounded px-2 py-0.5 text-slate-700">{u.sub_unit_name || u.merchant_id}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {projectInfo.client_contacts?.length > 0 && (
+                    <div>
+                      <p className="text-xs text-slate-400 mb-1">Client Contacts</p>
+                      {projectInfo.client_contacts.map((c, i) => (
+                        <p key={i} className="text-xs text-slate-700"><span className={`font-medium ${c.level === "Primary" ? "text-blue-700" : "text-slate-600"}`}>{c.level}:</span> {c.contact_name} {c.contact_email ? `· ${c.contact_email}` : ""}</p>
+                      ))}
+                    </div>
+                  )}
+                  {projectInfo.portal_credentials?.length > 0 && (
+                    <div>
+                      <p className="text-xs text-slate-400 mb-1">Portals</p>
+                      {projectInfo.portal_credentials.map((p, i) => (
+                        <p key={i} className="text-xs text-slate-700">
+                          {p.portal_label}: <a href={p.portal_address} target="_blank" rel="noreferrer" className="text-[#0D50B8] hover:underline">{p.portal_address}</a>
+                        </p>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           <SectionGrid title="Case Information">
             <InfoRow label="Case ID" value={currentDispute.case_id} />
             <InfoRow label="Case Type" value={currentDispute.case_type} />
