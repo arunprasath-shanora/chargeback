@@ -297,7 +297,6 @@ function AssignmentsTab({ form, set, toggleArray, allUsers, allFields, allEviden
                   >
                     <div className="flex items-center gap-3 flex-wrap">
                       <span className="text-sm font-medium text-slate-800">{grouping}</span>
-                      {rcCount > 0 && <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded">{rcCount} codes</span>}
                       {etCount > 0 && <span className="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded">{etCount} evidence</span>}
                       {mapping.assigned_cover_letter && <span className="text-xs bg-purple-50 text-purple-700 px-2 py-0.5 rounded">Cover letter set</span>}
                     </div>
