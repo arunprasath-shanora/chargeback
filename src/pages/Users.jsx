@@ -235,7 +235,7 @@ export default function Users() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-slate-100">
-                {["Name", "User ID", "Email", "Department", "Role", "Temp Password", "Status", "Actions"].map(h => (
+                {["Name", "User ID", "Email", "Department", "Role", "Assigned Projects", "Temp Password", "Status", "Actions"].map(h => (
                   <th key={h} className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase tracking-wide whitespace-nowrap">{h}</th>
                 ))}
               </tr>
