@@ -286,13 +286,13 @@ Write a formal, concise cover letter defending against this chargeback. Include 
             <InfoRow label="3D Secure (3DS)" value={currentDispute.three_d_secure} />
           </SectionGrid>
 
-          <SectionGrid title="Transaction">
+          <SectionGrid title="Original Transaction">
             <InfoRow label="Transaction ID" value={currentDispute.transaction_id} />
             <InfoRow label="Transaction Date" value={currentDispute.transaction_date} />
             <InfoRow label="Transaction Amount" value={`${currentDispute.transaction_currency || ""} ${currentDispute.transaction_amount?.toLocaleString() || "—"}`} />
-            <InfoRow label="Country" value={currentDispute.transaction_country} />
-            <InfoRow label="State" value={currentDispute.transaction_state} />
-            <InfoRow label="Billing Zip" value={currentDispute.billing_zip_code} />
+            <InfoRow label="Transaction Country" value={currentDispute.transaction_country} />
+            <InfoRow label="Transaction State" value={currentDispute.transaction_state} />
+            <InfoRow label="Billing Zip Code" value={currentDispute.billing_zip_code} />
           </SectionGrid>
 
           <SectionGrid title="Customer & Order">
