@@ -107,7 +107,7 @@ export default function Inventory() {
   const handleAction = async () => {
     setSaving(true);
     const projId = selectedProject || actionItem.project_id;
-    const analyst = assignedTo || undefined;
+    const analyst = assignedTo === "__none__" ? undefined : assignedTo || undefined;
     const project = projects.find(p => p.id === projId);
     // Find matching sub-unit from project if available
     const subUnit = project?.sub_units?.find(s => s.sub_unit_name === actionItem.sub_unit_name || s.merchant_id === actionItem.merchant_id);
