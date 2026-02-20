@@ -257,9 +257,16 @@ export default function ReasonCodeManager() {
       <div className="flex flex-wrap justify-between items-center gap-2">
         <p className="text-sm text-slate-500">{records.length} reason codes</p>
         <div className="flex gap-2 flex-wrap">
+          <Button size="sm" variant="outline" onClick={exportCSV} disabled={records.length === 0} className="text-xs border-slate-300 hover:bg-slate-50">
+            <Download className="w-3.5 h-3.5 mr-1" /> Export CSV
+          </Button>
+          <Button size="sm" variant="outline" onClick={() => uploadRef.current?.click()} disabled={importing} className="text-xs border-slate-300 hover:bg-slate-50">
+            <Upload className="w-3.5 h-3.5 mr-1" /> {importing ? "Uploading..." : "Upload CSV"}
+          </Button>
+          <input ref={uploadRef} type="file" accept=".csv" className="hidden" onChange={handleUpload} />
           <Button size="sm" variant="outline" onClick={importGlobal} disabled={importing} className="border-[#0D50B8] text-[#0D50B8] hover:bg-blue-50 text-xs">
             <Download className="w-3.5 h-3.5 mr-1" />
-            {importing ? "Importing..." : "Import Global Reason Codes"}
+            {importing ? "Importing..." : "Import Global Codes"}
           </Button>
           <Button size="sm" className="bg-[#0D50B8] hover:bg-[#0a3d8f]" onClick={() => { setShowForm(true); setEditId(null); setForm(EMPTY_FORM); }}>
             <Plus className="w-4 h-4 mr-1" /> Add
