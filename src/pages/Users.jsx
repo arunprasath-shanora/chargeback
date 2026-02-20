@@ -366,6 +366,12 @@ export default function Users() {
                     {copied ? <Check className="w-3.5 h-3.5 text-green-600" /> : <Copy className="w-3.5 h-3.5" />}
                   </Button>
                 </div>
+                {pwdErrors.length > 0 && (
+                  <div className="mt-2 p-2 bg-red-50 rounded text-xs text-red-600 space-y-0.5">
+                    <p className="font-semibold flex items-center gap-1"><AlertTriangle className="w-3 h-3" /> Password does not meet policy:</p>
+                    {pwdErrors.map(e => <p key={e}>• {e}</p>)}
+                  </div>
+                )}
                 <p className="text-xs text-amber-600 mt-1">Share this with the user. They'll be prompted to change it on first login.</p>
               </div>
             )}
