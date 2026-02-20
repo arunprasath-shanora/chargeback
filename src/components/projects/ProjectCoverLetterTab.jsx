@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Pencil, Trash2, X, Check, Upload, FileText, Copy, ChevronDown, ChevronUp, ArrowDownToLine } from "lucide-react";
+import { Plus, Pencil, Trash2, X, Check, Upload, FileText, Copy, ChevronDown, ChevronUp, ArrowDownToLine, Bold, Italic, Underline } from "lucide-react";
 
 const FIELD_GROUPS = [
   {
