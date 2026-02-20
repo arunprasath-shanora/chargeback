@@ -139,11 +139,12 @@ export default function DisputeDetail({ dispute, projects, onBack, onUpdate }) {
 Case ID: ${currentDispute.case_id}
 Reason Code: ${currentDispute.reason_code}
 Reason Category: ${currentDispute.reason_category}
-Dispute Amount: ${currentDispute.dispute_currency} ${currentDispute.dispute_amount}
-Dispute Date: ${currentDispute.dispute_date}
+Chargeback Amount: ${currentDispute.chargeback_currency} ${currentDispute.chargeback_amount}
+Chargeback Date: ${currentDispute.chargeback_date}
 Transaction ID: ${currentDispute.transaction_id}
 Transaction Date: ${currentDispute.transaction_date}
-Product Type: ${currentDispute.product_type}
+ARN: ${currentDispute.arn_number}
+Card Network: ${currentDispute.card_network}
 Card Type: ${currentDispute.card_type}
 Cardholder: ${currentDispute.cardholder_name}
 Customer: ${currentDispute.customer_name}
