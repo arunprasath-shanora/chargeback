@@ -7,8 +7,9 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { ChevronLeft, Pencil, Upload, FileText, Trash2, Wand2, Shield, ShieldOff } from "lucide-react";
+import { ChevronLeft, Pencil, Upload, FileText, Trash2, Wand2, Shield, ShieldOff, PauseCircle, Download, Send, AlertCircle, Globe } from "lucide-react";
 import DisputeForm from "./DisputeForm";
+import jsPDF from "jspdf";
 
 const statusColors = {
   new: "bg-yellow-100 text-yellow-800",
