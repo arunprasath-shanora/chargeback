@@ -28,7 +28,7 @@ const F = ({ label, children }) => (
 
 export default function DisputeForm({ dispute, projects, onSave, onCancel }) {
   const [form, setForm] = useState(dispute || {
-    case_id: "", project_id: "", status: "new", case_type: "",
+    case_id: "", project_id: "", status: "new", case_type: "", fought_decision: "", not_fought_reason: "", not_fought_notes: "",
     processor: "", merchant_id: "", merchant_alias: "", dba_name: "",
     card_network: "", card_bin_first6: "", card_last4: "", card_type: "",
     reason_code: "", reason_category: "",
