@@ -49,6 +49,11 @@ export default function Inventory() {
   const [saving, setSaving] = useState(false);
   const [projectUsers, setProjectUsers] = useState([]); // analysts for selected project
 
+  // Edit due date
+  const [editDueDateItem, setEditDueDateItem] = useState(null);
+  const [editDueDate, setEditDueDate] = useState("");
+  const [savingDueDate, setSavingDueDate] = useState(false);
+
   const load = () => {
     Promise.all([
       base44.entities.InventoryItem.list("-created_date", 500),
