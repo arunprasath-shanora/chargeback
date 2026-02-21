@@ -616,6 +616,37 @@ Write a formal, concise cover letter defending against this chargeback. Include 
             onChange={e => setCoverLetter(e.target.value)}
           />
 
+          {/* Evidence images panel */}
+          {(() => {
+            const imageEvidence = evidence.filter(ev => {
+              const name = (ev.file_name || "").toLowerCase();
+              return name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".png") || name.endsWith(".gif") || name.endsWith(".webp");
+            });
+            if (imageEvidence.length === 0) return null;
+            return (
+              <Card className="border-blue-100 bg-blue-50/30">
+                <CardContent className="p-4 space-y-3">
+                  <p className="text-xs font-semibold text-blue-700 uppercase tracking-wide">Evidence Images — included in PDF export</p>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                    {imageEvidence.map((ev, i) => (
+                      <div key={ev.id} className="space-y-1">
+                        <a href={ev.file_url} target="_blank" rel="noreferrer">
+                          <img
+                            src={ev.file_url}
+                            alt={ev.file_name}
+                            className="w-full h-32 object-cover rounded-lg border border-blue-200 hover:opacity-90 transition-opacity cursor-zoom-in"
+                          />
+                        </a>
+                        <p className="text-xs text-slate-500 truncate">{ev.evidence_type} — {ev.file_name}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-xs text-slate-400">These images will be appended to the PDF when you click "Export PDF".</p>
+                </CardContent>
+              </Card>
+            );
+          })()}
+
           {/* Submit to Portal section */}
           {isFought && !["awaiting_decision","won","lost"].includes(currentDispute.status) && (
             <Card className={`border-2 ${canSubmit ? "border-green-200 bg-green-50/40" : "border-dashed border-slate-200 bg-slate-50/40"}`}>
