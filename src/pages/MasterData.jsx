@@ -25,12 +25,7 @@ const DISPUTE_STATUS_LABEL = {
   awaiting_decision: "Awaiting Decision", won: "Won", lost: "Lost", not_fought: "Not Fought",
 };
 
-const INV_STATUS_COLORS = {
-  received: "bg-amber-100 text-amber-700",
-  assigned: "bg-blue-100 text-blue-700",
-  converted: "bg-green-100 text-green-700",
-  expired: "bg-red-100 text-red-600",
-};
+
 
 const STATUS_SUMMARY_CARDS = [
   { key: "won",               label: "Won",               bg: "bg-green-50",  border: "border-green-200",  text: "text-green-700",  num: "text-green-800" },
