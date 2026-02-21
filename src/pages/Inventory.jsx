@@ -340,9 +340,18 @@ export default function Inventory() {
                       <td className="px-4 py-3 text-slate-500 text-xs whitespace-nowrap">{i.chargeback_date || "—"}</td>
                       <td className="px-4 py-3 text-slate-500 text-xs whitespace-nowrap">{i.transaction_date || "—"}</td>
                       <td className="px-4 py-3">
-                        {i.due_date ? (
-                          <span className={`text-xs font-medium ${new Date(i.due_date) < new Date() ? "text-red-500" : new Date(i.due_date) < new Date(Date.now() + 3*86400000) ? "text-amber-600" : "text-slate-500"}`}>{i.due_date}</span>
-                        ) : "—"}
+                        <div className="flex items-center gap-1 group">
+                          {i.due_date ? (
+                            <span className={`text-xs font-medium ${new Date(i.due_date) < new Date() ? "text-red-500" : new Date(i.due_date) < new Date(Date.now() + 3*86400000) ? "text-amber-600" : "text-slate-500"}`}>{i.due_date}</span>
+                          ) : <span className="text-slate-300 text-xs">—</span>}
+                          <button
+                            onClick={() => { setEditDueDateItem(i); setEditDueDate(i.due_date || ""); }}
+                            className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-slate-200 transition-all ml-0.5"
+                            title="Edit due date"
+                          >
+                            <Pencil className="w-3 h-3 text-slate-400" />
+                          </button>
+                        </div>
                       </td>
                       <td className="px-4 py-3">
                         {(i.status === "received" || i.status === "assigned") && (
