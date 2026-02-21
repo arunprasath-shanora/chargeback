@@ -184,25 +184,21 @@ export default function DisputeForm({ dispute, projects, onSave, onCancel }) {
       </SECTION>
 
       <SECTION title="Chargeback Details (from Processor Portal)">
-        <F label="Chargeback Date"><Input type="date" value={form.chargeback_date} onChange={e => handleChargebackDateChange(e.target.value)} /></F>
-        <F label="Chargeback Amount"><Input type="number" value={form.chargeback_amount} onChange={e => set("chargeback_amount", e.target.value)} placeholder="0.00" /></F>
-        <F label="Chargeback Currency"><Input value={form.chargeback_currency} onChange={e => set("chargeback_currency", e.target.value)} placeholder="USD" /></F>
-        <F label="Dispute Currency">
-          <Select value={form.dispute_currency} onValueChange={v => handleDisputeAmountChange("dispute_currency", v)}>
+        <F label="Chargeback Date"><Input type="date" value={form.chargeback_date} onChange={e => handleChargebackFieldChange("chargeback_date", e.target.value)} /></F>
+        <F label="Chargeback Amount"><Input type="number" value={form.chargeback_amount} onChange={e => handleChargebackFieldChange("chargeback_amount", e.target.value)} placeholder="0.00" /></F>
+        <F label="Chargeback Currency">
+          <Select value={form.chargeback_currency} onValueChange={v => handleChargebackFieldChange("chargeback_currency", v)}>
             <SelectTrigger><SelectValue placeholder="Select currency..." /></SelectTrigger>
             <SelectContent>{CURRENCIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
           </Select>
         </F>
-        <F label="Dispute Amount">
-          <Input type="number" value={form.dispute_amount} onChange={e => handleDisputeAmountChange("dispute_amount", e.target.value)} placeholder="0.00" />
-        </F>
-        <F label={<span className="flex items-center gap-1">Converted Dispute Amount (USD) {convertingFx && <Loader2 className="w-3 h-3 animate-spin text-blue-500" />}</span>}>
+        <F label={<span className="flex items-center gap-1">Amount (USD) {convertingFx && <Loader2 className="w-3 h-3 animate-spin text-blue-500" />}</span>}>
           <Input
             type="number"
-            value={form.dispute_amount_usd ?? ""}
-            onChange={e => set("dispute_amount_usd", e.target.value)}
+            value={form.chargeback_amount_usd ?? ""}
+            readOnly
             placeholder="Auto-converted from FX rate"
-            className="bg-slate-50"
+            className="bg-slate-50 cursor-default"
           />
         </F>
         <F label="Reason Code">
