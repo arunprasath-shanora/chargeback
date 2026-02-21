@@ -372,12 +372,29 @@ Write a formal, concise cover letter defending against this chargeback. Include 
         </CardContent>
       </Card>
 
+      {/* Readiness banner for submission */}
+      {isFought && !["submitted","awaiting_decision","won","lost","not_fought"].includes(currentDispute.status) && (
+        <div className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm border ${canSubmit ? "bg-green-50 border-green-200 text-green-800" : "bg-amber-50 border-amber-200 text-amber-800"}`}>
+          <AlertCircle className="w-4 h-4 flex-shrink-0" />
+          <span className="flex-1">
+            {canSubmit ? "Ready to submit! Evidence uploaded and cover letter saved." : (
+              <>Checklist: {!hasEvidence && <b className="mr-2">Upload evidence</b>}{!hasCoverLetter && <b>Save a cover letter (min 50 chars)</b>}</>
+            )}
+          </span>
+        </div>
+      )}
+
       <Tabs defaultValue="details">
         <TabsList className="bg-slate-100">
-          <TabsTrigger value="details" className="text-xs">Case Details</TabsTrigger>
-          <TabsTrigger value="evidence" className="text-xs" disabled={currentDispute.fought_decision === "not_fought"}>Evidence</TabsTrigger>
-          <TabsTrigger value="cover_letter" className="text-xs" disabled={currentDispute.fought_decision === "not_fought"}>Cover Letter</TabsTrigger>
+          <TabsTrigger value="details" className="text-xs" disabled={!decisionMade}>Case Details</TabsTrigger>
+          <TabsTrigger value="evidence" className="text-xs" disabled={!isFought}>Evidence</TabsTrigger>
+          <TabsTrigger value="cover_letter" className="text-xs" disabled={!isFought}>Cover Letter</TabsTrigger>
         </TabsList>
+        {!decisionMade && (
+          <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mt-2">
+            ⚠ Please set a <b>Dispute Decision</b> above before accessing case details, evidence, or cover letter.
+          </p>
+        )}
 
         <TabsContent value="details" className="mt-4 space-y-5">
           {/* Project Info Panel */}
