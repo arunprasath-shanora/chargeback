@@ -33,11 +33,12 @@ export default function Disputes() {
 
   const load = () => {
     Promise.all([
-      base44.entities.Dispute.list("-created_date", 200),
+      base44.entities.Dispute.filter({ status: "new" }, "-created_date", 200),
+      base44.entities.Dispute.filter({ status: "in_progress" }, "-created_date", 200),
       base44.entities.Project.list(),
       base44.auth.me(),
-    ]).then(([d, p, u]) => {
-      setDisputes(d);
+    ]).then(([dnew, dinprog, p, u]) => {
+      setDisputes([...dnew, ...dinprog]);
       setProjects(p);
       setCurrentUser(u);
       setLoading(false);
