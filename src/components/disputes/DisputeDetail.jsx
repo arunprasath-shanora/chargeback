@@ -524,6 +524,11 @@ Write a formal, concise cover letter defending against this chargeback. Include 
             <Button className="bg-[#0D50B8] hover:bg-[#0a3d8f]" size="sm" onClick={handleSaveCoverLetter} disabled={savingCL}>
               {savingCL ? "Saving..." : "Save"}
             </Button>
+            {["new","in_progress","submitted"].includes(currentDispute.status) && (
+              <Button className="bg-indigo-600 hover:bg-indigo-700 text-white" size="sm" onClick={handleMarkSubmitted} disabled={savingStatus}>
+                {savingStatus ? "Updating..." : "Mark as Submitted → Awaiting Decision"}
+              </Button>
+            )}
           </div>
 
           <Textarea
@@ -532,6 +537,25 @@ Write a formal, concise cover letter defending against this chargeback. Include 
             value={coverLetter}
             onChange={e => setCoverLetter(e.target.value)}
           />
+
+          {/* Awaiting Decision resolution panel */}
+          {currentDispute.status === "awaiting_decision" && (
+            <Card className="border-purple-100 bg-purple-50/40">
+              <CardContent className="p-4">
+                <p className="text-xs font-semibold text-purple-700 uppercase tracking-wide mb-3">Update Processor Decision</p>
+                <p className="text-xs text-slate-500 mb-3">Check the processor portal and record the outcome below.</p>
+                <div className="flex gap-2 flex-wrap">
+                  <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white" disabled={savingStatus} onClick={() => handleUpdateFinalStatus("won")}>
+                    Mark as Won
+                  </Button>
+                  <Button size="sm" className="bg-red-600 hover:bg-red-700 text-white" disabled={savingStatus} onClick={() => handleUpdateFinalStatus("lost")}>
+                    Mark as Lost
+                  </Button>
+                  <span className="text-xs text-slate-400 self-center ml-1">Status remains Awaiting Decision until updated</span>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
       </Tabs>
     </div>
