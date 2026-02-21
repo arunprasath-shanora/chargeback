@@ -138,7 +138,7 @@ export default function Disputes() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-100 bg-slate-50">
-                  {["Case ID", "Decision", "Status", "Project", "Card Network", "Dispute Amount", "Reason Code", "SLA Deadline", "Assigned To", ""].map(h => (
+                  {["Case ID", "ARN", "Case Type", "Sub Unit", "Processor", "Decision", "Status", "Card Network", "Dispute Amount", "Reason Code", "SLA Deadline", "Assigned To", ""].map(h => (
                     <th key={h} className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase tracking-wide whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
