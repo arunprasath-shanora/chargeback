@@ -294,6 +294,11 @@ export default function Inventory() {
           <Button size="sm" className="bg-[#0D50B8] hover:bg-[#0a3d8f] gap-1.5 text-xs" onClick={() => setShowAdd(true)}>
             <Plus className="w-3.5 h-3.5" /> Add Manual
           </Button>
+          {selectedIds.size > 0 && (
+            <Button size="sm" variant="outline" onClick={openBulkAssign} className="gap-1.5 text-xs border-blue-300 text-blue-700 hover:bg-blue-50">
+              <Users className="w-3.5 h-3.5" /> Bulk Assign ({selectedIds.size})
+            </Button>
+          )}
           <Button size="sm" variant="outline" onClick={handleExport} className="gap-1.5 text-xs">
             <Download className="w-3.5 h-3.5" /> Export CSV
           </Button>
