@@ -67,6 +67,7 @@ export default function Disputes() {
       <DisputeDetail
         dispute={selectedDispute}
         projects={projects}
+        currentUser={currentUser}
         onBack={() => { setSelectedDispute(null); load(); }}
         onUpdate={(updated) => setSelectedDispute(updated)}
       />
