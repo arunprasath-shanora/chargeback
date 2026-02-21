@@ -72,10 +72,20 @@ export default function MasterData() {
       base44.entities.Dispute.list("-chargeback_date", 2000),
       base44.entities.Project.list(),
       base44.auth.me(),
-    ]).then(([d, p, u]) => {
+      base44.entities.DisputeEvidence.list(),
+      base44.entities.CustomField.filter({ status: "active" }),
+    ]).then(([d, p, u, ev, cf]) => {
       setDisputes(d);
       setProjects(p);
       setCurrentUser(u);
+      setCustomFields(cf);
+      // Build evidence map keyed by dispute_id
+      const map = {};
+      ev.forEach(e => {
+        if (!map[e.dispute_id]) map[e.dispute_id] = [];
+        map[e.dispute_id].push(e);
+      });
+      setEvidenceMap(map);
       setLoading(false);
       setAuthChecked(true);
     }).catch(() => { setLoading(false); setAuthChecked(true); });
