@@ -70,7 +70,10 @@ export default function Inventory() {
       i.arn_number?.toLowerCase().includes(q) ||
       i.processor?.toLowerCase().includes(q) ||
       i.sub_unit_name?.toLowerCase().includes(q);
-    const matchStatus = statusFilter === "all" || i.status === statusFilter;
+    // By default ("all"), hide converted items — they've moved to Disputes
+    const matchStatus = statusFilter === "all"
+      ? i.status !== "converted"
+      : i.status === statusFilter;
     const matchProject = projectFilter === "all" || i.project_id === projectFilter;
     const matchNetwork = networkFilter === "all" || i.card_network === networkFilter;
     return matchSearch && matchStatus && matchProject && matchNetwork;
