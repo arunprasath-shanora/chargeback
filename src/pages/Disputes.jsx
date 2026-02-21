@@ -55,7 +55,8 @@ export default function Disputes() {
       d.business_unit?.toLowerCase().includes(search.toLowerCase());
     const matchStatus = statusFilter === "all" || d.status === statusFilter;
     const matchProject = projectFilter === "all" || d.project_id === projectFilter;
-    return matchSearch && matchStatus && matchProject;
+    const matchFought = foughtFilter === "all" || d.fought_decision === foughtFilter;
+    return matchSearch && matchStatus && matchProject && matchFought;
   });
 
   if (selectedDispute) {
