@@ -42,6 +42,7 @@ export default function MasterData() {
   const [projectFilter, setProjectFilter] = useState("all");
   const [selectedDispute, setSelectedDispute] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
+  const [showStatusModal, setShowStatusModal] = useState(false);
 
   const load = () => {
     Promise.all([
