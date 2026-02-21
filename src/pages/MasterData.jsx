@@ -131,8 +131,22 @@ export default function MasterData() {
   return (
     <div className="p-6 space-y-5">
       <div>
-        <h1 className="text-2xl font-bold text-slate-800">Master Data</h1>
-        <p className="text-slate-500 text-sm mt-1">Central repository of all disputes and inventory across all statuses</p>
+        <div>
+          <h1 className="text-2xl font-bold text-slate-800">Master Data</h1>
+          <p className="text-slate-500 text-sm mt-1">Central repository of all disputes and inventory across all statuses</p>
+        </div>
+        <Button
+          className="bg-purple-600 hover:bg-purple-700 text-white gap-2"
+          onClick={() => setShowStatusModal(true)}
+        >
+          <RefreshCw className="w-4 h-4" />
+          Update Processor Status
+          {disputes.filter(d => d.status === "awaiting_decision").length > 0 && (
+            <span className="bg-white text-purple-700 text-xs font-bold rounded-full px-1.5 py-0.5 leading-none">
+              {disputes.filter(d => d.status === "awaiting_decision").length}
+            </span>
+          )}
+        </Button>
       </div>
 
       {/* Tabs */}
