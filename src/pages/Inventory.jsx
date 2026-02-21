@@ -506,6 +506,56 @@ export default function Inventory() {
         </DialogContent>
       </Dialog>
 
+      {/* Bulk Assign Dialog */}
+      <Dialog open={showBulkAssign} onOpenChange={setShowBulkAssign}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Bulk Assign to Analyst</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <p className="text-sm text-slate-500"><span className="font-medium text-slate-800">{selectedIds.size} items</span> selected — status will be set to <span className="font-medium">Assigned</span>.</p>
+            <div className="space-y-1">
+              <Label className="text-xs">Project (optional override)</Label>
+              <Select value={bulkProject} onValueChange={handleBulkProjectChange}>
+                <SelectTrigger><SelectValue placeholder="Keep existing project / select to change..." /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__keep__">— Keep existing —</SelectItem>
+                  {activeProjects.map(p => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Assign to Analyst</Label>
+              {bulkProject && bulkProject !== "__keep__" ? (
+                bulkProjectUsers.length > 0 ? (
+                  <Select value={bulkAnalyst} onValueChange={setBulkAnalyst}>
+                    <SelectTrigger><SelectValue placeholder="Select analyst..." /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__">— Unassigned —</SelectItem>
+                      {bulkProjectUsers.map(u => (
+                        <SelectItem key={u.email} value={u.email}>
+                          {u.full_name ? `${u.full_name} (${u.email})` : u.email}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <p className="text-xs text-slate-400 italic py-1.5">No analysts assigned to this project.</p>
+                )
+              ) : (
+                <p className="text-xs text-slate-400 italic py-1.5">Select a project above to pick an analyst.</p>
+              )}
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowBulkAssign(false)}>Cancel</Button>
+            <Button className="bg-[#0D50B8] hover:bg-[#0a3d8f]" onClick={handleBulkAssign} disabled={bulkSaving}>
+              {bulkSaving ? "Assigning..." : `Assign ${selectedIds.size} Items`}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Edit Due Date Dialog */}
       <Dialog open={!!editDueDateItem} onOpenChange={() => setEditDueDateItem(null)}>
         <DialogContent className="max-w-sm">
