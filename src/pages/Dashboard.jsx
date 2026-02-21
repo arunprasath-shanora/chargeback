@@ -37,6 +37,14 @@ export default function Dashboard() {
   const winRate = (stats.won + stats.lost) > 0
     ? Math.round((stats.won / (stats.won + stats.lost)) * 100) : 0;
 
+  const recoveredUSD = disputes
+    .filter(d => d.status === "won" && d.dispute_amount_usd)
+    .reduce((sum, d) => sum + (d.dispute_amount_usd || 0), 0);
+
+  const formatUSD = (n) => n >= 1000000
+    ? `$${(n / 1000000).toFixed(2)}M`
+    : n >= 1000 ? `$${(n / 1000).toFixed(1)}K` : `$${n.toFixed(0)}`;
+
   const statCards = [
     { label: "Total Disputes",  value: stats.total,             icon: FileText,    accent: "#0D50B8", light: "#EEF4FF" },
     { label: "New Cases",       value: stats.new,               icon: AlertCircle, accent: "#D97706", light: "#FFFBEB" },
