@@ -361,9 +361,7 @@ Write a formal, concise cover letter defending against this chargeback. Include 
           <SectionGrid title="Chargeback Details">
             <InfoRow label="Chargeback Date" value={currentDispute.chargeback_date} />
             <InfoRow label="Chargeback Amount" value={`${currentDispute.chargeback_currency || ""} ${currentDispute.chargeback_amount?.toLocaleString() || "—"}`} />
-            <InfoRow label="Dispute Currency" value={currentDispute.dispute_currency} />
-            <InfoRow label="Dispute Amount" value={currentDispute.dispute_amount ? `${currentDispute.dispute_currency || ""} ${currentDispute.dispute_amount?.toLocaleString()}` : "—"} />
-            <InfoRow label="Converted Amount (USD)" value={currentDispute.dispute_amount_usd ? `USD ${currentDispute.dispute_amount_usd?.toLocaleString()}` : "—"} />
+            <InfoRow label="Amount (USD)" value={currentDispute.chargeback_amount_usd ? `USD ${currentDispute.chargeback_amount_usd?.toLocaleString()}` : "—"} />
             <InfoRow label="Reason Code" value={currentDispute.reason_code} />
             <InfoRow label="Reason Category" value={currentDispute.reason_category} />
             <InfoRow label="ARN (Acquirer Ref No.)" value={currentDispute.arn_number} />
