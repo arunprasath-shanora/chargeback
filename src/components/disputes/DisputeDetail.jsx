@@ -294,9 +294,14 @@ Write a formal, concise cover letter defending against this chargeback. Include 
           </div>
           <p className="text-xs text-slate-400 mt-0.5">{currentDispute.business_unit} {currentDispute.reason_code ? `· ${currentDispute.reason_code}` : ""}</p>
         </div>
-        <Button variant="outline" size="sm" onClick={() => setEditing(true)}>
+        <Button variant="outline" size="sm" onClick={() => setEditing(true)} disabled={!isFought}>
           <Pencil className="w-3.5 h-3.5 mr-1" /> Edit
         </Button>
+        {currentDispute.status === "in_progress" && (
+          <Button variant="outline" size="sm" className="border-amber-300 text-amber-700 hover:bg-amber-50" onClick={handlePause}>
+            <PauseCircle className="w-3.5 h-3.5 mr-1" /> Pause & Exit
+          </Button>
+        )}
       </div>
 
       {/* ── Fought / Not Fought Decision Panel ── */}
