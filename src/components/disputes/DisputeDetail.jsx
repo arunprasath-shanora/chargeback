@@ -221,6 +221,70 @@ Write a formal, concise cover letter defending against this chargeback. Include 
         </Button>
       </div>
 
+      {/* ── Fought / Not Fought Decision Panel ── */}
+      <Card className={`border-2 ${currentDispute.fought_decision === "fought" ? "border-blue-200 bg-blue-50/40" : currentDispute.fought_decision === "not_fought" ? "border-slate-200 bg-slate-50/60" : "border-dashed border-amber-300 bg-amber-50/40"}`}>
+        <CardContent className="p-4">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+            <div className="flex-1">
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Dispute Decision</p>
+              <div className="flex gap-2 flex-wrap">
+                <Button
+                  size="sm"
+                  className={currentDispute.fought_decision === "fought" ? "bg-[#0D50B8] text-white" : "bg-white border border-slate-300 text-slate-700 hover:bg-blue-50"}
+                  onClick={() => { setCurrentDispute(p => ({...p, fought_decision: "fought"})); onUpdate({...currentDispute, fought_decision: "fought"}); base44.entities.Dispute.update(currentDispute.id, { fought_decision: "fought" }); }}
+                >
+                  <Shield className="w-3.5 h-3.5 mr-1.5" /> Fought
+                </Button>
+                <Button
+                  size="sm"
+                  className={currentDispute.fought_decision === "not_fought" ? "bg-slate-600 text-white" : "bg-white border border-slate-300 text-slate-700 hover:bg-slate-50"}
+                  onClick={() => setCurrentDispute(p => ({...p, fought_decision: "not_fought"}))}
+                >
+                  <ShieldOff className="w-3.5 h-3.5 mr-1.5" /> Not Fought
+                </Button>
+              </div>
+            </div>
+
+            {currentDispute.fought_decision === "not_fought" && (
+              <div className="flex-1 space-y-2">
+                <div>
+                  <p className="text-xs font-medium text-slate-600 mb-1">Reason <span className="text-red-500">*</span></p>
+                  <Select value={notFoughtReason} onValueChange={setNotFoughtReason}>
+                    <SelectTrigger className="bg-white h-8 text-sm"><SelectValue placeholder="Select reason..." /></SelectTrigger>
+                    <SelectContent>
+                      {["Low Dollar Value","Client Rule Set","Expired Cases","Duplicate","No Supporting Evidence","Client Decision","Other"].map(r => (
+                        <SelectItem key={r} value={r}>{r}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Input
+                  className="bg-white h-8 text-sm"
+                  placeholder="Additional notes (optional)..."
+                  value={notFoughtNotes}
+                  onChange={e => setNotFoughtNotes(e.target.value)}
+                />
+                <Button size="sm" className="bg-slate-700 hover:bg-slate-800 text-white" disabled={!notFoughtReason || savingDecision} onClick={() => handleSetDecision("not_fought")}>
+                  {savingDecision ? "Saving..." : "Confirm Not Fought"}
+                </Button>
+              </div>
+            )}
+
+            {currentDispute.fought_decision === "not_fought" && currentDispute.not_fought_reason && (
+              <div className="text-sm">
+                <p className="text-xs text-slate-400 mb-0.5">Saved Reason</p>
+                <p className="font-medium text-slate-700">{currentDispute.not_fought_reason}</p>
+                {currentDispute.not_fought_notes && <p className="text-xs text-slate-500 mt-0.5">{currentDispute.not_fought_notes}</p>}
+              </div>
+            )}
+
+            {!currentDispute.fought_decision && (
+              <p className="text-xs text-amber-700 font-medium">⚠ Please set a decision before proceeding</p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
       <Tabs defaultValue="details">
         <TabsList className="bg-slate-100">
           <TabsTrigger value="details" className="text-xs">Case Details</TabsTrigger>
