@@ -146,13 +146,20 @@ export default function Disputes() {
                   <tr key={d.id} className="border-b border-slate-50 hover:bg-slate-50 transition-colors cursor-pointer" onClick={() => setSelectedDispute(d)}>
                     <td className="px-4 py-3 font-medium text-[#0D50B8]">{d.case_id}</td>
                     <td className="px-4 py-3">
+                      {d.fought_decision ? (
+                        <Badge className={`${foughtColors[d.fought_decision]} text-xs border-0`}>
+                          {d.fought_decision === "fought" ? "Fought" : "Not Fought"}
+                        </Badge>
+                      ) : <span className="text-slate-300 text-xs">—</span>}
+                    </td>
+                    <td className="px-4 py-3">
                       <Badge className={`${statusColors[d.status] || "bg-slate-100 text-slate-700"} text-xs border-0`}>
                         {d.status?.replace("_", " ")}
                       </Badge>
                     </td>
                     <td className="px-4 py-3 text-slate-600">{d.business_unit || "—"}</td>
-                    <td className="px-4 py-3 text-slate-600">{d.card_type || "—"}</td>
-                    <td className="px-4 py-3 text-slate-600">{d.dispute_currency} {d.dispute_amount?.toLocaleString() || "—"}</td>
+                    <td className="px-4 py-3 text-slate-600">{d.card_network || "—"}</td>
+                    <td className="px-4 py-3 text-slate-600">{d.chargeback_currency} {d.chargeback_amount?.toLocaleString() || "—"}</td>
                     <td className="px-4 py-3 text-slate-500">{d.reason_code || "—"}</td>
                     <td className="px-4 py-3 text-slate-500">{d.sla_deadline || "—"}</td>
                     <td className="px-4 py-3 text-slate-500">{d.assigned_to || "—"}</td>
