@@ -48,6 +48,8 @@ export default function DisputeForm({ dispute, projects, onSave, onCancel }) {
   });
   const [reasonCodes, setReasonCodes] = useState([]);
   const [saving, setSaving] = useState(false);
+  const [convertingFx, setConvertingFx] = useState(false);
+  const fxTimer = useRef(null);
 
   useEffect(() => {
     base44.entities.ReasonCode.list().then(setReasonCodes).catch(() => {});
