@@ -106,19 +106,7 @@ export default function MasterData() {
     return matchSearch && matchStatus && matchProject && matchDate;
   }), [disputes, search, statusFilter, projectFilter, dateFrom, dateTo, dateField]);
 
-  const filteredInventory = useMemo(() => inventory.filter(i => {
-    const matchSearch = !search ||
-      i.case_id?.toLowerCase().includes(search.toLowerCase()) ||
-      i.merchant_id?.toLowerCase().includes(search.toLowerCase()) ||
-      i.reason_code?.toLowerCase().includes(search.toLowerCase()) ||
-      i.sub_unit_name?.toLowerCase().includes(search.toLowerCase());
-    const matchProject = projectFilter === "all" || i.project_id === projectFilter;
-    const matchDate    = !dateFrom || !dateTo || isInRange(
-      dateField === "chargeback_date" ? i.chargeback_date : i.created_date,
-      dateFrom, dateTo
-    );
-    return matchSearch && matchProject && matchDate;
-  }), [inventory, search, projectFilter, dateFrom, dateTo, dateField]);
+
 
   // ── Status summary counts (from filtered disputes) ──────────────────
   const statusCounts = useMemo(() => {
