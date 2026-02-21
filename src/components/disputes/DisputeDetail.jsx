@@ -174,10 +174,12 @@ Write a formal, concise cover letter defending against this chargeback. Include 
       patch.not_fought_reason = notFoughtReason;
       patch.not_fought_notes = notFoughtNotes;
     }
-    const updated = await base44.entities.Dispute.update(currentDispute.id, patch);
-    setCurrentDispute(prev => ({ ...prev, ...patch }));
+    await base44.entities.Dispute.update(currentDispute.id, patch);
     onUpdate({ ...currentDispute, ...patch });
     setSavingDecision(false);
+    if (decision === "not_fought") {
+      onBack();
+    }
   };
 
   if (editing) {
