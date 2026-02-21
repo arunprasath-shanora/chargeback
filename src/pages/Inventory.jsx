@@ -215,6 +215,65 @@ export default function Inventory() {
     URL.revokeObjectURL(url);
   };
 
+  const toggleSelect = (id) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    const eligible = filtered.filter(i => i.status === "received" || i.status === "assigned");
+    if (eligible.every(i => selectedIds.has(i.id))) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(eligible.map(i => i.id)));
+    }
+  };
+
+  const openBulkAssign = () => {
+    setBulkProject("");
+    setBulkAnalyst("");
+    setBulkProjectUsers([]);
+    setShowBulkAssign(true);
+  };
+
+  const handleBulkProjectChange = async (projId) => {
+    setBulkProject(projId);
+    setBulkAnalyst("");
+    if (!projId) { setBulkProjectUsers([]); return; }
+    const project = projects.find(p => p.id === projId);
+    const emails = project?.assigned_users || [];
+    if (!emails.length) { setBulkProjectUsers([]); return; }
+    const allUsers = await base44.entities.User.list();
+    setBulkProjectUsers(allUsers.filter(u => emails.includes(u.email)));
+  };
+
+  const handleBulkAssign = async () => {
+    setBulkSaving(true);
+    const ids = Array.from(selectedIds);
+    const analyst = bulkAnalyst === "__none__" ? undefined : bulkAnalyst || undefined;
+    await Promise.all(ids.map(id =>
+      base44.entities.InventoryItem.update(id, {
+        ...(bulkProject ? { project_id: bulkProject } : {}),
+        ...(analyst !== undefined ? { assigned_to: analyst } : {}),
+        status: "assigned",
+      })
+    ));
+    auditLog({
+      action: "update",
+      resource_type: "InventoryItem",
+      details: `Bulk assigned ${ids.length} items to analyst ${analyst || "unassigned"}`,
+      record_count: ids.length,
+      new_value: `project: ${bulkProject}, assigned_to: ${analyst || "none"}, status: assigned`
+    });
+    setBulkSaving(false);
+    setShowBulkAssign(false);
+    setSelectedIds(new Set());
+    load();
+  };
+
   const activeProjects = projects; // already filtered to active on load
 
   return (
