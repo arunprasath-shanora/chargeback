@@ -247,7 +247,7 @@ export default function MasterData() {
         </Select>
 
         <span className="text-xs text-slate-400 whitespace-nowrap">
-          {filteredDisputes.length} disputes · {filteredInventory.length} inventory
+          {filteredDisputes.length} disputes
         </span>
       </div>
 
