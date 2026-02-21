@@ -226,6 +226,9 @@ export default function Inventory() {
           <Button size="sm" className="bg-[#0D50B8] hover:bg-[#0a3d8f] gap-1.5 text-xs" onClick={() => setShowAdd(true)}>
             <Plus className="w-3.5 h-3.5" /> Add Manual
           </Button>
+          <Button size="sm" variant="outline" onClick={handleExport} className="gap-1.5 text-xs">
+            <Download className="w-3.5 h-3.5" /> Export CSV
+          </Button>
           <Button size="sm" variant="ghost" onClick={load} className="gap-1.5 text-xs text-slate-500">
             <RefreshCw className="w-3.5 h-3.5" />
           </Button>
