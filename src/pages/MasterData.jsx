@@ -143,7 +143,7 @@ export default function MasterData() {
       i.transaction_date, i.chargeback_date, i.due_date, i.assigned_to, i.source, i.created_date,
     ]);
     downloadCSV([dHeaders, ...dRows], `disputes_master_${dateFrom}_${dateTo}.csv`);
-    setTimeout(() => downloadCSV([iHeaders, ...iRows], `inventory_master_${dateFrom}_${dateTo}.csv`), 300);
+
   };
 
   // ── Access denied ───────────────────────────────────────────────────
