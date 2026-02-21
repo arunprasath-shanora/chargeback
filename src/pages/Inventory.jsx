@@ -394,7 +394,12 @@ export default function Inventory() {
                 ) : filtered.map(i => {
                   const proj = activeProjects.find(p => p.id === i.project_id);
                   return (
-                    <tr key={i.id} className="border-b border-slate-50 hover:bg-slate-50 transition-colors">
+                    <tr key={i.id} className={`border-b border-slate-50 hover:bg-slate-50 transition-colors ${selectedIds.has(i.id) ? "bg-blue-50/60" : ""}`}>
+                      <td className="px-4 py-3 w-8">
+                        {(i.status === "received" || i.status === "assigned") && (
+                          <Checkbox checked={selectedIds.has(i.id)} onCheckedChange={() => toggleSelect(i.id)} />
+                        )}
+                      </td>
                       <td className="px-4 py-3 font-medium text-slate-800 whitespace-nowrap">{i.case_id}</td>
                       <td className="px-4 py-3 text-slate-600 text-xs whitespace-nowrap">{i.case_type || "—"}</td>
                       <td className="px-4 py-3 text-slate-500 text-xs font-mono">{i.arn_number || "—"}</td>
