@@ -176,11 +176,10 @@ Write a formal, concise cover letter defending against this chargeback. Include 
       patch.status = "not_fought";
     }
     await base44.entities.Dispute.update(currentDispute.id, patch);
-    onUpdate({ ...currentDispute, ...patch });
+    const merged = { ...currentDispute, ...patch };
+    setCurrentDispute(merged);
+    onUpdate(merged);
     setSavingDecision(false);
-    if (decision === "not_fought") {
-      onBack();
-    }
   };
 
   const isSuperAdmin = currentUser?.role === "super_admin";
