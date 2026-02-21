@@ -144,7 +144,6 @@ export default function MasterData() {
             onClick={() => { setActiveTab(tab.id); resetFilters(); }}
             className={`px-5 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === tab.id ? "bg-white text-[#0D50B8] shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
           >
-            {tab.tab}
             {tab.label}
           </button>
         ))}
