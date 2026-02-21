@@ -336,6 +336,8 @@ Write a formal, concise cover letter defending against this chargeback. Include 
             <InfoRow label="Case ID" value={currentDispute.case_id} />
             <InfoRow label="Case Type" value={currentDispute.case_type} />
             <InfoRow label="Status" value={currentDispute.status?.replace("_", " ")} />
+            <InfoRow label="Decision" value={currentDispute.fought_decision === "fought" ? "Fought" : currentDispute.fought_decision === "not_fought" ? "Not Fought" : "—"} />
+            {currentDispute.fought_decision === "not_fought" && <InfoRow label="Not Fought Reason" value={currentDispute.not_fought_reason} />}
             <InfoRow label="Assigned To" value={currentDispute.assigned_to} />
             <InfoRow label="SLA Deadline" value={currentDispute.sla_deadline} />
             <InfoRow label="Business Unit" value={currentDispute.business_unit} />
@@ -343,6 +345,7 @@ Write a formal, concise cover letter defending against this chargeback. Include 
             <InfoRow label="Processor" value={currentDispute.processor} />
             <InfoRow label="Merchant ID" value={currentDispute.merchant_id} />
             <InfoRow label="DBA Name" value={currentDispute.dba_name} />
+            <InfoRow label="Missing Evidence" value={currentDispute.missing_evidence} />
           </SectionGrid>
 
           <SectionGrid title="Chargeback Details">
