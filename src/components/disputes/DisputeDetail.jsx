@@ -325,7 +325,13 @@ Write a formal, concise cover letter defending against this chargeback. Include 
                   <Button
                     size="sm"
                     className={currentDispute.fought_decision === "fought" ? "bg-[#0D50B8] text-white" : "bg-white border border-slate-300 text-slate-700 hover:bg-blue-50"}
-                    onClick={() => { setCurrentDispute(p => ({...p, fought_decision: "fought"})); onUpdate({...currentDispute, fought_decision: "fought"}); base44.entities.Dispute.update(currentDispute.id, { fought_decision: "fought" }); }}
+                    onClick={() => {
+                      const patch = { fought_decision: "fought", status: "in_progress" };
+                      base44.entities.Dispute.update(currentDispute.id, patch);
+                      const merged = { ...currentDispute, ...patch };
+                      setCurrentDispute(merged);
+                      onUpdate(merged);
+                    }}
                   >
                     <Shield className="w-3.5 h-3.5 mr-1.5" /> Fought
                   </Button>
