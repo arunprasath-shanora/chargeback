@@ -40,6 +40,7 @@ const STATUS_SUMMARY_CARDS = [
 const today = new Date();
 const MTD_START = format(startOfMonth(today), "yyyy-MM-dd");
 const MTD_END   = format(today, "yyyy-MM-dd");
+const SIX_MONTHS_START = format(startOfMonth(new Date(today.getFullYear(), today.getMonth() - 5, 1)), "yyyy-MM-dd");
 
 function isInRange(dateStr, from, to) {
   if (!dateStr) return false;
