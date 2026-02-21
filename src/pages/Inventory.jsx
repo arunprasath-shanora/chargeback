@@ -421,6 +421,28 @@ export default function Inventory() {
         </DialogContent>
       </Dialog>
 
+      {/* Edit Due Date Dialog */}
+      <Dialog open={!!editDueDateItem} onOpenChange={() => setEditDueDateItem(null)}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Edit Due Date</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <p className="text-sm text-slate-500">Case ID: <span className="font-medium text-slate-800">{editDueDateItem?.case_id}</span></p>
+            <div className="space-y-1">
+              <Label className="text-xs">Due Date</Label>
+              <Input type="date" value={editDueDate} onChange={e => setEditDueDate(e.target.value)} />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditDueDateItem(null)}>Cancel</Button>
+            <Button className="bg-[#0D50B8] hover:bg-[#0a3d8f]" onClick={handleSaveDueDate} disabled={savingDueDate}>
+              {savingDueDate ? "Saving..." : "Save"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Sub-modals */}
       <InventoryUploadModal open={showUpload} onClose={() => setShowUpload(false)} projects={activeProjects} onSuccess={load} />
       <InventoryAddModal    open={showAdd}    onClose={() => setShowAdd(false)}    projects={activeProjects} onSuccess={load} />
