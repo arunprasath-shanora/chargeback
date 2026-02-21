@@ -33,7 +33,7 @@ const SectionGrid = ({ title, children }) => (
   </div>
 );
 
-export default function DisputeDetail({ dispute, projects, onBack, onUpdate }) {
+export default function DisputeDetail({ dispute, projects, onBack, onUpdate, currentUser }) {
   const [editing, setEditing] = useState(false);
   const [evidence, setEvidence] = useState([]);
   const [evidenceTypes, setEvidenceTypes] = useState([]);
