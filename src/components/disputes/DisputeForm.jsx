@@ -121,8 +121,14 @@ export default function DisputeForm({ dispute, projects, onSave, onCancel }) {
 
   const handleSave = async () => {
     setSaving(true);
-    if (dispute?.id) await base44.entities.Dispute.update(dispute.id, form);
-    else await base44.entities.Dispute.create(form);
+    if (dispute?.id) {
+      // Auto-advance from "new" to "in_progress" when editing
+      const saveData = { ...form };
+      if (saveData.status === "new") saveData.status = "in_progress";
+      await base44.entities.Dispute.update(dispute.id, saveData);
+    } else {
+      await base44.entities.Dispute.create({ ...form, status: "new" });
+    }
     setSaving(false);
     onSave();
   };
