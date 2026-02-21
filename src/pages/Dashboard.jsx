@@ -156,7 +156,7 @@ export default function Dashboard() {
                       </span>
                     </td>
                     <td className="px-6 py-3.5 font-medium text-slate-700">
-                      {d.dispute_currency || d.chargeback_currency} {d.dispute_amount?.toLocaleString() || d.chargeback_amount?.toLocaleString() || "—"}{d.dispute_amount_usd ? ` · $${d.dispute_amount_usd?.toLocaleString()} USD` : ""}
+                      {d.chargeback_currency} {d.chargeback_amount?.toLocaleString() || "—"}{d.chargeback_amount_usd ? ` · $${d.chargeback_amount_usd?.toLocaleString()} USD` : ""}
                     </td>
                     <td className="px-6 py-3.5 text-slate-500">{d.reason_code || "—"}</td>
                     <td className="px-6 py-3.5">
