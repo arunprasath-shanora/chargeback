@@ -18,7 +18,7 @@ const navItems = [
   { label: "Projects",             icon: FolderOpen,       page: "Projects" },
   { label: "Master Setup",         icon: Settings,         page: "MasterSetup" },
   { label: "Performance Dashboard",icon: BookOpen,         page: "Reports" },
-  { label: "Master Data",          icon: Users,            page: "MasterData" },
+  { label: "Master Data",          icon: Database,         page: "MasterData" },
   { label: "Users",                icon: Users,            page: "Users" },
   { label: "Audit Log",            icon: ShieldCheck,      page: "AuditLog" },
 ];
