@@ -116,6 +116,14 @@ export default function Disputes() {
             {projects.map(p => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
           </SelectContent>
         </Select>
+        <Select value={foughtFilter} onValueChange={setFoughtFilter}>
+          <SelectTrigger className="w-36"><SelectValue placeholder="Fought?" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Decisions</SelectItem>
+            <SelectItem value="fought">Fought</SelectItem>
+            <SelectItem value="not_fought">Not Fought</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <Card className="border-slate-100">
