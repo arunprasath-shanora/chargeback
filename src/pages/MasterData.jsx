@@ -73,12 +73,10 @@ export default function MasterData() {
     setLoading(true);
     Promise.all([
       base44.entities.Dispute.list("-chargeback_date", 2000),
-      base44.entities.InventoryItem.list("-chargeback_date", 2000),
       base44.entities.Project.list(),
       base44.auth.me(),
-    ]).then(([d, inv, p, u]) => {
+    ]).then(([d, p, u]) => {
       setDisputes(d);
-      setInventory(inv);
       setProjects(p);
       setCurrentUser(u);
       setLoading(false);
