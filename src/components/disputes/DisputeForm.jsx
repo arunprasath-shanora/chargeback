@@ -84,6 +84,42 @@ export default function DisputeForm({ dispute, projects, onSave, onCancel }) {
     setForm(f => ({ ...f, reason_code: code, reason_category: rc?.cb_reason || f.reason_category }));
   };
 
+  // Auto-convert dispute amount to USD whenever currency, amount, or chargeback_date changes
+  const triggerFxConversion = (currency, amount, date) => {
+    if (!currency || !amount || currency === "USD") {
+      setForm(f => ({ ...f, dispute_amount_usd: currency === "USD" ? parseFloat(amount) || null : null }));
+      return;
+    }
+    clearTimeout(fxTimer.current);
+    fxTimer.current = setTimeout(async () => {
+      setConvertingFx(true);
+      const res = await base44.functions.invoke("convertCurrency", { currency, amount: parseFloat(amount), date });
+      setConvertingFx(false);
+      if (res?.data?.usd_amount !== undefined) {
+        setForm(f => ({ ...f, dispute_amount_usd: res.data.usd_amount }));
+      }
+    }, 700);
+  };
+
+  const handleDisputeAmountChange = (field, value) => {
+    setForm(f => {
+      const updated = { ...f, [field]: value };
+      triggerFxConversion(
+        field === "dispute_currency" ? value : f.dispute_currency,
+        field === "dispute_amount" ? value : f.dispute_amount,
+        f.chargeback_date
+      );
+      return updated;
+    });
+  };
+
+  const handleChargebackDateChange = (value) => {
+    setForm(f => {
+      triggerFxConversion(f.dispute_currency, f.dispute_amount, value);
+      return { ...f, chargeback_date: value };
+    });
+  };
+
   const handleSave = async () => {
     setSaving(true);
     if (dispute?.id) await base44.entities.Dispute.update(dispute.id, form);
