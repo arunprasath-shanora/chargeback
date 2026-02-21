@@ -288,8 +288,8 @@ Write a formal, concise cover letter defending against this chargeback. Include 
       <Tabs defaultValue="details">
         <TabsList className="bg-slate-100">
           <TabsTrigger value="details" className="text-xs">Case Details</TabsTrigger>
-          <TabsTrigger value="evidence" className="text-xs">Evidence</TabsTrigger>
-          <TabsTrigger value="cover_letter" className="text-xs">Cover Letter</TabsTrigger>
+          <TabsTrigger value="evidence" className="text-xs" disabled={currentDispute.fought_decision === "not_fought"}>Evidence</TabsTrigger>
+          <TabsTrigger value="cover_letter" className="text-xs" disabled={currentDispute.fought_decision === "not_fought"}>Cover Letter</TabsTrigger>
         </TabsList>
 
         <TabsContent value="details" className="mt-4 space-y-5">
