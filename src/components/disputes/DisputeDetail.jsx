@@ -14,9 +14,10 @@ const statusColors = {
   new: "bg-yellow-100 text-yellow-800",
   in_progress: "bg-blue-100 text-blue-800",
   submitted: "bg-indigo-100 text-indigo-800",
-  pending: "bg-orange-100 text-orange-800",
+  awaiting_decision: "bg-purple-100 text-purple-800",
   won: "bg-green-100 text-green-800",
   lost: "bg-red-100 text-red-800",
+  not_fought: "bg-slate-100 text-slate-600",
 };
 
 const InfoRow = ({ label, value }) => (
