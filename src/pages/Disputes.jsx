@@ -112,6 +112,7 @@ export default function Disputes() {
             <SelectItem value="pending">Pending</SelectItem>
             <SelectItem value="won">Won</SelectItem>
             <SelectItem value="lost">Lost</SelectItem>
+            <SelectItem value="not_fought">Not Fought</SelectItem>
           </SelectContent>
         </Select>
         <Select value={projectFilter} onValueChange={setProjectFilter}>
