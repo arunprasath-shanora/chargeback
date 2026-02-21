@@ -134,14 +134,7 @@ export default function MasterData() {
       d.chargeback_amount, d.chargeback_amount_usd, d.reason_code, d.reason_category,
       d.chargeback_date, d.sla_deadline, d.fought_decision, d.assigned_to, d.created_date,
     ]);
-    const iHeaders = ["Type","Case ID","Inv Status","Project","Sub Unit","Merchant ID","Processor","Card Network","Currency","CB Amount","Reason Code","Reason Category","Transaction Date","CB Date","Due Date","Assigned To","Source","Created Date"];
-    const iRows = filteredInventory.map(i => [
-      "Inventory", i.case_id, i.status,
-      projects.find(p => p.id === i.project_id)?.name || "",
-      i.sub_unit_name, i.merchant_id, i.processor, i.card_network, i.currency,
-      i.chargeback_amount, i.reason_code, i.reason_category,
-      i.transaction_date, i.chargeback_date, i.due_date, i.assigned_to, i.source, i.created_date,
-    ]);
+
     downloadCSV([dHeaders, ...dRows], `disputes_master_${dateFrom}_${dateTo}.csv`);
 
   };
