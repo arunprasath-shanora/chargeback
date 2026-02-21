@@ -30,6 +30,7 @@ export default function Disputes() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [projectFilter, setProjectFilter] = useState("all");
+  const [foughtFilter, setFoughtFilter] = useState("all");
   const [showForm, setShowForm] = useState(false);
   const [selectedDispute, setSelectedDispute] = useState(null);
 
