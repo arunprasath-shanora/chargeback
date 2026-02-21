@@ -159,9 +159,9 @@ export default function Disputes() {
                       </Badge>
                     </td>
                     <td className="px-4 py-3 text-slate-600">{d.card_network || "—"}</td>
-                    <td className="px-4 py-3 text-slate-500 text-xs font-medium">{d.dispute_currency || d.chargeback_currency || "—"}</td>
-                    <td className="px-4 py-3 text-slate-700 font-medium">{d.dispute_amount?.toLocaleString() || d.chargeback_amount?.toLocaleString() || "—"}</td>
-                    <td className="px-4 py-3 text-emerald-700 font-medium">{d.dispute_amount_usd ? `$${d.dispute_amount_usd?.toLocaleString()}` : "—"}</td>
+                    <td className="px-4 py-3 text-slate-500 text-xs font-medium">{d.chargeback_currency || "—"}</td>
+                    <td className="px-4 py-3 text-slate-700 font-medium">{d.chargeback_amount?.toLocaleString() || "—"}</td>
+                    <td className="px-4 py-3 text-emerald-700 font-medium">{d.chargeback_amount_usd ? `$${d.chargeback_amount_usd?.toLocaleString()}` : "—"}</td>
                     <td className="px-4 py-3 text-slate-500">{d.reason_code || "—"}</td>
                     <td className="px-4 py-3 text-slate-500">{d.sla_deadline || "—"}</td>
                     <td className="px-4 py-3 text-slate-500">{d.assigned_to || "—"}</td>
