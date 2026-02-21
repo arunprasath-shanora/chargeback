@@ -55,6 +55,14 @@ export default function Inventory() {
   const [editDueDate, setEditDueDate] = useState("");
   const [savingDueDate, setSavingDueDate] = useState(false);
 
+  // Bulk assign
+  const [selectedIds, setSelectedIds] = useState(new Set());
+  const [showBulkAssign, setShowBulkAssign] = useState(false);
+  const [bulkProject, setBulkProject] = useState("");
+  const [bulkAnalyst, setBulkAnalyst] = useState("");
+  const [bulkProjectUsers, setBulkProjectUsers] = useState([]);
+  const [bulkSaving, setBulkSaving] = useState(false);
+
   const load = () => {
     Promise.all([
       base44.entities.InventoryItem.list("-created_date", 500),
