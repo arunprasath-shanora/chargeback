@@ -74,7 +74,7 @@ export default function Dashboard() {
       </div>
 
       {/* Stat Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-8 gap-4">
         {statCards.map((s) => (
           <div key={s.label} className="stat-chip p-4 flex flex-col gap-3 cursor-default">
             <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: s.light }}>
