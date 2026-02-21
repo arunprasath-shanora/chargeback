@@ -303,6 +303,12 @@ export default function MasterData() {
           )}
         </div>
       )}
+      <StatusUpdateModal
+        open={showStatusModal}
+        onClose={() => setShowStatusModal(false)}
+        awaitingDisputes={disputes.filter(d => d.status === "awaiting_decision")}
+        onDone={() => load()}
+      />
     </div>
   );
 }
