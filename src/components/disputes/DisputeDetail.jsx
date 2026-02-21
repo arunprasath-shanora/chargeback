@@ -173,6 +173,7 @@ Write a formal, concise cover letter defending against this chargeback. Include 
     if (decision === "not_fought") {
       patch.not_fought_reason = notFoughtReason;
       patch.not_fought_notes = notFoughtNotes;
+      patch.status = "not_fought";
     }
     await base44.entities.Dispute.update(currentDispute.id, patch);
     onUpdate({ ...currentDispute, ...patch });
@@ -181,6 +182,9 @@ Write a formal, concise cover letter defending against this chargeback. Include 
       onBack();
     }
   };
+
+  const isSuperAdmin = currentUser?.role === "super_admin";
+  const isNotFoughtLocked = currentDispute.fought_decision === "not_fought" && !isSuperAdmin;
 
   if (editing) {
     return (
