@@ -56,7 +56,6 @@ function isInRange(dateStr, from, to) {
 
 export default function MasterData() {
   const [disputes, setDisputes]       = useState([]);
-  const [inventory, setInventory]     = useState([]);
   const [projects, setProjects]       = useState([]);
   const [loading, setLoading]         = useState(true);
   const [search, setSearch]           = useState("");

@@ -51,11 +51,11 @@ import AuditLog from './pages/AuditLog';
 import Dashboard from './pages/Dashboard';
 import Disputes from './pages/Disputes';
 import Inventory from './pages/Inventory';
+import MasterData from './pages/MasterData';
 import MasterSetup from './pages/MasterSetup';
 import Projects from './pages/Projects';
 import Reports from './pages/Reports';
 import Users from './pages/Users';
-import MasterData from './pages/MasterData';
 import __Layout from './Layout.jsx';
 
 
@@ -64,11 +64,11 @@ export const PAGES = {
     "Dashboard": Dashboard,
     "Disputes": Disputes,
     "Inventory": Inventory,
+    "MasterData": MasterData,
     "MasterSetup": MasterSetup,
     "Projects": Projects,
     "Reports": Reports,
     "Users": Users,
-    "MasterData": MasterData,
 }
 
 export const pagesConfig = {
