@@ -6,7 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { ChevronLeft, Pencil, Upload, FileText, Trash2, RefreshCw, Wand2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { ChevronLeft, Pencil, Upload, FileText, Trash2, Wand2, Shield, ShieldOff } from "lucide-react";
 import DisputeForm from "./DisputeForm";
 
 const statusColors = {
