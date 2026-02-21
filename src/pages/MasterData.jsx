@@ -58,7 +58,7 @@ export default function MasterData() {
   const [statusFilter, setStatusFilter]   = useState("all");
   const [projectFilter, setProjectFilter] = useState("all");
   const [dateField, setDateField]     = useState("chargeback_date"); // or "created_date"
-  const [dateFrom, setDateFrom]       = useState(MTD_START);
+  const [dateFrom, setDateFrom]       = useState(SIX_MONTHS_START);
   const [dateTo, setDateTo]           = useState(MTD_END);
   const [selectedDispute, setSelectedDispute] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
