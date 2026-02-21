@@ -104,11 +104,6 @@ export default function Disputes() {
             <SelectItem value="all">All Status</SelectItem>
             <SelectItem value="new">New</SelectItem>
             <SelectItem value="in_progress">In Progress</SelectItem>
-            <SelectItem value="submitted">Submitted</SelectItem>
-            <SelectItem value="pending">Pending</SelectItem>
-            <SelectItem value="won">Won</SelectItem>
-            <SelectItem value="lost">Lost</SelectItem>
-            <SelectItem value="not_fought">Not Fought</SelectItem>
           </SelectContent>
         </Select>
         <Select value={projectFilter} onValueChange={setProjectFilter}>
