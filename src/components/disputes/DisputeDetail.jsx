@@ -595,21 +595,64 @@ Write a formal, concise cover letter defending against this chargeback. Include 
               {generatingCL ? "Generating..." : "AI Generate"}
             </Button>
             <Button className="bg-[#0D50B8] hover:bg-[#0a3d8f]" size="sm" onClick={handleSaveCoverLetter} disabled={savingCL}>
-              {savingCL ? "Saving..." : "Save"}
+              {savingCL ? "Saving..." : "Save Cover Letter"}
             </Button>
-            {["new","in_progress","submitted"].includes(currentDispute.status) && (
-              <Button className="bg-indigo-600 hover:bg-indigo-700 text-white" size="sm" onClick={handleMarkSubmitted} disabled={savingStatus}>
-                {savingStatus ? "Updating..." : "Mark as Submitted → Awaiting Decision"}
-              </Button>
-            )}
+            <Button variant="outline" size="sm" onClick={exportCoverLetterPDF} disabled={!hasCoverLetter} title="Export as PDF for portal upload">
+              <Download className="w-3.5 h-3.5 mr-1" /> Export PDF
+            </Button>
           </div>
 
           <Textarea
             className="min-h-[400px] font-mono text-sm"
-            placeholder="Cover letter content will appear here. Use a template or AI generate..."
+            placeholder="Cover letter content will appear here. Use a template or AI generate, then save before submitting..."
             value={coverLetter}
             onChange={e => setCoverLetter(e.target.value)}
           />
+
+          {/* Submit to Portal section */}
+          {isFought && !["awaiting_decision","won","lost"].includes(currentDispute.status) && (
+            <Card className={`border-2 ${canSubmit ? "border-green-200 bg-green-50/40" : "border-dashed border-slate-200 bg-slate-50/40"}`}>
+              <CardContent className="p-4 space-y-3">
+                <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Submit to Processor Portal</p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="flex flex-col gap-1 text-xs">
+                    <span className={`flex items-center gap-1.5 font-medium ${hasEvidence ? "text-green-700" : "text-amber-600"}`}>
+                      {hasEvidence ? "✓" : "○"} Evidence Uploaded
+                    </span>
+                    <span className="text-slate-400">{evidence.length} file(s) attached</span>
+                  </div>
+                  <div className="flex flex-col gap-1 text-xs">
+                    <span className={`flex items-center gap-1.5 font-medium ${hasCoverLetter ? "text-green-700" : "text-amber-600"}`}>
+                      {hasCoverLetter ? "✓" : "○"} Cover Letter Saved
+                    </span>
+                    <span className="text-slate-400">{hasCoverLetter ? "Ready to export as PDF" : "Generate & save above"}</span>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <Button
+                      size="sm"
+                      className={`w-full ${canSubmit ? "bg-indigo-600 hover:bg-indigo-700 text-white" : "bg-slate-200 text-slate-400 cursor-not-allowed"}`}
+                      disabled={!canSubmit || savingStatus}
+                      onClick={handleSubmitToPortal}
+                      title={!canSubmit ? "Upload evidence and save cover letter first" : "Mark as submitted to processor portal"}
+                    >
+                      <Send className="w-3.5 h-3.5 mr-1.5" />
+                      {savingStatus ? "Submitting..." : "Manual Submit"}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="w-full text-indigo-700 border-indigo-200 hover:bg-indigo-50"
+                      disabled={!canSubmit}
+                      onClick={() => window.open(`${window.location.origin}/#api-info`, "_blank")}
+                      title="Use API or automation to submit to portal"
+                    >
+                      <Globe className="w-3.5 h-3.5 mr-1.5" /> API / Automation
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Awaiting Decision resolution panel */}
           {currentDispute.status === "awaiting_decision" && (
