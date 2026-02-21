@@ -53,6 +53,7 @@ export default function Dashboard() {
     { label: "Lost",            value: stats.lost,              icon: TrendingDown,accent: "#DC2626", light: "#FEF2F2" },
     { label: "Win Rate",        value: `${winRate}%`,           icon: CheckCircle, accent: "#0891B2", light: "#ECFEFF" },
     { label: "New Inventory",   value: stats.inventoryReceived, icon: Package,     accent: "#4F46E5", light: "#EEF2FF" },
+    { label: "Recovered (USD)", value: loading ? "—" : formatUSD(recoveredUSD), icon: DollarSign, accent: "#059669", light: "#ECFDF5" },
   ];
 
   const recent = disputes.slice(0, 8);
