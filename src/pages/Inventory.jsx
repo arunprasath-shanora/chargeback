@@ -168,6 +168,44 @@ export default function Inventory() {
     load();
   };
 
+  const handleSaveDueDate = async () => {
+    setSavingDueDate(true);
+    await base44.entities.InventoryItem.update(editDueDateItem.id, { due_date: editDueDate });
+    auditLog({
+      action: "update",
+      resource_type: "InventoryItem",
+      resource_id: editDueDateItem.id,
+      old_value: `due_date: ${editDueDateItem.due_date || "none"}`,
+      new_value: `due_date: ${editDueDate}`,
+      details: `Updated due date for case ${editDueDateItem.case_id}`
+    });
+    setSavingDueDate(false);
+    setEditDueDateItem(null);
+    load();
+  };
+
+  const handleExport = () => {
+    const headers = ["Case ID","Case Type","ARN","Reason Code","Reason Category","Project","Sub Unit","MID","Status","Source","Card Network","Card Type","BIN First 6","Last 4","CB Amount","Currency","CB Date","Txn Date","Due Date","Assigned To"];
+    const rows = filtered.map(i => {
+      const proj = activeProjects.find(p => p.id === i.project_id);
+      return [
+        i.case_id, i.case_type, i.arn_number, i.reason_code, i.reason_category,
+        proj?.name || "", i.sub_unit_name, i.merchant_id, i.status, i.source,
+        i.card_network, i.card_type, i.bin_first6, i.bin_last4,
+        i.chargeback_amount, i.currency, i.chargeback_date, i.transaction_date,
+        i.due_date, i.assigned_to
+      ].map(v => `"${v ?? ""}"`).join(",");
+    });
+    const csv = [headers.join(","), ...rows].join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `inventory_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const activeProjects = projects; // already filtered to active on load
 
   return (
