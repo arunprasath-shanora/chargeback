@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { FileText, TrendingUp, TrendingDown, Clock, CheckCircle, AlertCircle, Package } from "lucide-react";
+import { FileText, TrendingUp, TrendingDown, Clock, CheckCircle, AlertCircle, Package, DollarSign } from "lucide-react";
 
 const STATUS_COLORS = {
   new:         { pill: "bg-amber-50 text-amber-700 ring-1 ring-amber-200",  dot: "bg-amber-400" },
