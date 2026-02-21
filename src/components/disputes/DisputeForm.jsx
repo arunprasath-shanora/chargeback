@@ -10,6 +10,7 @@ import { ChevronLeft, Save, Loader2 } from "lucide-react";
 
 const CURRENCIES = ["USD","AUD","EUR","GBP","CAD","NZD","SGD","HKD","CHF","JPY","INR","MXN","BRL","ZAR","AED"];
 
+
 const SECTION = ({ title, children }) => (
   <Card className="border-slate-100">
     <CardHeader className="pb-3 pt-4 px-5">
