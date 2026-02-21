@@ -165,9 +165,10 @@ export default function DisputeForm({ dispute, projects, onSave, onCancel }) {
               <SelectItem value="new">New</SelectItem>
               <SelectItem value="in_progress">In Progress</SelectItem>
               <SelectItem value="submitted">Submitted</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="awaiting_decision">Awaiting Decision</SelectItem>
               <SelectItem value="won">Won</SelectItem>
               <SelectItem value="lost">Lost</SelectItem>
+              <SelectItem value="not_fought">Not Fought</SelectItem>
             </SelectContent>
           </Select>
         </F>
