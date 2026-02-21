@@ -167,7 +167,6 @@ export default function Disputes() {
                         {d.status?.replace("_", " ")}
                       </Badge>
                     </td>
-                    <td className="px-4 py-3 text-slate-600">{d.business_unit || "—"}</td>
                     <td className="px-4 py-3 text-slate-600">{d.card_network || "—"}</td>
                     <td className="px-4 py-3 text-slate-600">{d.chargeback_currency} {d.chargeback_amount?.toLocaleString() || "—"}</td>
                     <td className="px-4 py-3 text-slate-500">{d.reason_code || "—"}</td>
