@@ -223,12 +223,12 @@ Write a formal, concise cover letter defending against this chargeback. Include 
     onBack();
   };
 
-  const exportCoverLetterPDF = () => {
+  const exportCoverLetterPDF = async () => {
     const doc = new jsPDF({ unit: "mm", format: "a4" });
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(11);
     const margin = 20;
     const pageWidth = doc.internal.pageSize.getWidth() - margin * 2;
+    const pageHeight = doc.internal.pageSize.getHeight();
+
     // Header
     doc.setFontSize(13);
     doc.setFont("helvetica", "bold");
@@ -240,11 +240,64 @@ Write a formal, concise cover letter defending against this chargeback. Include 
     doc.setTextColor(0);
     doc.setLineWidth(0.3);
     doc.line(margin, margin + 10, margin + pageWidth, margin + 10);
-    // Body
+
+    // Body text
     doc.setFontSize(10);
     doc.setFont("helvetica", "normal");
     const lines = doc.splitTextToSize(currentDispute.cover_letter_content || "", pageWidth);
     doc.text(lines, margin, margin + 18);
+
+    // Evidence images
+    const imageEvidence = evidence.filter(ev => {
+      const name = (ev.file_name || "").toLowerCase();
+      return name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".png") || name.endsWith(".gif") || name.endsWith(".webp");
+    });
+
+    if (imageEvidence.length > 0) {
+      doc.addPage();
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "bold");
+      doc.text("Supporting Evidence", margin, margin);
+      doc.setLineWidth(0.3);
+      doc.line(margin, margin + 3, margin + pageWidth, margin + 3);
+
+      let y = margin + 12;
+      for (const ev of imageEvidence) {
+        try {
+          // Load image via canvas for cross-origin
+          const img = await new Promise((resolve, reject) => {
+            const i = new Image();
+            i.crossOrigin = "anonymous";
+            i.onload = () => resolve(i);
+            i.onerror = reject;
+            i.src = ev.file_url;
+          });
+          const canvas = document.createElement("canvas");
+          canvas.width = img.naturalWidth;
+          canvas.height = img.naturalHeight;
+          canvas.getContext("2d").drawImage(img, 0, 0);
+          const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
+
+          const aspect = img.naturalHeight / img.naturalWidth;
+          const imgW = pageWidth;
+          const imgH = Math.min(imgW * aspect, 120);
+
+          if (y + imgH + 16 > pageHeight - margin) { doc.addPage(); y = margin; }
+
+          doc.setFontSize(8);
+          doc.setFont("helvetica", "bold");
+          doc.setTextColor(80);
+          doc.text(`${ev.evidence_type || "Evidence"}: ${ev.file_name}`, margin, y);
+          doc.setTextColor(0);
+          y += 4;
+          doc.addImage(dataUrl, "JPEG", margin, y, imgW, imgH);
+          y += imgH + 10;
+        } catch {
+          // Skip images that fail to load
+        }
+      }
+    }
+
     doc.save(`cover_letter_${currentDispute.case_id}.pdf`);
   };
 
