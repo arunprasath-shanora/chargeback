@@ -208,6 +208,56 @@ Write a formal, concise cover letter defending against this chargeback. Include 
   const isSuperAdmin = currentUser?.role === "super_admin";
   const isNotFoughtLocked = currentDispute.fought_decision === "not_fought" && !isSuperAdmin;
 
+  // Decision gate: tabs are locked until a decision is made
+  const decisionMade = !!currentDispute.fought_decision;
+  const isFought = currentDispute.fought_decision === "fought";
+
+  // Readiness checks for submission
+  const hasEvidence = evidence.length > 0;
+  const hasCoverLetter = !!(currentDispute.cover_letter_content && currentDispute.cover_letter_content.trim().length > 50);
+  const canSubmit = isFought && hasEvidence && hasCoverLetter;
+
+  const handlePause = async () => {
+    await base44.entities.Dispute.update(currentDispute.id, { status: "new" });
+    onBack();
+  };
+
+  const exportCoverLetterPDF = () => {
+    const doc = new jsPDF({ unit: "mm", format: "a4" });
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+    const margin = 20;
+    const pageWidth = doc.internal.pageSize.getWidth() - margin * 2;
+    // Header
+    doc.setFontSize(13);
+    doc.setFont("helvetica", "bold");
+    doc.text("Chargeback Dispute Cover Letter", margin, margin);
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(100);
+    doc.text(`Case ID: ${currentDispute.case_id}  |  Date: ${new Date().toLocaleDateString()}`, margin, margin + 7);
+    doc.setTextColor(0);
+    doc.setLineWidth(0.3);
+    doc.line(margin, margin + 10, margin + pageWidth, margin + 10);
+    // Body
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    const lines = doc.splitTextToSize(currentDispute.cover_letter_content || "", pageWidth);
+    doc.text(lines, margin, margin + 18);
+    doc.save(`cover_letter_${currentDispute.case_id}.pdf`);
+  };
+
+  const handleSubmitToPortal = async () => {
+    if (!canSubmit) return;
+    setSavingStatus(true);
+    const patch = { status: "submitted" };
+    await base44.entities.Dispute.update(currentDispute.id, patch);
+    const merged = { ...currentDispute, ...patch };
+    setCurrentDispute(merged);
+    onUpdate(merged);
+    setSavingStatus(false);
+  };
+
   if (editing) {
     return (
       <DisputeForm
