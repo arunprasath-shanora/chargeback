@@ -18,6 +18,11 @@ const statusColors = {
   lost: "bg-red-100 text-red-800",
 };
 
+const foughtColors = {
+  fought: "bg-blue-50 text-blue-700",
+  not_fought: "bg-slate-100 text-slate-600",
+};
+
 export default function Disputes() {
   const [disputes, setDisputes] = useState([]);
   const [projects, setProjects] = useState([]);
