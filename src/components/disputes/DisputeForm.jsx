@@ -73,7 +73,7 @@ export default function DisputeForm({ dispute, projects, onSave, onCancel }) {
         merchant_id: firstUnit?.merchant_id || f.merchant_id,
         merchant_alias: firstUnit?.mid_alias || f.merchant_alias,
         dba_name: firstUnit?.dba_name || f.dba_name,
-        dispute_currency: firstUnit?.currency || f.dispute_currency,
+        chargeback_currency: firstUnit?.currency || f.chargeback_currency,
         transaction_currency: firstUnit?.currency || f.transaction_currency,
       }));
     } else {
