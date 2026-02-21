@@ -12,14 +12,15 @@ import { auditLog } from "@/components/security/auditLogger";
 const LOGO_URL = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6996f53449fb2f4f399c2c75/6daefa08f_sign-no-tagline-bg-fff-1500x1500.png";
 
 const navItems = [
-  { label: "Dashboard",   icon: LayoutDashboard, page: "Dashboard" },
-  { label: "Disputes",    icon: FileText,         page: "Disputes" },
-  { label: "Inventory",   icon: Package,          page: "Inventory" },
-  { label: "Projects",    icon: FolderOpen,       page: "Projects" },
-  { label: "Master Setup",icon: Settings,         page: "MasterSetup" },
-  { label: "Reports",     icon: BookOpen,         page: "Reports" },
-  { label: "Users",       icon: Users,            page: "Users" },
-  { label: "Audit Log",   icon: ShieldCheck,      page: "AuditLog" },
+  { label: "Production Dashboard", icon: LayoutDashboard, page: "Dashboard" },
+  { label: "Disputes",             icon: FileText,         page: "Disputes" },
+  { label: "Inventory",            icon: Package,          page: "Inventory" },
+  { label: "Projects",             icon: FolderOpen,       page: "Projects" },
+  { label: "Master Setup",         icon: Settings,         page: "MasterSetup" },
+  { label: "Performance Dashboard",icon: BookOpen,         page: "Reports" },
+  { label: "Master Data",          icon: Users,            page: "MasterData" },
+  { label: "Users",                icon: Users,            page: "Users" },
+  { label: "Audit Log",            icon: ShieldCheck,      page: "AuditLog" },
 ];
 
 export default function Layout({ children, currentPageName }) {
