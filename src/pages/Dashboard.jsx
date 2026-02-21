@@ -64,7 +64,7 @@ export default function Dashboard() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold text-slate-900 tracking-tight">Dashboard</h1>
+          <h1 className="text-xl font-bold text-slate-900 tracking-tight">Production Dashboard</h1>
           <p className="text-slate-500 text-sm mt-0.5">Chargeback management overview</p>
         </div>
         <div className="inline-flex items-center gap-2 bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs text-slate-500 shadow-sm self-start">
