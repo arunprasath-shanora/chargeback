@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Search, Plus, ArrowRightLeft, Upload, Zap, AlertTriangle, RefreshCw } from "lucide-react";
+import { Search, Plus, ArrowRightLeft, Upload, Zap, AlertTriangle, RefreshCw, Download, Pencil } from "lucide-react";
 import InventoryUploadModal from "@/components/inventory/InventoryUploadModal";
 import InventoryAddModal from "@/components/inventory/InventoryAddModal";
 import ApiInfoModal from "@/components/inventory/ApiInfoModal";
