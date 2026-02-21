@@ -169,6 +169,26 @@ Write a formal, concise cover letter defending against this chargeback. Include 
     setSavingCL(false);
   };
 
+  const handleMarkSubmitted = async () => {
+    setSavingStatus(true);
+    const patch = { status: "awaiting_decision" };
+    await base44.entities.Dispute.update(currentDispute.id, patch);
+    const merged = { ...currentDispute, ...patch };
+    setCurrentDispute(merged);
+    onUpdate(merged);
+    setSavingStatus(false);
+  };
+
+  const handleUpdateFinalStatus = async (newStatus) => {
+    setSavingStatus(true);
+    const patch = { status: newStatus, resolution_date: new Date().toISOString().split("T")[0] };
+    await base44.entities.Dispute.update(currentDispute.id, patch);
+    const merged = { ...currentDispute, ...patch };
+    setCurrentDispute(merged);
+    onUpdate(merged);
+    setSavingStatus(false);
+  };
+
   const handleSetDecision = async (decision) => {
     setSavingDecision(true);
     const patch = { fought_decision: decision };
