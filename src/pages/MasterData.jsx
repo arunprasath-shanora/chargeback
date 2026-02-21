@@ -311,54 +311,7 @@ export default function MasterData() {
             </Card>
           </div>
 
-          {/* ── Inventory Table ── */}
-          <div>
-            <h2 className="text-sm font-semibold text-slate-700 mb-2 uppercase tracking-wide">
-              Inventory <span className="text-slate-400 font-normal normal-case">({filteredInventory.length})</span>
-            </h2>
-            <Card className="border-slate-100">
-              <CardContent className="p-0">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-slate-100 bg-slate-50">
-                        {["Case ID","Inv Status","Sub Unit","Merchant ID","Processor","Card Network","Currency","CB Amount","Reason Code","Reason Category","Txn Date","CB Date","Due Date","Assigned To","Source"].map(h => (
-                          <th key={h} className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase tracking-wide whitespace-nowrap">{h}</th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredInventory.length === 0 ? (
-                        <tr><td colSpan={15} className="px-4 py-10 text-center text-slate-400">No inventory in this date range</td></tr>
-                      ) : filteredInventory.map(i => (
-                        <tr key={i.id} className="border-b border-slate-50 hover:bg-blue-50/30">
-                          <td className="px-4 py-3 font-medium text-slate-700">{i.case_id}</td>
-                          <td className="px-4 py-3">
-                            <Badge className={`${INV_STATUS_COLORS[i.status] || "bg-slate-100 text-slate-600"} text-xs border-0`}>
-                              {i.status?.charAt(0).toUpperCase() + i.status?.slice(1) || "—"}
-                            </Badge>
-                          </td>
-                          <td className="px-4 py-3 text-slate-600">{i.sub_unit_name || "—"}</td>
-                          <td className="px-4 py-3 text-slate-600">{i.merchant_id || "—"}</td>
-                          <td className="px-4 py-3 text-slate-600">{i.processor || "—"}</td>
-                          <td className="px-4 py-3 text-slate-600">{i.card_network || "—"}</td>
-                          <td className="px-4 py-3 text-slate-500 text-xs">{i.currency || "—"}</td>
-                          <td className="px-4 py-3 text-slate-700 font-medium">{i.chargeback_amount?.toLocaleString() || "—"}</td>
-                          <td className="px-4 py-3 text-slate-500">{i.reason_code || "—"}</td>
-                          <td className="px-4 py-3 text-slate-500">{i.reason_category || "—"}</td>
-                          <td className="px-4 py-3 text-slate-500">{i.transaction_date || "—"}</td>
-                          <td className="px-4 py-3 text-slate-500">{i.chargeback_date || "—"}</td>
-                          <td className="px-4 py-3 text-slate-500">{i.due_date || "—"}</td>
-                          <td className="px-4 py-3 text-slate-500">{i.assigned_to || "—"}</td>
-                          <td className="px-4 py-3 text-slate-500">{i.source || "—"}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+
         </div>
       )}
 
