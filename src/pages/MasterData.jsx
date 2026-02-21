@@ -304,47 +304,136 @@ export default function MasterData() {
             <Card className="border-slate-100">
               <CardContent className="p-0">
                 <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
+                  <table className="w-full text-sm" style={{ minWidth: "2800px" }}>
                     <thead>
                       <tr className="border-b border-slate-100 bg-slate-50">
-                        {["Case ID","Status","Sub Unit","Processor","Card Network","Currency","CB Amount","USD Amount","Reason Code","CB Date","SLA Deadline","Decision","Assigned To",""].map(h => (
-                          <th key={h} className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase tracking-wide whitespace-nowrap">{h}</th>
+                        {/* Case */}
+                        {["Case ID","Status","Project","Business Unit","Sub Unit","Processor","Merchant ID","DBA Name","Decision","Not Fought Reason","Missing Evid.","Assigned To","SLA Deadline","Resolution Date","Recovery Amt","Case Type",
+                        // Chargeback
+                        "CB Date","CB Amount","CB Currency","CB USD","Reason Code","Reason Category","ARN","Cardholder",
+                        // Card & Auth
+                        "Card Network","Card Type","BIN First6","Last4","Auth Code","Auth Date","Auth Amt","AVS","CVV","3DS",
+                        // Transaction
+                        "Txn ID","Txn Date","Txn Amount","Txn Currency","Txn Country","Txn State","Billing Zip",
+                        // Customer
+                        "Cust ID","Cust Name","Cust Email","Cust Phone","Cust IP","Cust Type",
+                        // Order
+                        "Product Name","Product Type","Sale Type","Service Start","Service End","Cancellation","Cust Contact Date",
+                        // Custom fields
+                        ...customFields.map(cf => cf.field_name),
+                        // Evidence
+                        "Evidence","Notes",""].map((h, i) => (
+                          <th key={i} className="text-left px-3 py-3 text-xs font-medium text-slate-500 uppercase tracking-wide whitespace-nowrap">{h}</th>
                         ))}
                       </tr>
                     </thead>
                     <tbody>
                       {filteredDisputes.length === 0 ? (
-                        <tr><td colSpan={14} className="px-4 py-10 text-center text-slate-400">No disputes in this date range</td></tr>
-                      ) : filteredDisputes.map(d => (
+                        <tr><td colSpan={60} className="px-4 py-10 text-center text-slate-400">No disputes in this date range</td></tr>
+                      ) : filteredDisputes.map(d => {
+                        const evList = evidenceMap[d.id] || [];
+                        return (
                         <tr key={d.id} className="border-b border-slate-50 hover:bg-blue-50/30 cursor-pointer" onClick={() => setSelectedDispute(d)}>
-                          <td className="px-4 py-3 font-medium text-[#0D50B8]">{d.case_id}</td>
-                          <td className="px-4 py-3">
-                            <Badge className={`${DISPUTE_STATUS_COLORS[d.status] || "bg-slate-100 text-slate-600"} text-xs border-0`}>
+                          {/* Case */}
+                          <td className="px-3 py-2.5 font-medium text-[#0D50B8] whitespace-nowrap">{d.case_id}</td>
+                          <td className="px-3 py-2.5">
+                            <Badge className={`${DISPUTE_STATUS_COLORS[d.status] || "bg-slate-100 text-slate-600"} text-xs border-0 whitespace-nowrap`}>
                               {DISPUTE_STATUS_LABEL[d.status] || d.status}
                             </Badge>
                           </td>
-                          <td className="px-4 py-3 text-slate-600">{d.sub_unit_name || "—"}</td>
-                          <td className="px-4 py-3 text-slate-600">{d.processor || "—"}</td>
-                          <td className="px-4 py-3 text-slate-600">{d.card_network || "—"}</td>
-                          <td className="px-4 py-3 text-slate-500 text-xs">{d.chargeback_currency || "—"}</td>
-                          <td className="px-4 py-3 text-slate-700 font-medium">{d.chargeback_amount?.toLocaleString() || "—"}</td>
-                          <td className="px-4 py-3 text-emerald-700 font-medium">{d.chargeback_amount_usd ? `$${d.chargeback_amount_usd.toLocaleString()}` : "—"}</td>
-                          <td className="px-4 py-3 text-slate-500">{d.reason_code || "—"}</td>
-                          <td className="px-4 py-3 text-slate-500">{d.chargeback_date || "—"}</td>
-                          <td className="px-4 py-3 text-slate-500">{d.sla_deadline || "—"}</td>
-                          <td className="px-4 py-3">
+                          <td className="px-3 py-2.5 text-slate-600 whitespace-nowrap">{projects.find(p => p.id === d.project_id)?.name || "—"}</td>
+                          <td className="px-3 py-2.5 text-slate-600 whitespace-nowrap">{d.business_unit || "—"}</td>
+                          <td className="px-3 py-2.5 text-slate-600 whitespace-nowrap">{d.sub_unit_name || "—"}</td>
+                          <td className="px-3 py-2.5 text-slate-600 whitespace-nowrap">{d.processor || "—"}</td>
+                          <td className="px-3 py-2.5 text-slate-500">{d.merchant_id || "—"}</td>
+                          <td className="px-3 py-2.5 text-slate-500">{d.dba_name || "—"}</td>
+                          <td className="px-3 py-2.5">
                             {d.fought_decision
-                              ? <Badge className={`${d.fought_decision === "fought" ? "bg-blue-50 text-blue-700" : "bg-slate-100 text-slate-600"} text-xs border-0`}>{d.fought_decision === "fought" ? "Fought" : "Not Fought"}</Badge>
+                              ? <Badge className={`${d.fought_decision === "fought" ? "bg-blue-50 text-blue-700" : "bg-slate-100 text-slate-600"} text-xs border-0 whitespace-nowrap`}>{d.fought_decision === "fought" ? "Fought" : "Not Fought"}</Badge>
                               : <span className="text-slate-300 text-xs">—</span>}
                           </td>
-                          <td className="px-4 py-3 text-slate-500">{d.assigned_to || "—"}</td>
-                          <td className="px-4 py-3">
+                          <td className="px-3 py-2.5 text-slate-500 text-xs">{d.not_fought_reason || "—"}</td>
+                          <td className="px-3 py-2.5 text-center">
+                            {d.missing_evidence === "Yes" ? <Badge className="bg-red-100 text-red-700 text-xs border-0">Yes</Badge> : <span className="text-slate-300 text-xs">No</span>}
+                          </td>
+                          <td className="px-3 py-2.5 text-slate-500 text-xs whitespace-nowrap">{d.assigned_to || "—"}</td>
+                          <td className="px-3 py-2.5 text-slate-500 whitespace-nowrap">{d.sla_deadline || "—"}</td>
+                          <td className="px-3 py-2.5 text-slate-500 whitespace-nowrap">{d.resolution_date || "—"}</td>
+                          <td className="px-3 py-2.5 text-emerald-700 font-medium whitespace-nowrap">{d.recovery_amount != null ? `$${d.recovery_amount.toLocaleString()}` : "—"}</td>
+                          <td className="px-3 py-2.5 text-slate-500 whitespace-nowrap text-xs">{d.case_type || "—"}</td>
+                          {/* Chargeback */}
+                          <td className="px-3 py-2.5 text-slate-500 whitespace-nowrap">{d.chargeback_date || "—"}</td>
+                          <td className="px-3 py-2.5 text-slate-700 font-medium whitespace-nowrap">{d.chargeback_amount?.toLocaleString() || "—"}</td>
+                          <td className="px-3 py-2.5 text-slate-500 text-xs">{d.chargeback_currency || "—"}</td>
+                          <td className="px-3 py-2.5 text-emerald-700 font-medium whitespace-nowrap">{d.chargeback_amount_usd ? `$${d.chargeback_amount_usd.toLocaleString()}` : "—"}</td>
+                          <td className="px-3 py-2.5 text-slate-500">{d.reason_code || "—"}</td>
+                          <td className="px-3 py-2.5 text-slate-500 whitespace-nowrap">{d.reason_category || "—"}</td>
+                          <td className="px-3 py-2.5 text-slate-500 text-xs">{d.arn_number || "—"}</td>
+                          <td className="px-3 py-2.5 text-slate-600">{d.cardholder_name || "—"}</td>
+                          {/* Card & Auth */}
+                          <td className="px-3 py-2.5 text-slate-600 whitespace-nowrap">{d.card_network || "—"}</td>
+                          <td className="px-3 py-2.5 text-slate-500">{d.card_type || "—"}</td>
+                          <td className="px-3 py-2.5 text-slate-500">{d.card_bin_first6 || "—"}</td>
+                          <td className="px-3 py-2.5 text-slate-500">{d.card_last4 || "—"}</td>
+                          <td className="px-3 py-2.5 text-slate-500">{d.authorization_code || "—"}</td>
+                          <td className="px-3 py-2.5 text-slate-500 whitespace-nowrap">{d.authorization_date || "—"}</td>
+                          <td className="px-3 py-2.5 text-slate-500">{d.authorization_amount?.toLocaleString() || "—"}</td>
+                          <td className="px-3 py-2.5 text-slate-500 text-xs">{d.avs_match || "—"}</td>
+                          <td className="px-3 py-2.5 text-slate-500 text-xs">{d.cvv_match || "—"}</td>
+                          <td className="px-3 py-2.5 text-slate-500 text-xs">{d.three_d_secure || "—"}</td>
+                          {/* Transaction */}
+                          <td className="px-3 py-2.5 text-slate-500 text-xs">{d.transaction_id || "—"}</td>
+                          <td className="px-3 py-2.5 text-slate-500 whitespace-nowrap">{d.transaction_date || "—"}</td>
+                          <td className="px-3 py-2.5 text-slate-700 font-medium">{d.transaction_amount?.toLocaleString() || "—"}</td>
+                          <td className="px-3 py-2.5 text-slate-500 text-xs">{d.transaction_currency || "—"}</td>
+                          <td className="px-3 py-2.5 text-slate-500">{d.transaction_country || "—"}</td>
+                          <td className="px-3 py-2.5 text-slate-500">{d.transaction_state || "—"}</td>
+                          <td className="px-3 py-2.5 text-slate-500">{d.billing_zip_code || "—"}</td>
+                          {/* Customer */}
+                          <td className="px-3 py-2.5 text-slate-500 text-xs">{d.customer_id || "—"}</td>
+                          <td className="px-3 py-2.5 text-slate-600">{d.customer_name || "—"}</td>
+                          <td className="px-3 py-2.5 text-slate-500 text-xs">{d.customer_email || "—"}</td>
+                          <td className="px-3 py-2.5 text-slate-500 text-xs">{d.customer_phone || "—"}</td>
+                          <td className="px-3 py-2.5 text-slate-500 text-xs">{d.customer_ip || "—"}</td>
+                          <td className="px-3 py-2.5 text-slate-500 text-xs">{d.customer_type || "—"}</td>
+                          {/* Order */}
+                          <td className="px-3 py-2.5 text-slate-600">{d.product_name || "—"}</td>
+                          <td className="px-3 py-2.5 text-slate-500 text-xs">{d.product_type || "—"}</td>
+                          <td className="px-3 py-2.5 text-slate-500 text-xs">{d.sale_type || "—"}</td>
+                          <td className="px-3 py-2.5 text-slate-500 whitespace-nowrap">{d.service_start_date || "—"}</td>
+                          <td className="px-3 py-2.5 text-slate-500 whitespace-nowrap">{d.service_end_date || "—"}</td>
+                          <td className="px-3 py-2.5 text-slate-500 whitespace-nowrap">{d.cancellation_date || "—"}</td>
+                          <td className="px-3 py-2.5 text-slate-500 whitespace-nowrap">{d.customer_contact_date || "—"}</td>
+                          {/* Custom fields */}
+                          {customFields.map(cf => (
+                            <td key={cf.id} className="px-3 py-2.5 text-slate-600 text-xs">{d.custom_fields?.[cf.field_key] ?? "—"}</td>
+                          ))}
+                          {/* Evidence */}
+                          <td className="px-3 py-2.5">
+                            {evList.length === 0 ? (
+                              <span className="text-slate-300 text-xs">None</span>
+                            ) : (
+                              <div className="space-y-0.5 min-w-[180px]">
+                                {evList.map((ev, i) => (
+                                  <div key={i} className="flex items-center gap-1">
+                                    <Badge className="bg-indigo-50 text-indigo-700 text-xs border-0 whitespace-nowrap">{ev.evidence_type || "Other"}</Badge>
+                                    <a href={ev.file_url} target="_blank" rel="noreferrer" onClick={e => e.stopPropagation()} className="text-xs text-[#0D50B8] hover:underline truncate max-w-[120px]">{ev.file_name}</a>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </td>
+                          {/* Notes */}
+                          <td className="px-3 py-2.5 text-slate-400 text-xs max-w-[200px]">
+                            {d.notes ? <span className="line-clamp-2">{d.notes}</span> : "—"}
+                          </td>
+                          <td className="px-3 py-2.5">
                             <Button size="icon" variant="ghost" className="h-7 w-7" onClick={e => { e.stopPropagation(); setSelectedDispute(d); }}>
                               <Eye className="w-3.5 h-3.5" />
                             </Button>
                           </td>
                         </tr>
-                      ))}
+                      )})}
                     </tbody>
                   </table>
                 </div>
