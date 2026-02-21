@@ -38,6 +38,7 @@ export default function DisputeForm({ dispute, projects, onSave, onCancel }) {
     arn_number: "", cardholder_name: "", authorization_type: "",
     authorization_date: "", authorization_amount: "", authorization_code: "",
     chargeback_date: "", chargeback_amount: "", chargeback_currency: "",
+    chargeback_amount_usd: null,
     sla_deadline: "", transaction_id: "", transaction_date: "",
     transaction_amount: "", transaction_currency: "",
     avs_match: "", cvv_match: "", three_d_secure: "",
