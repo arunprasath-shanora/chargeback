@@ -132,18 +132,52 @@ export default function MasterData() {
   };
 
   const exportAll = () => {
-    // Disputes sheet
-    const dHeaders = ["Type","Case ID","Status","Project","Sub Unit","Processor","Card Network","Currency","CB Amount","USD Amount","Reason Code","Reason Category","CB Date","SLA Deadline","Fought Decision","Assigned To","Created Date"];
-    const dRows = filteredDisputes.map(d => [
-      "Dispute", d.case_id, DISPUTE_STATUS_LABEL[d.status] || d.status,
-      projects.find(p => p.id === d.project_id)?.name || "",
-      d.sub_unit_name, d.processor, d.card_network, d.chargeback_currency,
-      d.chargeback_amount, d.chargeback_amount_usd, d.reason_code, d.reason_category,
-      d.chargeback_date, d.sla_deadline, d.fought_decision, d.assigned_to, d.created_date,
-    ]);
-
+    const cfHeaders = customFields.map(cf => cf.field_name);
+    const dHeaders = [
+      // Case
+      "Case ID","Status","Project","Business Unit","Sub Unit","Processor","Merchant ID","DBA Name","Merchant Alias","Fought Decision","Not Fought Reason","Not Fought Notes","Missing Evidence","Assigned To","SLA Deadline","Resolution Date","Recovery Amount","Case Type",
+      // Chargeback
+      "CB Date","CB Amount","CB Currency","CB Amount USD","Reason Code","Reason Category","ARN Number","Cardholder Name",
+      // Card & Auth
+      "Card Network","Card Type","Card BIN First6","Card Last4","Auth Code","Auth Date","Auth Amount","Auth Type","AVS Match","CVV Match","3D Secure",
+      // Transaction
+      "Transaction ID","Transaction Date","Transaction Amount","Transaction Currency","Transaction Country","Transaction State","Billing Zip",
+      // Customer & Order
+      "Customer ID","Customer Name","Customer Email","Customer Phone","Customer IP","Customer Type","Product Name","Product Type","Sale Type","Service Start","Service End","Cancellation Date","Customer Contact Date",
+      // Custom fields
+      ...cfHeaders,
+      // Evidence
+      "Evidence Count","Evidence Types","Evidence Files",
+      // Notes
+      "Notes","Created Date",
+    ];
+    const dRows = filteredDisputes.map(d => {
+      const evList = evidenceMap[d.id] || [];
+      const cfValues = customFields.map(cf => d.custom_fields?.[cf.field_key] ?? "");
+      return [
+        d.case_id, DISPUTE_STATUS_LABEL[d.status] || d.status,
+        projects.find(p => p.id === d.project_id)?.name || "",
+        d.business_unit, d.sub_unit_name, d.processor, d.merchant_id, d.dba_name, d.merchant_alias,
+        d.fought_decision, d.not_fought_reason, d.not_fought_notes, d.missing_evidence,
+        d.assigned_to, d.sla_deadline, d.resolution_date, d.recovery_amount, d.case_type,
+        d.chargeback_date, d.chargeback_amount, d.chargeback_currency, d.chargeback_amount_usd,
+        d.reason_code, d.reason_category, d.arn_number, d.cardholder_name,
+        d.card_network, d.card_type, d.card_bin_first6, d.card_last4,
+        d.authorization_code, d.authorization_date, d.authorization_amount, d.authorization_type,
+        d.avs_match, d.cvv_match, d.three_d_secure,
+        d.transaction_id, d.transaction_date, d.transaction_amount, d.transaction_currency,
+        d.transaction_country, d.transaction_state, d.billing_zip_code,
+        d.customer_id, d.customer_name, d.customer_email, d.customer_phone, d.customer_ip,
+        d.customer_type, d.product_name, d.product_type, d.sale_type,
+        d.service_start_date, d.service_end_date, d.cancellation_date, d.customer_contact_date,
+        ...cfValues,
+        evList.length,
+        [...new Set(evList.map(e => e.evidence_type))].join("; "),
+        evList.map(e => e.file_name).join("; "),
+        d.notes, d.created_date,
+      ];
+    });
     downloadCSV([dHeaders, ...dRows], `disputes_master_${dateFrom}_${dateTo}.csv`);
-
   };
 
   // ── Access denied ───────────────────────────────────────────────────
