@@ -33,14 +33,17 @@ export default function Disputes() {
   const [foughtFilter, setFoughtFilter] = useState("all");
   const [showForm, setShowForm] = useState(false);
   const [selectedDispute, setSelectedDispute] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
 
   const load = () => {
     Promise.all([
       base44.entities.Dispute.list("-created_date", 200),
       base44.entities.Project.list(),
-    ]).then(([d, p]) => {
+      base44.auth.me(),
+    ]).then(([d, p, u]) => {
       setDisputes(d);
       setProjects(p);
+      setCurrentUser(u);
       setLoading(false);
     }).catch(() => setLoading(false));
   };
