@@ -38,8 +38,8 @@ export default function Dashboard() {
     ? Math.round((stats.won / (stats.won + stats.lost)) * 100) : 0;
 
   const recoveredUSD = disputes
-    .filter(d => d.status === "won" && d.dispute_amount_usd)
-    .reduce((sum, d) => sum + (d.dispute_amount_usd || 0), 0);
+    .filter(d => d.status === "won" && d.chargeback_amount_usd)
+    .reduce((sum, d) => sum + (d.chargeback_amount_usd || 0), 0);
 
   const formatUSD = (n) => n >= 1000000
     ? `$${(n / 1000000).toFixed(2)}M`
