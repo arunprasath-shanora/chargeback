@@ -131,7 +131,8 @@ export default function MasterData() {
   return (
     <div className="p-6 space-y-5">
       <div>
-        <div>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
           <h1 className="text-2xl font-bold text-slate-800">Master Data</h1>
           <p className="text-slate-500 text-sm mt-1">Central repository of all disputes and inventory across all statuses</p>
         </div>
