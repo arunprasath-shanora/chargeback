@@ -218,7 +218,8 @@ Write a formal, concise cover letter defending against this chargeback. Include 
   const canSubmit = isFought && hasEvidence && hasCoverLetter;
 
   const handlePause = async () => {
-    await base44.entities.Dispute.update(currentDispute.id, { status: "new" });
+    // Keep in_progress so the status reflects work has started; just navigate back
+    await base44.entities.Dispute.update(currentDispute.id, { status: "in_progress" });
     onBack();
   };
 
