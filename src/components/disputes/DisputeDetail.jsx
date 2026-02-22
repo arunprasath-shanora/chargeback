@@ -141,6 +141,11 @@ Provide your response in this exact JSON format:
       const project = projects.find(p => p.id === dispute.project_id);
       setProjectInfo(project);
       applyProjectMappings(project, dispute.reason_code, et, ct, rc);
+
+      // Prefetch AI analysis in background if dispute is already fought
+      if (dispute.fought_decision === "fought" && (dispute.reason_code || dispute.reason_category)) {
+        prefetchAiAnalysis(dispute, et, ev);
+      }
     }).catch(() => {});
   }, [dispute.id]);
 
