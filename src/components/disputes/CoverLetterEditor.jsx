@@ -179,17 +179,35 @@ export default function CoverLetterEditor({
 
   const insertTable = () => {
     const cols = 3, rows = 3;
-    let t = `<table style="border-collapse:collapse;width:100%;margin:8px 0;"><thead style="background:#f8fafc;"><tr>`;
-    for (let c = 0; c < cols; c++) t += `<th style="border:1px solid #cbd5e1;padding:6px 10px;text-align:left;font-size:12px;" >Header ${c + 1}</th>`;
+    let t = `<table style="border-collapse:collapse;width:100%;margin:12px 0;box-shadow:0 1px 4px rgba(37,99,235,0.08);overflow:hidden;"><thead><tr>`;
+    for (let c = 0; c < cols; c++) t += `<th style="border:1.5px solid #2563eb;padding:7px 12px;text-align:left;font-size:12px;background:#1d4ed8;color:#ffffff;font-weight:600;">Header ${c + 1}</th>`;
     t += `</tr></thead><tbody>`;
     for (let r = 0; r < rows - 1; r++) {
-      t += `<tr>`;
-      for (let c = 0; c < cols; c++) t += `<td style="border:1px solid #cbd5e1;padding:6px 10px;font-size:12px;">Cell</td>`;
+      t += `<tr style="background:${r % 2 === 0 ? "#ffffff" : "#eff6ff"};">`;
+      for (let c = 0; c < cols; c++) t += `<td style="border:1px solid #93c5fd;padding:7px 12px;font-size:12px;color:#1e293b;">Cell</td>`;
       t += `</tr>`;
     }
     t += `</tbody></table><br>`;
     editorRef.current?.focus();
     document.execCommand("insertHTML", false, t);
+  };
+
+  const insertEvidence = (ev) => {
+    setEvDropdownOpen(false);
+    editorRef.current?.focus();
+    const name = (ev.file_name || "").toLowerCase();
+    const isImage = /\.(jpg|jpeg|png|webp|gif)$/.test(name);
+    let html;
+    if (isImage) {
+      html = `<div class="ev-block" data-ev-type="${ev.evidence_type}" data-ev-url="${ev.file_url}" data-ev-name="${ev.file_name}" contenteditable="false" style="border:1.5px dashed #94a3b8;border-radius:6px;padding:8px;margin:8px 0;background:#f8fafc;display:block;">
+        <p style="font-size:11px;color:#64748b;margin:0 0 4px 0;">${ev.evidence_type}: ${ev.file_name}</p>
+        <img src="${ev.file_url}" alt="${ev.file_name}" style="max-width:100%;max-height:400px;border:1px solid #e2e8f0;border-radius:4px;display:block;" crossorigin="anonymous" />
+      </div><br>`;
+    } else {
+      html = `<a href="${ev.file_url}" target="_blank" style="color:#0D50B8;">${ev.file_name}</a><br>`;
+    }
+    document.execCommand("insertHTML", false, html);
+    handleInput();
   };
 
   const addTableRow = () => {
