@@ -30,10 +30,10 @@ function AICard({ icon: Icon, title, accent, children }) {
   );
 }
 
-export default function AIAssistantPanel({ dispute, evidenceTypes, evidence, onApplyCoverLetter, onTabSwitch }) {
+export default function AIAssistantPanel({ dispute, evidenceTypes, evidence, onApplyCoverLetter, onTabSwitch, cachedAnalysis, onAnalysisComplete }) {
   const [open, setOpen] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [analysis, setAnalysis] = useState(null);
+  const [analysis, setAnalysis] = useState(cachedAnalysis || null);
   const [dismissed, setDismissed] = useState({});
 
   const runAnalysis = async () => {
