@@ -453,6 +453,8 @@ Write a formal, concise cover letter defending against this chargeback. Include 
           dispute={currentDispute}
           evidenceTypes={evidenceTypes}
           evidence={evidence}
+          cachedAnalysis={aiAnalysisCache}
+          onAnalysisComplete={(result) => setAiAnalysisCache(result)}
           onApplyCoverLetter={(draft) => setCoverLetter(draft)}
           onTabSwitch={(tab) => setActiveTab(tab)}
         />
