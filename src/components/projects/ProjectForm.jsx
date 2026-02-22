@@ -358,6 +358,7 @@ export default function ProjectForm({ project, onSave, onCancel }) {
     assigned_users: [], assigned_fields: [], assigned_processors: [],
     reason_code_mappings: [],
     inventory_automation: { manual_upload_enabled: true },
+    evidence_connectors: [],
     notes: "",
   };
 
