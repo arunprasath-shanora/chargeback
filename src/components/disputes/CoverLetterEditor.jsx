@@ -50,15 +50,15 @@ function buildEditorHtml(rawText, dispute, evidence) {
     }
   });
 
-  // Markdown table → HTML table
+  // Markdown table → HTML table (Word-like styling)
   html = html.replace(/(\|[^\n]+\|\n\|[-| :]+\|\n(?:\|[^\n]+\|\n?)*)/g, (block) => {
     const lines = block.trim().split("\n").filter(l => l.trim());
     if (lines.length < 2) return block;
     const headers = lines[0].split("|").map(c => c.trim()).filter(Boolean);
     const dataRows = lines.slice(2).map(l => l.split("|").map(c => c.trim()).filter(Boolean));
-    const thead = `<thead style="background:#f8fafc;"><tr>${headers.map(h => `<th style="border:1px solid #cbd5e1;padding:6px 10px;text-align:left;font-size:12px;font-family:inherit;">${h}</th>`).join("")}</tr></thead>`;
-    const tbody = dataRows.map(r => `<tr>${r.map(c => `<td style="border:1px solid #cbd5e1;padding:6px 10px;font-size:12px;font-family:inherit;">${c}</td>`).join("")}</tr>`).join("");
-    return `<table style="border-collapse:collapse;width:100%;margin:8px 0;">${thead}<tbody>${tbody}</tbody></table>`;
+    const thead = `<thead><tr>${headers.map(h => `<th style="border:1.5px solid #2563eb;padding:7px 12px;text-align:left;font-size:12px;font-family:inherit;background:#1d4ed8;color:#ffffff;font-weight:600;letter-spacing:0.02em;">${h}</th>`).join("")}</tr></thead>`;
+    const tbody = dataRows.map((r, ri) => `<tr style="background:${ri % 2 === 0 ? "#ffffff" : "#eff6ff"};">${r.map(c => `<td style="border:1px solid #93c5fd;padding:7px 12px;font-size:12px;font-family:inherit;color:#1e293b;">${c}</td>`).join("")}</tr>`).join("");
+    return `<table style="border-collapse:collapse;width:100%;margin:12px 0;box-shadow:0 1px 4px rgba(37,99,235,0.08);border-radius:4px;overflow:hidden;">${thead}<tbody>${tbody}</tbody></table>`;
   });
 
   // **bold**, __underline__, _italic_
