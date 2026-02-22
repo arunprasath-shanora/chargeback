@@ -55,6 +55,7 @@ export default function DisputeDetail({ dispute, projects, onBack, onUpdate, cur
   const [notFoughtReason, setNotFoughtReason] = useState(dispute.not_fought_reason || "");
   const [notFoughtNotes, setNotFoughtNotes] = useState(dispute.not_fought_notes || "");
   const [savingStatus, setSavingStatus] = useState(false);
+  const [activeTab, setActiveTab] = useState("details");
 
   useEffect(() => {
     Promise.all([
