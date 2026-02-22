@@ -134,7 +134,6 @@ export default function CoverLetterEditor({
   canSubmit,
   savingStatus,
   onApplyTemplate,
-  onGenerate,
   onSave,
   onExportPDF: _onExportPDF, // we override this
   onSubmit,
