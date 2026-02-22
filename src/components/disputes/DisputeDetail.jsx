@@ -307,12 +307,24 @@ Write a formal, concise cover letter defending against this chargeback. Include 
   const handleSubmitToPortal = async () => {
     if (!canSubmit) return;
     setSavingStatus(true);
-    const patch = { status: "submitted" };
+    const patch = { status: "awaiting_decision" };
     await base44.entities.Dispute.update(currentDispute.id, patch);
     const merged = { ...currentDispute, ...patch };
-    setCurrentDispute(merged);
     onUpdate(merged);
     setSavingStatus(false);
+    // Return to dispute list after submission
+    onBack();
+  };
+
+  const handleApiAutomationSubmit = async () => {
+    if (!canSubmit) return;
+    setSavingStatus(true);
+    const patch = { status: "awaiting_decision" };
+    await base44.entities.Dispute.update(currentDispute.id, patch);
+    const merged = { ...currentDispute, ...patch };
+    onUpdate(merged);
+    setSavingStatus(false);
+    onBack();
   };
 
   if (editing) {
