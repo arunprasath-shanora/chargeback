@@ -375,6 +375,7 @@ export default function ProjectForm({ project, onSave, onCancel }) {
       assigned_processors: project.assigned_processors || [],
       reason_code_mappings: project.reason_code_mappings || [],
       evidence_connectors: project.evidence_connectors || [],
+      end_to_end_automation: project.end_to_end_automation || {},
     };
   });
 
