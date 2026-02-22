@@ -687,7 +687,7 @@ Write a formal, concise cover letter defending against this chargeback. Include 
             onSave={handleSaveCoverLetter}
             onExportPDF={exportCoverLetterPDF}
             onSubmit={handleSubmitToPortal}
-            onApiAutomation={() => window.open(`${window.location.origin}/#api-info`, "_blank")}
+            onApiAutomation={handleApiAutomationSubmit}
           />
 
           {/* Awaiting Decision resolution panel */}
