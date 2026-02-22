@@ -640,111 +640,28 @@ Write a formal, concise cover letter defending against this chargeback. Include 
         </TabsContent>
 
         <TabsContent value="cover_letter" className="mt-4 space-y-4">
-          <div className="flex gap-3 flex-wrap items-end">
-            <div className="flex-1 min-w-[200px] space-y-1">
-              <p className="text-xs font-medium text-slate-600">Apply Template</p>
-              <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
-                <SelectTrigger><SelectValue placeholder="Select a template..." /></SelectTrigger>
-                <SelectContent>
-                  {coverTemplates.map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </div>
-            <Button variant="outline" size="sm" onClick={handleApplyTemplate} disabled={!selectedTemplate}>Apply Template</Button>
-            <Button variant="outline" size="sm" onClick={handleGenerateCoverLetter} disabled={generatingCL}>
-              <Wand2 className="w-3.5 h-3.5 mr-1" />
-              {generatingCL ? "Generating..." : "AI Generate"}
-            </Button>
-            <Button className="bg-[#0D50B8] hover:bg-[#0a3d8f]" size="sm" onClick={handleSaveCoverLetter} disabled={savingCL}>
-              {savingCL ? "Saving..." : "Save Cover Letter"}
-            </Button>
-            <Button variant="outline" size="sm" onClick={exportCoverLetterPDF} disabled={!hasCoverLetter} title="Export as PDF for portal upload">
-              <Download className="w-3.5 h-3.5 mr-1" /> Export PDF
-            </Button>
-          </div>
-
-          <Textarea
-            className="min-h-[400px] font-mono text-sm"
-            placeholder="Cover letter content will appear here. Use a template or AI generate, then save before submitting..."
-            value={coverLetter}
-            onChange={e => setCoverLetter(e.target.value)}
+          <CoverLetterEditor
+            coverLetter={coverLetter}
+            setCoverLetter={setCoverLetter}
+            currentDispute={currentDispute}
+            evidence={evidence}
+            coverTemplates={coverTemplates}
+            selectedTemplate={selectedTemplate}
+            setSelectedTemplate={setSelectedTemplate}
+            generatingCL={generatingCL}
+            savingCL={savingCL}
+            hasCoverLetter={hasCoverLetter}
+            hasEvidence={hasEvidence}
+            canSubmit={canSubmit}
+            savingStatus={savingStatus}
+            isFought={isFought}
+            onApplyTemplate={handleApplyTemplate}
+            onGenerate={handleGenerateCoverLetter}
+            onSave={handleSaveCoverLetter}
+            onExportPDF={exportCoverLetterPDF}
+            onSubmit={handleSubmitToPortal}
+            onApiAutomation={() => window.open(`${window.location.origin}/#api-info`, "_blank")}
           />
-
-          {/* Evidence images panel */}
-          {(() => {
-            const imageEvidence = evidence.filter(ev => {
-              const name = (ev.file_name || "").toLowerCase();
-              return name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".png") || name.endsWith(".gif") || name.endsWith(".webp");
-            });
-            if (imageEvidence.length === 0) return null;
-            return (
-              <Card className="border-blue-100 bg-blue-50/30">
-                <CardContent className="p-4 space-y-3">
-                  <p className="text-xs font-semibold text-blue-700 uppercase tracking-wide">Evidence Images — included in PDF export</p>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-                    {imageEvidence.map((ev, i) => (
-                      <div key={ev.id} className="space-y-1">
-                        <a href={ev.file_url} target="_blank" rel="noreferrer">
-                          <img
-                            src={ev.file_url}
-                            alt={ev.file_name}
-                            className="w-full h-32 object-cover rounded-lg border border-blue-200 hover:opacity-90 transition-opacity cursor-zoom-in"
-                          />
-                        </a>
-                        <p className="text-xs text-slate-500 truncate">{ev.evidence_type} — {ev.file_name}</p>
-                      </div>
-                    ))}
-                  </div>
-                  <p className="text-xs text-slate-400">These images will be appended to the PDF when you click "Export PDF".</p>
-                </CardContent>
-              </Card>
-            );
-          })()}
-
-          {/* Submit to Portal section */}
-          {isFought && !["awaiting_decision","won","lost"].includes(currentDispute.status) && (
-            <Card className={`border-2 ${canSubmit ? "border-green-200 bg-green-50/40" : "border-dashed border-slate-200 bg-slate-50/40"}`}>
-              <CardContent className="p-4 space-y-3">
-                <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Submit to Processor Portal</p>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div className="flex flex-col gap-1 text-xs">
-                    <span className={`flex items-center gap-1.5 font-medium ${hasEvidence ? "text-green-700" : "text-amber-600"}`}>
-                      {hasEvidence ? "✓" : "○"} Evidence Uploaded
-                    </span>
-                    <span className="text-slate-400">{evidence.length} file(s) attached</span>
-                  </div>
-                  <div className="flex flex-col gap-1 text-xs">
-                    <span className={`flex items-center gap-1.5 font-medium ${hasCoverLetter ? "text-green-700" : "text-amber-600"}`}>
-                      {hasCoverLetter ? "✓" : "○"} Cover Letter Saved
-                    </span>
-                    <span className="text-slate-400">{hasCoverLetter ? "Ready to export as PDF" : "Generate & save above"}</span>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <Button
-                      size="sm"
-                      className={`w-full ${canSubmit ? "bg-indigo-600 hover:bg-indigo-700 text-white" : "bg-slate-200 text-slate-400 cursor-not-allowed"}`}
-                      disabled={!canSubmit || savingStatus}
-                      onClick={handleSubmitToPortal}
-                      title={!canSubmit ? "Upload evidence and save cover letter first" : "Mark as submitted to processor portal"}
-                    >
-                      <Send className="w-3.5 h-3.5 mr-1.5" />
-                      {savingStatus ? "Submitting..." : "Manual Submit"}
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="w-full text-indigo-700 border-indigo-200 hover:bg-indigo-50"
-                      disabled={!canSubmit}
-                      onClick={() => window.open(`${window.location.origin}/#api-info`, "_blank")}
-                      title="Use API or automation to submit to portal"
-                    >
-                      <Globe className="w-3.5 h-3.5 mr-1.5" /> API / Automation
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
 
           {/* Awaiting Decision resolution panel */}
           {currentDispute.status === "awaiting_decision" && (
