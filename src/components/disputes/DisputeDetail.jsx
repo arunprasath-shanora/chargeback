@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { ChevronLeft, Pencil, Upload, FileText, Trash2, Shield, ShieldOff, PauseCircle, AlertCircle } from "lucide-react";
 import DisputeForm from "./DisputeForm";
 import CoverLetterEditor from "./CoverLetterEditor";
+import AIAssistantPanel from "./AIAssistantPanel";
 import jsPDF from "jspdf";
 
 const statusColors = {
