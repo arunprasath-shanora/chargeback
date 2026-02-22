@@ -43,9 +43,9 @@ export default function AIAssistantPanel({ dispute, evidenceTypes, evidence, onA
     const evTypeNames = evidenceTypes.filter(e => e.status === "active").map(e => e.name);
     const uploadedTypes = [...new Set(evidence.map(e => e.evidence_type))];
 
-    const prompt = `You are an expert chargeback dispute analyst. Analyze the following dispute and return a JSON response.
+    const prompt = `You are a senior chargeback dispute analyst and legal writing expert specializing in winning merchant chargeback disputes. Analyze the following dispute thoroughly and return a structured JSON response.
 
-Dispute details:
+DISPUTE DETAILS:
 - Case ID: ${dispute.case_id}
 - Case Type: ${dispute.case_type || "Unknown"}
 - Reason Code: ${dispute.reason_code || "Unknown"}
@@ -55,19 +55,44 @@ Dispute details:
 - Chargeback Date: ${dispute.chargeback_date || "Unknown"}
 - Transaction Date: ${dispute.transaction_date || "Unknown"}
 - Transaction Amount: ${dispute.transaction_currency || "USD"} ${dispute.transaction_amount || 0}
+- Transaction ID: ${dispute.transaction_id || "Unknown"}
+- ARN: ${dispute.arn_number || "Unknown"}
+- Authorization Code: ${dispute.authorization_code || "Unknown"}
+- Authorization Date: ${dispute.authorization_date || "Unknown"}
 - Product Type: ${dispute.product_type || "Unknown"}
-- Customer: ${dispute.customer_name || "Unknown"}
+- Product Name: ${dispute.product_name || "Unknown"}
+- Customer Name: ${dispute.customer_name || "Unknown"}
+- Customer Email: ${dispute.customer_email || "Unknown"}
+- Cardholder Name: ${dispute.cardholder_name || "Unknown"}
+- Card Last 4: ${dispute.card_last4 || "Unknown"}
+- Card BIN: ${dispute.card_bin_first6 || "Unknown"}
 - AVS Match: ${dispute.avs_match || "Unknown"}
 - CVV Match: ${dispute.cvv_match || "Unknown"}
 - 3D Secure: ${dispute.three_d_secure || "Unknown"}
+- Service Start: ${dispute.service_start_date || "N/A"}
+- Service End: ${dispute.service_end_date || "N/A"}
+- Merchant DBA: ${dispute.dba_name || "Unknown"}
+- Processor: ${dispute.processor || "Unknown"}
 - Current Status: ${dispute.status || "new"}
-- Fought Decision: ${dispute.fought_decision || "not set"}
 - SLA Deadline: ${dispute.sla_deadline || "Unknown"} (${daysLeft !== null ? daysLeft + " days remaining" : "unknown"})
 - Evidence already uploaded: ${uploadedTypes.length > 0 ? uploadedTypes.join(", ") : "none"}
 - Available evidence types: ${evTypeNames.join(", ")}
-- Cover letter saved: ${dispute.cover_letter_content ? "Yes" : "No"}
 
-Provide your analysis in this exact JSON format:
+For the coverLetterDraft, write a COMPLETE, ADVANCED, PROFESSIONAL chargeback rebuttal letter structured as follows:
+1. Merchant header block (merchant name, address placeholder, date)
+2. Processor/Acquirer address block
+3. Subject line referencing the case ID, reason code, and card network
+4. Opening paragraph: formal identification of the dispute, assert the transaction was legitimate
+5. Transaction verification section: detail the authorization data (auth code, date, amount, AVS/CVV/3DS results)
+6. Narrative defense section: tailored to the specific reason code category - address the exact chargeback reason with factual rebuttals
+7. Evidence summary table: list each piece of evidence being submitted, what it proves, and why it supports the merchant
+8. Legal/network rule reference: cite the relevant card network (${dispute.card_network || "Visa/Mastercard"}) chargeback rules and timeframes that support the merchant's position
+9. Closing paragraph: formal request to reverse the chargeback and restore funds, with contact information placeholder
+10. Professional sign-off
+
+Use actual dispute data wherever available. Do NOT use generic placeholders like [insert here]. The letter should be compelling, fact-based, and structured to maximize the probability of winning the dispute.
+
+Provide your response in this exact JSON format:
 {
   "category": {
     "label": "<short category like 'Fraud - Card Not Present' or 'Unauthorized Transaction'>",
@@ -77,9 +102,9 @@ Provide your analysis in this exact JSON format:
   "evidenceSuggestions": [
     { "type": "<evidence type name from available list>", "reason": "<why it helps for this dispute>", "priority": "<High | Medium | Low>" }
   ],
-  "coverLetterDraft": "<A complete, professional chargeback dispute cover letter (4-6 paragraphs). Include specific dispute details. Do NOT use placeholder brackets. Write it ready to use.>",
+  "coverLetterDraft": "<The complete advanced cover letter as described above>",
   "nextBestAction": {
-    "action": "<specific action title, e.g. 'Upload Invoice immediately'>",
+    "action": "<specific action title>",
     "urgency": "<Critical | High | Medium | Low>",
     "reason": "<why this is the best next step given status and SLA>",
     "steps": ["<step 1>", "<step 2>", "<step 3>"]
