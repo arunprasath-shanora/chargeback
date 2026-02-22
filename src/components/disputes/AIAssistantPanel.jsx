@@ -125,12 +125,13 @@ Provide your analysis in this exact JSON format:
     });
 
     setAnalysis(result);
+    onAnalysisComplete?.(result);
     setLoading(false);
   };
 
-  // Auto-run once when panel mounts if dispute has enough data
+  // Auto-run once only if no cached analysis exists
   useEffect(() => {
-    if (dispute.reason_code || dispute.reason_category) {
+    if (!cachedAnalysis && (dispute.reason_code || dispute.reason_category)) {
       runAnalysis();
     }
   }, []);
