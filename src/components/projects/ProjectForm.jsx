@@ -372,6 +372,7 @@ export default function ProjectForm({ project, onSave, onCancel }) {
       portal_credentials: project.portal_credentials || [],
       assigned_processors: project.assigned_processors || [],
       reason_code_mappings: project.reason_code_mappings || [],
+      evidence_connectors: project.evidence_connectors || [],
     };
   });
 
