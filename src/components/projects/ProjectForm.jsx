@@ -360,6 +360,7 @@ export default function ProjectForm({ project, onSave, onCancel }) {
     reason_code_mappings: [],
     inventory_automation: { manual_upload_enabled: true },
     evidence_connectors: [],
+    end_to_end_automation: {},
     notes: "",
   };
 
