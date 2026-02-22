@@ -143,6 +143,19 @@ export default function CoverLetterEditor({
 }) {
   const editorRef = useRef(null);
   const skipInput = useRef(false);
+  const [evDropdownOpen, setEvDropdownOpen] = useState(false);
+  const evDropdownRef = useRef(null);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handler = (e) => {
+      if (evDropdownRef.current && !evDropdownRef.current.contains(e.target)) {
+        setEvDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   // Re-render editor HTML whenever coverLetter text or evidence changes
   useEffect(() => {
