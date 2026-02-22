@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Pencil, Trash2, X, Check, Upload, FileText, Copy, ChevronDown, ChevronUp, ArrowDownToLine, Bold, Italic, Underline } from "lucide-react";
+import { Plus, Pencil, Trash2, X, Check, Upload, FileText, Copy, ChevronDown, ChevronUp, ArrowDownToLine, Bold, Italic, Underline, Table } from "lucide-react";
 
 const FIELD_GROUPS = [
   {
@@ -184,6 +184,18 @@ function TemplateEditor({ form, setForm, uploading, setUploading, textareaRef })
         </button>
         <button type="button" title="Underline — wraps selection with __...__" onClick={() => wrapSelection("__", "__")} className="p-1.5 rounded hover:bg-slate-200 text-slate-600 transition-colors">
           <Underline className="w-3.5 h-3.5" />
+        </button>
+        <div className="w-px h-4 bg-slate-300 mx-1" />
+        <button type="button" title="Insert table" onClick={() => {
+          const tableTemplate = "\n| Header 1 | Header 2 | Header 3 |\n|----------|----------|----------|\n| Cell 1   | Cell 2   | Cell 3   |\n| Cell 4   | Cell 5   | Cell 6   |\n";
+          const ta = textareaRef.current;
+          if (!ta) { setForm(f => ({ ...f, content: (f.content || "") + tableTemplate })); return; }
+          const start = ta.selectionStart;
+          const current = form.content || "";
+          setForm(f => ({ ...f, content: current.slice(0, start) + tableTemplate + current.slice(start) }));
+          setTimeout(() => { ta.focus(); ta.setSelectionRange(start + tableTemplate.length, start + tableTemplate.length); }, 0);
+        }} className="p-1.5 rounded hover:bg-slate-200 text-slate-600 transition-colors flex items-center gap-1 text-xs">
+          <Table className="w-3.5 h-3.5" /> Table
         </button>
         <div className="w-px h-4 bg-slate-300 mx-1" />
         <span className="text-[10px] text-slate-400">Select text then click a format button</span>

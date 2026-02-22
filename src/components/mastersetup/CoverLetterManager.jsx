@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Pencil, Trash2, X, Check, Upload, FileText, Copy, ChevronDown, ChevronUp, Bold, Italic, Underline, AlignLeft } from "lucide-react";
+import { Plus, Pencil, Trash2, X, Check, Upload, FileText, Copy, ChevronDown, ChevronUp, Bold, Italic, Underline, Table } from "lucide-react";
 
 const RC_GROUPINGS = [
   "Authorization","Cancelled Recurring","Cancelled Services","Credit Not Processed",
@@ -266,6 +266,13 @@ function TemplateEditor({ form, setForm, uploading, setUploading, onInsertRef })
           </button>
           <button type="button" title="Underline — wraps selection with __...__" onClick={() => wrapSelection("__", "__")} className="p-1.5 rounded hover:bg-slate-200 text-slate-600 transition-colors">
             <Underline className="w-3.5 h-3.5" />
+          </button>
+          <div className="w-px h-4 bg-slate-300 mx-1" />
+          <button type="button" title="Insert table" onClick={() => {
+            const tableTemplate = "\n| Header 1 | Header 2 | Header 3 |\n|----------|----------|----------|\n| Cell 1   | Cell 2   | Cell 3   |\n| Cell 4   | Cell 5   | Cell 6   |\n";
+            insertAtCursor(tableTemplate);
+          }} className="p-1.5 rounded hover:bg-slate-200 text-slate-600 transition-colors flex items-center gap-1 text-xs">
+            <Table className="w-3.5 h-3.5" /> Table
           </button>
           <div className="w-px h-4 bg-slate-300 mx-1" />
           <span className="text-[10px] text-slate-400">Select text then click a format button</span>
