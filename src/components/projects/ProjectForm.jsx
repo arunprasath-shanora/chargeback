@@ -12,6 +12,7 @@ import { ChevronLeft, Save, Plus, Trash2, Eye, EyeOff } from "lucide-react";
 import ProjectCoverLetterTab from "./ProjectCoverLetterTab";
 import ProjectInventoryAutomationTab from "./ProjectInventoryAutomationTab";
 import ProjectEvidenceConnectorsTab from "./ProjectEvidenceConnectorsTab";
+import ProjectEndToEndAutomationTab from "./ProjectEndToEndAutomationTab";
 
 const PROCESSORS = ["Fiserv","American Express","Visa","Mastercard","Stripe","PayPal","Adyen","Worldpay","Other"];
 const CURRENCIES = ["USD","EUR","GBP","AUD","CAD","NZD","INR","SGD","AED","Other"];
