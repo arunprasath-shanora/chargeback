@@ -737,7 +737,6 @@ Provide your response in this exact JSON format:
             savingStatus={savingStatus}
             isFought={isFought}
             onApplyTemplate={handleApplyTemplate}
-            onGenerate={handleGenerateCoverLetter}
             onSave={handleSaveCoverLetter}
             onExportPDF={exportCoverLetterPDF}
             onSubmit={handleSubmitToPortal}
