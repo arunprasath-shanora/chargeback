@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Search, Eye } from "lucide-react";
+import { Search, Eye } from "lucide-react";
 import DisputeForm from "@/components/disputes/DisputeForm";
 import DisputeDetail from "@/components/disputes/DisputeDetail";
 
@@ -27,7 +27,7 @@ export default function Disputes() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [projectFilter, setProjectFilter] = useState("all");
   const [foughtFilter, setFoughtFilter] = useState("all");
-  const [showForm, setShowForm] = useState(false);
+
   const [selectedDispute, setSelectedDispute] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
 
@@ -71,15 +71,6 @@ export default function Disputes() {
     );
   }
 
-  if (showForm) {
-    return (
-      <DisputeForm
-        projects={projects}
-        onSave={() => { setShowForm(false); load(); }}
-        onCancel={() => setShowForm(false)}
-      />
-    );
-  }
 
   return (
     <div className="p-6 space-y-5">
@@ -88,9 +79,7 @@ export default function Disputes() {
           <h1 className="text-2xl font-bold text-slate-800">Disputes</h1>
           <p className="text-slate-500 text-sm mt-1">Manage chargeback disputes</p>
         </div>
-        <Button className="bg-[#0D50B8] hover:bg-[#0a3d8f]" onClick={() => setShowForm(true)}>
-          <Plus className="w-4 h-4 mr-2" /> New Dispute
-        </Button>
+        
       </div>
 
       <div className="flex gap-3 flex-wrap">
