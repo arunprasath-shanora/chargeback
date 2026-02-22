@@ -446,7 +446,18 @@ Write a formal, concise cover letter defending against this chargeback. Include 
         </div>
       )}
 
-      <Tabs defaultValue="details">
+      {/* AI Assistant Panel - shown when dispute has a fought decision */}
+      {isFought && (
+        <AIAssistantPanel
+          dispute={currentDispute}
+          evidenceTypes={evidenceTypes}
+          evidence={evidence}
+          onApplyCoverLetter={(draft) => setCoverLetter(draft)}
+          onTabSwitch={(tab) => setActiveTab(tab)}
+        />
+      )}
+
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="bg-slate-100">
           <TabsTrigger value="details" className="text-xs" disabled={!decisionMade}>Case Details</TabsTrigger>
           <TabsTrigger value="evidence" className="text-xs" disabled={!isFought}>Evidence</TabsTrigger>
