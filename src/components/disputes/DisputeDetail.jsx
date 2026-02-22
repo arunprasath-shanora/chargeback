@@ -57,6 +57,73 @@ export default function DisputeDetail({ dispute, projects, onBack, onUpdate, cur
   const [savingStatus, setSavingStatus] = useState(false);
   const [activeTab, setActiveTab] = useState("details");
   const [aiAnalysisCache, setAiAnalysisCache] = useState(null);
+  const aiRunning = useRef(false);
+
+  const prefetchAiAnalysis = async (disputeData, evTypes, ev) => {
+    if (aiRunning.current || aiAnalysisCache) return;
+    aiRunning.current = true;
+    const daysLeft = disputeData.sla_deadline
+      ? Math.ceil((new Date(disputeData.sla_deadline) - new Date()) / (1000 * 60 * 60 * 24))
+      : null;
+    const evTypeNames = (evTypes || []).filter(e => e.status === "active").map(e => e.name);
+    const uploadedTypes = [...new Set((ev || []).map(e => e.evidence_type))];
+
+    const prompt = `You are a senior chargeback dispute analyst and legal writing expert specializing in winning merchant chargeback disputes. Analyze the following dispute thoroughly and return a structured JSON response.
+
+DISPUTE DETAILS:
+- Case ID: ${disputeData.case_id}
+- Case Type: ${disputeData.case_type || "Unknown"}
+- Reason Code: ${disputeData.reason_code || "Unknown"}
+- Reason Category: ${disputeData.reason_category || "Unknown"}
+- Card Network: ${disputeData.card_network || "Unknown"}
+- Chargeback Amount: ${disputeData.chargeback_currency || "USD"} ${disputeData.chargeback_amount || 0}
+- Chargeback Date: ${disputeData.chargeback_date || "Unknown"}
+- Transaction Date: ${disputeData.transaction_date || "Unknown"}
+- Transaction Amount: ${disputeData.transaction_currency || "USD"} ${disputeData.transaction_amount || 0}
+- Transaction ID: ${disputeData.transaction_id || "Unknown"}
+- ARN: ${disputeData.arn_number || "Unknown"}
+- Authorization Code: ${disputeData.authorization_code || "Unknown"}
+- Authorization Date: ${disputeData.authorization_date || "Unknown"}
+- Product Type: ${disputeData.product_type || "Unknown"}
+- Product Name: ${disputeData.product_name || "Unknown"}
+- Customer Name: ${disputeData.customer_name || "Unknown"}
+- Customer Email: ${disputeData.customer_email || "Unknown"}
+- Cardholder Name: ${disputeData.cardholder_name || "Unknown"}
+- Card Last 4: ${disputeData.card_last4 || "Unknown"}
+- AVS Match: ${disputeData.avs_match || "Unknown"}
+- CVV Match: ${disputeData.cvv_match || "Unknown"}
+- 3D Secure: ${disputeData.three_d_secure || "Unknown"}
+- Merchant DBA: ${disputeData.dba_name || "Unknown"}
+- Processor: ${disputeData.processor || "Unknown"}
+- SLA Deadline: ${disputeData.sla_deadline || "Unknown"} (${daysLeft !== null ? daysLeft + " days remaining" : "unknown"})
+- Evidence already uploaded: ${uploadedTypes.length > 0 ? uploadedTypes.join(", ") : "none"}
+- Available evidence types: ${evTypeNames.join(", ")}
+
+For the coverLetterDraft, write a COMPLETE, ADVANCED, PROFESSIONAL chargeback rebuttal letter with: merchant header, processor address, subject line, opening paragraph, transaction verification, narrative defense tailored to the reason code, evidence summary table, card network rule reference, and formal closing requesting reversal.
+
+Provide your response in this exact JSON format:
+{
+  "category": { "label": "<category>", "confidence": "<High|Medium|Low>", "explanation": "<explanation>" },
+  "evidenceSuggestions": [{ "type": "<type>", "reason": "<reason>", "priority": "<High|Medium|Low>" }],
+  "coverLetterDraft": "<complete letter>",
+  "nextBestAction": { "action": "<action>", "urgency": "<Critical|High|Medium|Low>", "reason": "<reason>", "steps": ["<step1>","<step2>","<step3>"] }
+}`;
+
+    const result = await base44.integrations.Core.InvokeLLM({
+      prompt,
+      response_json_schema: {
+        type: "object",
+        properties: {
+          category: { type: "object", properties: { label: { type: "string" }, confidence: { type: "string" }, explanation: { type: "string" } } },
+          evidenceSuggestions: { type: "array", items: { type: "object", properties: { type: { type: "string" }, reason: { type: "string" }, priority: { type: "string" } } } },
+          coverLetterDraft: { type: "string" },
+          nextBestAction: { type: "object", properties: { action: { type: "string" }, urgency: { type: "string" }, reason: { type: "string" }, steps: { type: "array", items: { type: "string" } } } }
+        }
+      }
+    });
+    setAiAnalysisCache(result);
+    aiRunning.current = false;
+  };
 
   useEffect(() => {
     Promise.all([
