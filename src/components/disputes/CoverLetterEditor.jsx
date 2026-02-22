@@ -322,10 +322,6 @@ export default function CoverLetterEditor({
           </Select>
         </div>
         <Button variant="outline" size="sm" onClick={onApplyTemplate} disabled={!selectedTemplate}>Apply Template</Button>
-        <Button variant="outline" size="sm" onClick={onGenerate} disabled={generatingCL}>
-          <Wand2 className="w-3.5 h-3.5 mr-1" />
-          {generatingCL ? "Generating..." : "AI Generate"}
-        </Button>
         <Button className="bg-[#0D50B8] hover:bg-[#0a3d8f]" size="sm" onClick={onSave} disabled={savingCL}>
           {savingCL ? "Saving..." : "Save"}
         </Button>
