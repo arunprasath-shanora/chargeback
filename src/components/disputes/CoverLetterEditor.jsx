@@ -498,9 +498,17 @@ export default function CoverLetterEditor({
         }
         [contenteditable] table td,
         [contenteditable] table th {
-          border: 1px solid #cbd5e1 !important;
-          padding: 6px 10px !important;
           min-width: 60px;
+        }
+        [contenteditable] table th {
+          border: 1.5px solid #2563eb !important;
+          padding: 7px 12px !important;
+          background: #1d4ed8 !important;
+          color: #ffffff !important;
+        }
+        [contenteditable] table td {
+          border: 1px solid #93c5fd !important;
+          padding: 7px 12px !important;
         }
         [contenteditable] table td:focus,
         [contenteditable] table th:focus {
