@@ -522,6 +522,17 @@ export default function ProjectForm({ project, onSave, onCancel }) {
           </Card>
         </TabsContent>
 
+        <TabsContent value="e2e_automation" className="mt-4">
+          <Card className="border-slate-100">
+            <CardContent className="p-5">
+              <ProjectEndToEndAutomationTab
+                config={form.end_to_end_automation}
+                onChange={v => set("end_to_end_automation", v)}
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         <TabsContent value="notes" className="mt-4">
           <Card className="border-slate-100">
             <CardContent className="p-5">
