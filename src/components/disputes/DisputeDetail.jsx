@@ -56,6 +56,7 @@ export default function DisputeDetail({ dispute, projects, onBack, onUpdate, cur
   const [notFoughtNotes, setNotFoughtNotes] = useState(dispute.not_fought_notes || "");
   const [savingStatus, setSavingStatus] = useState(false);
   const [activeTab, setActiveTab] = useState("details");
+  const [aiAnalysisCache, setAiAnalysisCache] = useState(null);
 
   useEffect(() => {
     Promise.all([
