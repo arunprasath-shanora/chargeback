@@ -1,53 +1,110 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Wand2, Download, Send, Globe, Bold, Italic, Underline, Table, Eye, EyeOff, AlertCircle } from "lucide-react";
+import { Wand2, Download, Send, Globe, Bold, Italic, Underline, Table, AlignLeft, AlignCenter, AlignRight, List, ListOrdered, Strikethrough } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import ReactMarkdown from "react-markdown";
 
-// Renders markdown content including tables
-function MarkdownPreview({ content }) {
-  return (
-    <div className="prose prose-sm max-w-none text-slate-800 leading-relaxed">
-      <ReactMarkdown
-        components={{
-          table: ({ children }) => (
-            <table className="w-full border-collapse border border-slate-300 my-3 text-xs">
-              {children}
-            </table>
-          ),
-          thead: ({ children }) => (
-            <thead className="bg-slate-100">{children}</thead>
-          ),
-          th: ({ children }) => (
-            <th className="border border-slate-300 px-3 py-2 text-left font-semibold text-slate-700">
-              {children}
-            </th>
-          ),
-          td: ({ children }) => (
-            <td className="border border-slate-300 px-3 py-2 text-slate-600">
-              {children}
-            </td>
-          ),
-          strong: ({ children }) => (
-            <strong className="font-bold text-slate-900">{children}</strong>
-          ),
-          em: ({ children }) => (
-            <em className="italic">{children}</em>
-          ),
-          p: ({ children }) => (
-            <p className="mb-2 leading-relaxed">{children}</p>
-          ),
-          h1: ({ children }) => <h1 className="text-lg font-bold mb-2 mt-4">{children}</h1>,
-          h2: ({ children }) => <h2 className="text-base font-bold mb-2 mt-3">{children}</h2>,
-          h3: ({ children }) => <h3 className="text-sm font-bold mb-1 mt-2">{children}</h3>,
-        }}
-      >
-        {content || ""}
-      </ReactMarkdown>
-    </div>
-  );
+// Convert stored markdown-like text to HTML for the editor
+function toEditorHtml(text, dispute, evidence) {
+  if (!text) return "";
+  let html = text;
+
+  // Replace {{field}} placeholders with actual values
+  Object.entries(dispute).forEach(([k, v]) => {
+    if (v !== undefined && v !== null) {
+      html = html.replaceAll(`{{${k}}}`, `<span class="field-value" data-key="${k}">${v}</span>`);
+    }
+  });
+
+  // Replace {{evidence:TypeName}} with actual images or file links
+  html = html.replace(/\{\{evidence:([^}]+)\}\}/g, (match, typeName) => {
+    const evItems = evidence.filter(e => e.evidence_type === typeName);
+    if (evItems.length === 0) return match; // keep placeholder if no upload yet
+    return evItems.map(ev => {
+      const name = (ev.file_name || "").toLowerCase();
+      const isImage = name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".png") || name.endsWith(".webp") || name.endsWith(".gif");
+      if (isImage) {
+        return `<div class="evidence-block" data-type="${typeName}" data-url="${ev.file_url}" data-name="${ev.file_name}">
+          <p style="font-size:11px;color:#64748b;margin:4px 0 2px;">${ev.evidence_type}: ${ev.file_name}</p>
+          <img src="${ev.file_url}" alt="${ev.file_name}" style="max-width:100%;border:1px solid #e2e8f0;border-radius:6px;display:block;" />
+        </div>`;
+      }
+      return `<a href="${ev.file_url}" target="_blank" style="color:#0D50B8;">${ev.file_name}</a>`;
+    }).join("");
+  });
+
+  // Convert markdown-like table syntax to HTML table
+  html = html.replace(/(\|[^\n]+\|\n\|[-| :]+\|\n(?:\|[^\n]+\|\n?)*)/g, (tableBlock) => {
+    const lines = tableBlock.trim().split("\n").filter(l => l.trim());
+    if (lines.length < 2) return tableBlock;
+    const headers = lines[0].split("|").map(c => c.trim()).filter(c => c);
+    const rows = lines.slice(2).map(l => l.split("|").map(c => c.trim()).filter(c => c));
+    const thead = `<thead style="background:#f8fafc;"><tr>${headers.map(h => `<th style="border:1px solid #cbd5e1;padding:6px 10px;text-align:left;font-size:12px;">${h}</th>`).join("")}</tr></thead>`;
+    const tbody = rows.map(r => `<tr>${r.map(c => `<td style="border:1px solid #cbd5e1;padding:6px 10px;font-size:12px;">${c}</td>`).join("")}</tr>`).join("");
+    return `<table style="border-collapse:collapse;width:100%;margin:8px 0;">${thead}<tbody>${tbody}</tbody></table>`;
+  });
+
+  // Convert **bold**, _italic_, __underline__
+  html = html.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+  html = html.replace(/__([^_]+)__/g, "<u>$1</u>");
+  html = html.replace(/_([^_]+)_/g, "<em>$1</em>");
+
+  // Convert newlines to <br> (except inside table blocks)
+  html = html.replace(/\n/g, "<br>");
+
+  return html;
+}
+
+// Extract raw text back from editor HTML (convert HTML back to storable format)
+function fromEditorHtml(html) {
+  let text = html;
+  // Replace <br> and block endings with newlines
+  text = text.replace(/<br\s*\/?>/gi, "\n");
+  text = text.replace(/<\/p>/gi, "\n");
+  text = text.replace(/<\/div>/gi, "\n");
+  text = text.replace(/<\/tr>/gi, "\n");
+
+  // Restore evidence blocks back to placeholders only if no evidence uploaded
+  text = text.replace(/<div[^>]*class="evidence-block"[^>]*data-type="([^"]*)"[^>]*>[\s\S]*?<\/div>/g, "{{evidence:$1}}");
+
+  // Convert <table> back to markdown table
+  text = text.replace(/<table[^>]*>([\s\S]*?)<\/table>/g, (match, inner) => {
+    const headers = [];
+    const rows = [];
+    const thMatches = inner.matchAll(/<th[^>]*>(.*?)<\/th>/gi);
+    for (const m of thMatches) headers.push(m[1].replace(/<[^>]+>/g, "").trim());
+    const trMatches = inner.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/gi);
+    let isFirst = true;
+    for (const tr of trMatches) {
+      if (isFirst) { isFirst = false; continue; } // skip header row
+      const cells = [];
+      const tdMatches = tr[1].matchAll(/<td[^>]*>(.*?)<\/td>/gi);
+      for (const td of tdMatches) cells.push(td[1].replace(/<[^>]+>/g, "").trim());
+      if (cells.length) rows.push(cells);
+    }
+    if (!headers.length) return "";
+    const headerRow = `| ${headers.join(" | ")} |`;
+    const sepRow = `| ${headers.map(() => "----------").join(" | ")} |`;
+    const dataRows = rows.map(r => `| ${r.join(" | ")} |`).join("\n");
+    return `\n${headerRow}\n${sepRow}\n${dataRows}\n`;
+  });
+
+  // Convert formatting tags
+  text = text.replace(/<strong>(.*?)<\/strong>/gi, "**$1**");
+  text = text.replace(/<b>(.*?)<\/b>/gi, "**$1**");
+  text = text.replace(/<u>(.*?)<\/u>/gi, "__$1__");
+  text = text.replace(/<em>(.*?)<\/em>/gi, "_$1_");
+  text = text.replace(/<i>(.*?)<\/i>/gi, "_$1_");
+
+  // Strip remaining HTML tags
+  text = text.replace(/<[^>]+>/g, "");
+
+  // Decode HTML entities
+  const d = document.createElement("div");
+  d.innerHTML = text;
+  text = d.textContent || d.innerText || text;
+
+  return text.trim();
 }
 
 export default function CoverLetterEditor({
@@ -72,61 +129,98 @@ export default function CoverLetterEditor({
   onApiAutomation,
   isFought,
 }) {
-  const [preview, setPreview] = useState(false);
-  const textareaRef = useRef(null);
+  const editorRef = useRef(null);
+  const isInternalUpdate = useRef(false);
 
-  // Replace {{field}} placeholders with actual dispute values for preview
-  const resolvedContent = React.useMemo(() => {
-    if (!coverLetter) return "";
-    let result = coverLetter;
-    // Replace dispute fields
-    Object.entries(currentDispute).forEach(([k, v]) => {
-      if (v !== undefined && v !== null) {
-        result = result.replaceAll(`{{${k}}}`, String(v));
-      }
-    });
-    // Replace evidence placeholders with image links or filenames
-    result = result.replaceAll(/\{\{evidence:([^}]+)\}\}/g, (match, typeName) => {
-      const ev = evidence.filter(e => e.evidence_type === typeName);
-      if (ev.length === 0) return `*[No ${typeName} uploaded]*`;
-      return ev.map(e => {
-        const name = (e.file_name || "").toLowerCase();
-        const isImage = name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".png") || name.endsWith(".webp") || name.endsWith(".gif");
-        if (isImage) return `\n\n![${e.file_name}](${e.file_url})\n`;
-        return `[${e.file_name}](${e.file_url})`;
-      }).join("\n");
-    });
-    return result;
-  }, [coverLetter, currentDispute, evidence]);
+  // Initialize editor content when coverLetter or evidence changes
+  useEffect(() => {
+    if (!editorRef.current) return;
+    isInternalUpdate.current = true;
+    const html = toEditorHtml(coverLetter || "", currentDispute, evidence);
+    editorRef.current.innerHTML = html;
+    isInternalUpdate.current = false;
+  }, [coverLetter, evidence]);
 
-  const wrapSelection = (before, after) => {
-    const ta = textareaRef.current;
-    if (!ta) return;
-    const start = ta.selectionStart, end = ta.selectionEnd;
-    const current = coverLetter || "";
-    const selected = current.slice(start, end) || "text";
-    const newContent = current.slice(0, start) + before + selected + after + current.slice(end);
-    setCoverLetter(newContent);
-    setTimeout(() => { ta.focus(); ta.setSelectionRange(start + before.length, start + before.length + selected.length); }, 0);
-  };
+  const handleEditorInput = useCallback(() => {
+    if (isInternalUpdate.current || !editorRef.current) return;
+    const raw = fromEditorHtml(editorRef.current.innerHTML);
+    setCoverLetter(raw);
+  }, [setCoverLetter]);
 
-  const insertAtCursor = (text) => {
-    const ta = textareaRef.current;
-    if (!ta) { setCoverLetter((coverLetter || "") + text); return; }
-    const start = ta.selectionStart;
-    const current = coverLetter || "";
-    setCoverLetter(current.slice(0, start) + text + current.slice(start));
-    setTimeout(() => { ta.focus(); ta.setSelectionRange(start + text.length, start + text.length); }, 0);
+  const exec = (command, value = null) => {
+    editorRef.current?.focus();
+    document.execCommand(command, false, value);
   };
 
   const insertTable = () => {
-    const tableTemplate = "\n| Header 1 | Header 2 | Header 3 |\n|----------|----------|----------|\n| Cell 1   | Cell 2   | Cell 3   |\n| Cell 4   | Cell 5   | Cell 6   |\n";
-    insertAtCursor(tableTemplate);
+    const rows = 3, cols = 3;
+    let tableHtml = `<table style="border-collapse:collapse;width:100%;margin:8px 0;">`;
+    tableHtml += `<thead style="background:#f8fafc;"><tr>`;
+    for (let c = 0; c < cols; c++) tableHtml += `<th style="border:1px solid #cbd5e1;padding:6px 10px;text-align:left;font-size:12px;" contenteditable="true">Header ${c + 1}</th>`;
+    tableHtml += `</tr></thead><tbody>`;
+    for (let r = 0; r < rows - 1; r++) {
+      tableHtml += `<tr>`;
+      for (let c = 0; c < cols; c++) tableHtml += `<td style="border:1px solid #cbd5e1;padding:6px 10px;font-size:12px;" contenteditable="true">Cell</td>`;
+      tableHtml += `</tr>`;
+    }
+    tableHtml += `</tbody></table><br>`;
+    editorRef.current?.focus();
+    document.execCommand("insertHTML", false, tableHtml);
   };
+
+  const addTableRow = () => {
+    // Insert a row to the last focused table
+    const sel = window.getSelection();
+    if (!sel.rangeCount) return;
+    const cell = sel.anchorNode?.parentElement?.closest("td, th");
+    const row = cell?.closest("tr");
+    const table = row?.closest("table");
+    if (!table) return;
+    const cols = row.cells.length;
+    const newRow = document.createElement("tr");
+    for (let i = 0; i < cols; i++) {
+      const td = document.createElement("td");
+      td.style.cssText = "border:1px solid #cbd5e1;padding:6px 10px;font-size:12px;";
+      td.contentEditable = "true";
+      td.textContent = "";
+      newRow.appendChild(td);
+    }
+    row.parentElement.appendChild(newRow);
+    handleEditorInput();
+  };
+
+  const addTableCol = () => {
+    const sel = window.getSelection();
+    if (!sel.rangeCount) return;
+    const cell = sel.anchorNode?.parentElement?.closest("td, th");
+    const table = cell?.closest("table");
+    if (!table) return;
+    table.querySelectorAll("tr").forEach((row, ri) => {
+      const newCell = ri === 0 ? document.createElement("th") : document.createElement("td");
+      newCell.style.cssText = ri === 0
+        ? "border:1px solid #cbd5e1;padding:6px 10px;text-align:left;font-size:12px;background:#f8fafc;"
+        : "border:1px solid #cbd5e1;padding:6px 10px;font-size:12px;";
+      newCell.contentEditable = "true";
+      newCell.textContent = ri === 0 ? "Header" : "Cell";
+      row.appendChild(newCell);
+    });
+    handleEditorInput();
+  };
+
+  const ToolBtn = ({ title, onClick, children, active }) => (
+    <button
+      type="button"
+      title={title}
+      onMouseDown={(e) => { e.preventDefault(); onClick(); }}
+      className={`p-1.5 rounded transition-colors text-slate-600 ${active ? "bg-slate-300" : "hover:bg-slate-200"}`}
+    >
+      {children}
+    </button>
+  );
 
   return (
     <div className="space-y-4">
-      {/* Toolbar row */}
+      {/* Top toolbar: template + actions */}
       <div className="flex gap-3 flex-wrap items-end">
         <div className="flex-1 min-w-[200px] space-y-1">
           <p className="text-xs font-medium text-slate-600">Apply Template</p>
@@ -145,91 +239,98 @@ export default function CoverLetterEditor({
         <Button className="bg-[#0D50B8] hover:bg-[#0a3d8f]" size="sm" onClick={onSave} disabled={savingCL}>
           {savingCL ? "Saving..." : "Save Cover Letter"}
         </Button>
-        <Button variant="outline" size="sm" onClick={onExportPDF} disabled={!hasCoverLetter} title="Export as PDF">
+        <Button variant="outline" size="sm" onClick={onExportPDF} disabled={!hasCoverLetter}>
           <Download className="w-3.5 h-3.5 mr-1" /> Export PDF
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setPreview(v => !v)}
-          className={preview ? "bg-blue-50 border-blue-300 text-blue-700" : ""}
-        >
-          {preview ? <><EyeOff className="w-3.5 h-3.5 mr-1" /> Edit</> : <><Eye className="w-3.5 h-3.5 mr-1" /> Preview</>}
         </Button>
       </div>
 
-      {/* Format toolbar (only in edit mode) */}
-      {!preview && (
-        <div className="flex items-center gap-1 px-2 py-1.5 border border-b-0 border-slate-200 rounded-t-md bg-slate-50">
-          <button type="button" onClick={() => wrapSelection("**", "**")} title="Bold" className="p-1.5 rounded hover:bg-slate-200 text-slate-600 transition-colors">
-            <Bold className="w-3.5 h-3.5" />
-          </button>
-          <button type="button" onClick={() => wrapSelection("_", "_")} title="Italic" className="p-1.5 rounded hover:bg-slate-200 text-slate-600 transition-colors">
-            <Italic className="w-3.5 h-3.5" />
-          </button>
-          <button type="button" onClick={() => wrapSelection("__", "__")} title="Underline" className="p-1.5 rounded hover:bg-slate-200 text-slate-600 transition-colors">
-            <Underline className="w-3.5 h-3.5" />
-          </button>
+      {/* Word-processor editor */}
+      <div className="border border-slate-200 rounded-lg overflow-hidden shadow-sm">
+        {/* Formatting toolbar */}
+        <div className="flex items-center gap-0.5 px-2 py-1.5 bg-slate-50 border-b border-slate-200 flex-wrap">
+          <ToolBtn title="Bold (Ctrl+B)" onClick={() => exec("bold")}><Bold className="w-3.5 h-3.5" /></ToolBtn>
+          <ToolBtn title="Italic (Ctrl+I)" onClick={() => exec("italic")}><Italic className="w-3.5 h-3.5" /></ToolBtn>
+          <ToolBtn title="Underline (Ctrl+U)" onClick={() => exec("underline")}><Underline className="w-3.5 h-3.5" /></ToolBtn>
+          <ToolBtn title="Strikethrough" onClick={() => exec("strikeThrough")}><Strikethrough className="w-3.5 h-3.5" /></ToolBtn>
           <div className="w-px h-4 bg-slate-300 mx-1" />
-          <button type="button" onClick={insertTable} title="Insert table" className="p-1.5 rounded hover:bg-slate-200 text-slate-600 transition-colors flex items-center gap-1 text-xs">
-            <Table className="w-3.5 h-3.5" /> Table
-          </button>
+          <ToolBtn title="Align Left" onClick={() => exec("justifyLeft")}><AlignLeft className="w-3.5 h-3.5" /></ToolBtn>
+          <ToolBtn title="Align Center" onClick={() => exec("justifyCenter")}><AlignCenter className="w-3.5 h-3.5" /></ToolBtn>
+          <ToolBtn title="Align Right" onClick={() => exec("justifyRight")}><AlignRight className="w-3.5 h-3.5" /></ToolBtn>
           <div className="w-px h-4 bg-slate-300 mx-1" />
-          <span className="text-[10px] text-slate-400">Select text then click format. Placeholders like <code className="bg-slate-200 px-0.5 rounded text-[9px]">{"{{case_id}}"}</code> are replaced in preview.</span>
+          <ToolBtn title="Bullet List" onClick={() => exec("insertUnorderedList")}><List className="w-3.5 h-3.5" /></ToolBtn>
+          <ToolBtn title="Numbered List" onClick={() => exec("insertOrderedList")}><ListOrdered className="w-3.5 h-3.5" /></ToolBtn>
+          <div className="w-px h-4 bg-slate-300 mx-1" />
+          <ToolBtn title="Insert Table" onClick={insertTable}>
+            <span className="flex items-center gap-1 text-xs font-medium"><Table className="w-3.5 h-3.5" /> Table</span>
+          </ToolBtn>
+          <ToolBtn title="Add Row to selected table" onClick={addTableRow}>
+            <span className="text-xs font-medium">+Row</span>
+          </ToolBtn>
+          <ToolBtn title="Add Column to selected table" onClick={addTableCol}>
+            <span className="text-xs font-medium">+Col</span>
+          </ToolBtn>
+          <div className="w-px h-4 bg-slate-300 mx-1" />
+          <select
+            className="text-xs border border-slate-200 rounded px-1 py-0.5 bg-white text-slate-600"
+            onChange={e => exec("fontSize", e.target.value)}
+            defaultValue="3"
+          >
+            <option value="1">8pt</option>
+            <option value="2">10pt</option>
+            <option value="3">12pt</option>
+            <option value="4">14pt</option>
+            <option value="5">18pt</option>
+            <option value="6">24pt</option>
+          </select>
+          <select
+            className="text-xs border border-slate-200 rounded px-1 py-0.5 bg-white text-slate-600 ml-1"
+            onChange={e => exec("formatBlock", e.target.value)}
+            defaultValue="p"
+          >
+            <option value="p">Paragraph</option>
+            <option value="h1">Heading 1</option>
+            <option value="h2">Heading 2</option>
+            <option value="h3">Heading 3</option>
+          </select>
         </div>
-      )}
 
-      {/* Editor / Preview */}
-      {preview ? (
-        <div className="border border-slate-200 rounded-lg bg-white p-6 min-h-[420px]">
-          {/* Header */}
-          <div className="border-b border-slate-200 pb-4 mb-4">
-            <p className="text-base font-bold text-slate-800">Chargeback Dispute Cover Letter</p>
-            <p className="text-xs text-slate-400 mt-0.5">Case ID: {currentDispute.case_id} | Date: {new Date().toLocaleDateString()}</p>
-          </div>
-
-          {resolvedContent ? (
-            <MarkdownPreview content={resolvedContent} />
-          ) : (
-            <p className="text-slate-300 italic text-sm">No cover letter content yet. Write or generate one in edit mode.</p>
-          )}
-
-          {/* Evidence images inline */}
-          {(() => {
-            const imageEvidence = evidence.filter(ev => {
-              const name = (ev.file_name || "").toLowerCase();
-              return name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".png") || name.endsWith(".gif") || name.endsWith(".webp");
-            });
-            // Only show images NOT already embedded via {{evidence:...}} tags
-            const embeddedUrls = evidence.filter(ev => coverLetter?.includes(`{{evidence:${ev.evidence_type}}}`)).map(ev => ev.file_url);
-            const unembedded = imageEvidence.filter(ev => !embeddedUrls.includes(ev.file_url));
-            if (unembedded.length === 0) return null;
-            return (
-              <div className="mt-6 border-t border-slate-200 pt-4">
-                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Supporting Evidence (appended in PDF)</p>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {unembedded.map(ev => (
-                    <div key={ev.id} className="space-y-1">
-                      <a href={ev.file_url} target="_blank" rel="noreferrer">
-                        <img src={ev.file_url} alt={ev.file_name} className="w-full h-28 object-cover rounded-lg border border-slate-200 hover:opacity-90 cursor-zoom-in" />
-                      </a>
-                      <p className="text-[10px] text-slate-400 truncate">{ev.evidence_type} — {ev.file_name}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            );
-          })()}
+        {/* A4-style page editor */}
+        <div className="bg-slate-100 p-6 min-h-[500px]">
+          <div
+            ref={editorRef}
+            contentEditable
+            suppressContentEditableWarning
+            onInput={handleEditorInput}
+            onKeyDown={(e) => {
+              // Tab in table moves to next cell
+              if (e.key === "Tab") {
+                const cell = window.getSelection()?.anchorNode?.parentElement?.closest("td, th");
+                if (cell) {
+                  e.preventDefault();
+                  const allCells = Array.from(cell.closest("table").querySelectorAll("td, th"));
+                  const idx = allCells.indexOf(cell);
+                  if (idx < allCells.length - 1) {
+                    allCells[idx + 1].focus();
+                    const range = document.createRange();
+                    range.selectNodeContents(allCells[idx + 1]);
+                    range.collapse(false);
+                    window.getSelection().removeAllRanges();
+                    window.getSelection().addRange(range);
+                  }
+                }
+              }
+            }}
+            className="bg-white mx-auto shadow-md rounded-sm min-h-[480px] p-10 text-sm text-slate-800 leading-relaxed focus:outline-none"
+            style={{
+              maxWidth: "750px",
+              fontFamily: "'Times New Roman', Times, serif",
+              lineHeight: "1.8",
+              caretColor: "#0D50B8",
+            }}
+            data-placeholder="Start typing your cover letter... Use the toolbar to format. {{evidence:TypeName}} tags will show the actual uploaded images inline."
+          />
         </div>
-      ) : (
-        <textarea
-          ref={textareaRef}
-          className="w-full border border-slate-200 rounded-b-md px-3 py-2 text-sm min-h-[420px] focus:outline-none focus:ring-1 focus:ring-[#0D50B8] resize-y font-mono leading-relaxed rounded-t-none"
-          placeholder={"Dear Sir/Madam,\n\nCase ID: {{case_id}}\nDispute Date: {{chargeback_date}}\nAmount: {{chargeback_currency}} {{chargeback_amount}}\nReason Code: {{reason_code}}\n\nEvidence: {{evidence:Invoice}}\n\n| Field | Value |\n|-------|-------|\n| ARN   | {{arn_number}} |\n| Card  | {{card_last4}} |\n\nYours sincerely,\nDispute Team"}
-          value={coverLetter}
-          onChange={e => setCoverLetter(e.target.value)}
-        />
-      )}
+      </div>
 
       {/* Submit to Portal section */}
       {isFought && !["awaiting_decision","won","lost"].includes(currentDispute.status) && (
@@ -273,6 +374,38 @@ export default function CoverLetterEditor({
           </CardContent>
         </Card>
       )}
+
+      <style>{`
+        [contenteditable][data-placeholder]:empty:before {
+          content: attr(data-placeholder);
+          color: #94a3b8;
+          pointer-events: none;
+          font-style: italic;
+        }
+        [contenteditable] table td, [contenteditable] table th {
+          border: 1px solid #cbd5e1 !important;
+          padding: 6px 10px !important;
+          min-width: 80px;
+        }
+        [contenteditable] table td:focus, [contenteditable] table th:focus {
+          outline: 2px solid #0D50B8;
+          outline-offset: -2px;
+        }
+        [contenteditable] .field-value {
+          background: #eff6ff;
+          border-radius: 3px;
+          padding: 0 3px;
+          color: #1d4ed8;
+          font-size: 0.85em;
+        }
+        [contenteditable] .evidence-block {
+          border: 1px dashed #94a3b8;
+          border-radius: 6px;
+          padding: 8px;
+          margin: 8px 0;
+          background: #f8fafc;
+        }
+      `}</style>
     </div>
   );
 }
