@@ -142,28 +142,8 @@ export default function DisputeDetail({ dispute, projects, onBack, onUpdate, cur
     setCoverLetter(content);
   };
 
-  const handleGenerateCoverLetter = async () => {
-    setGeneratingCL(true);
-    const result = await base44.integrations.Core.InvokeLLM({
-      prompt: `Generate a professional chargeback dispute cover letter for the following case:
-Case ID: ${currentDispute.case_id}
-Reason Code: ${currentDispute.reason_code}
-Reason Category: ${currentDispute.reason_category}
-Chargeback Amount: ${currentDispute.chargeback_currency} ${currentDispute.chargeback_amount}
-Chargeback Date: ${currentDispute.chargeback_date}
-Transaction ID: ${currentDispute.transaction_id}
-Transaction Date: ${currentDispute.transaction_date}
-ARN: ${currentDispute.arn_number}
-Card Network: ${currentDispute.card_network}
-Card Type: ${currentDispute.card_type}
-Cardholder: ${currentDispute.cardholder_name}
-Customer: ${currentDispute.customer_name}
-Business Unit: ${currentDispute.business_unit}
-
-Write a formal, concise cover letter defending against this chargeback. Include all relevant dispute details. Use professional language.`,
-    });
-    setCoverLetter(result);
-    setGeneratingCL(false);
+  const handleGenerateCoverLetter = () => {
+    // Handled via AI Assistant Panel — this is a no-op kept for prop compat
   };
 
   const handleSaveCoverLetter = async () => {
