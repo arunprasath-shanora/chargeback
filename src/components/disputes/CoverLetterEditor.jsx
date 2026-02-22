@@ -350,6 +350,48 @@ export default function CoverLetterEditor({
           <ToolBtn title="Add Row" onClick={addTableRow}><span className="text-xs font-medium">+Row</span></ToolBtn>
           <ToolBtn title="Add Column" onClick={addTableCol}><span className="text-xs font-medium">+Col</span></ToolBtn>
           <div className="w-px h-4 bg-slate-300 mx-1" />
+          {/* Insert Evidence dropdown */}
+          <div className="relative" ref={evDropdownRef}>
+            <button
+              type="button"
+              title="Insert Evidence"
+              onMouseDown={e => { e.preventDefault(); setEvDropdownOpen(o => !o); }}
+              className="p-1.5 rounded hover:bg-slate-200 text-slate-600 transition-colors flex items-center gap-0.5"
+            >
+              <Image className="w-3.5 h-3.5" />
+              <span className="text-xs">Evidence</span>
+              <ChevronDown className="w-3 h-3" />
+            </button>
+            {evDropdownOpen && (
+              <div className="absolute top-full left-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-50 min-w-[220px] max-h-64 overflow-y-auto">
+                {evidence.length === 0 ? (
+                  <p className="text-xs text-slate-400 px-3 py-2">No evidence uploaded yet</p>
+                ) : (
+                  <>
+                    <p className="text-[10px] font-semibold text-slate-400 px-3 pt-2 pb-1 uppercase tracking-wide">Click to insert at cursor</p>
+                    {evidence.map(ev => {
+                      const isImg = /\.(jpg|jpeg|png|webp|gif)$/.test((ev.file_name || "").toLowerCase());
+                      return (
+                        <button
+                          key={ev.id}
+                          type="button"
+                          className="w-full flex items-center gap-2 px-3 py-1.5 hover:bg-blue-50 text-left"
+                          onMouseDown={e => { e.preventDefault(); insertEvidence(ev); }}
+                        >
+                          <span className="text-sm">{isImg ? "🖼" : "📎"}</span>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-medium text-slate-700 truncate">{ev.file_name}</p>
+                            <p className="text-[10px] text-slate-400">{ev.evidence_type}</p>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+          <div className="w-px h-4 bg-slate-300 mx-1" />
           <select className="text-xs border border-slate-200 rounded px-1 py-0.5 bg-white text-slate-600"
             onChange={e => exec("fontSize", e.target.value)} defaultValue="3">
             <option value="1">8pt</option>
