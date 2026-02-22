@@ -507,6 +507,17 @@ export default function ProjectForm({ project, onSave, onCancel }) {
           />
         </TabsContent>
 
+        <TabsContent value="evidence_connectors" className="mt-4">
+          <Card className="border-slate-100">
+            <CardContent className="p-5">
+              <ProjectEvidenceConnectorsTab
+                connectors={form.evidence_connectors}
+                onChange={v => set("evidence_connectors", v)}
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         <TabsContent value="notes" className="mt-4">
           <Card className="border-slate-100">
             <CardContent className="p-5">
