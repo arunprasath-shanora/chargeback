@@ -588,6 +588,30 @@ Provide your response in this exact JSON format:
             </Card>
           )}
 
+          {/* Child dispute alert banner */}
+          {childDisputes.length > 0 && (
+            <div className="space-y-2">
+              {childDisputes.map(child => (
+                <div key={child.id} className="flex items-center gap-3 px-4 py-2.5 rounded-xl border bg-amber-50 border-amber-200">
+                  <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0" />
+                  <div className="flex-1 text-sm">
+                    <span className="font-semibold text-amber-800">{child.case_type} received — </span>
+                    <span className="text-amber-700">Case: </span>
+                    <span className="font-bold text-amber-900">{child.case_id}</span>
+                    <span className="mx-2 text-amber-400">·</span>
+                    <span className="text-xs text-amber-700">SLA: {child.sla_deadline || "—"}</span>
+                    <span className="mx-2 text-amber-400">·</span>
+                    <Badge className={`${statusColors[child.status] || "bg-slate-100"} border-0 text-xs`}>{child.status?.replace("_"," ")}</Badge>
+                  </div>
+                  <Button size="sm" variant="outline" className="border-amber-300 text-amber-800 text-xs hover:bg-amber-100"
+                    onClick={() => { onUpdate(child); }}>
+                    Open
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+
           <SectionGrid title="Case Information">
             <InfoRow label="Case ID" value={currentDispute.case_id} />
             <InfoRow label="Case Type" value={currentDispute.case_type} />
