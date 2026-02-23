@@ -197,6 +197,52 @@ export default function VolumeAnalyzer({ disputes }) {
     return insights;
   }, [momVolumeData, disputes, sixMonths]);
 
+  // ── Anomaly detection on 12-month volume & amount ──
+  const months12 = useMemo(() => {
+    const now = new Date();
+    return Array.from({ length: 12 }, (_, i) => {
+      const d = new Date(now.getFullYear(), now.getMonth() - (11 - i), 1);
+      return { label: fmtMonthYear(d), year: d.getFullYear(), month: d.getMonth() };
+    });
+  }, []);
+
+  const anomalyStats = useMemo(() => {
+    const map = {};
+    disputes.forEach(d => {
+      const date = new Date(d.chargeback_date || d.created_date);
+      if (!date || isNaN(date)) return;
+      const key = `${date.getFullYear()}-${date.getMonth()}`;
+      if (!map[key]) map[key] = { count: 0, amount: 0 };
+      map[key].count++;
+      map[key].amount += d.chargeback_amount_usd || d.chargeback_amount || 0;
+    });
+    return months12.map(({ label, year, month }) => {
+      const m = map[`${year}-${month}`] || { count: 0, amount: 0 };
+      return { label, count: m.count, amount: parseFloat((m.amount / 1000).toFixed(1)) };
+    });
+  }, [disputes, months12]);
+
+  const countFlags = useMemo(() => detectAnomalies(anomalyStats.map(m => m.count)), [anomalyStats]);
+  const amountFlags = useMemo(() => detectAnomalies(anomalyStats.map(m => m.amount)), [anomalyStats]);
+
+  const anomalyData = useMemo(() => anomalyStats.map((m, i) => ({
+    ...m,
+    countAnomaly: countFlags[i],
+    amountAnomaly: amountFlags[i],
+  })), [anomalyStats, countFlags, amountFlags]);
+
+  const meanCount12 = anomalyStats.reduce((s, m) => s + m.count, 0) / Math.max(1, anomalyStats.length);
+  const meanAmount12 = anomalyStats.reduce((s, m) => s + m.amount, 0) / Math.max(1, anomalyStats.length);
+
+  const volumeAnomalyEvents = useMemo(() => {
+    const events = [];
+    anomalyData.forEach(m => {
+      if (m.countAnomaly) events.push({ label: m.label, metric: "Volume", value: m.count, mean: Math.round(meanCount12), type: m.count > meanCount12 ? "spike" : "drop" });
+      if (m.amountAnomaly) events.push({ label: m.label, metric: "CB Amount", value: `$${m.amount}K`, mean: `$${meanAmount12.toFixed(1)}K`, type: m.amount > meanAmount12 ? "spike" : "drop" });
+    });
+    return events.reverse();
+  }, [anomalyData, meanCount12, meanAmount12]);
+
   const { rcTrendData, top5RCs } = useMemo(() => {
     const byRC = {};
     disputes.forEach(d => {
