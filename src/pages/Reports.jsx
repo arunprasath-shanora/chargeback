@@ -1,113 +1,63 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-
-const COLORS = ["#0D50B8", "#22c55e", "#ef4444", "#f59e0b", "#8b5cf6", "#06b6d4", "#ec4899", "#14b8a6"];
-
-const STATUS_LABEL = {
-  new: "New",
-  in_progress: "In Progress",
-  submitted: "Submitted",
-  awaiting_decision: "Awaiting Decision",
-  won: "Won",
-  lost: "Lost",
-  not_fought: "Not Fought",
-};
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { BarChart2, TrendingUp, Sparkles } from "lucide-react";
+import VolumeAnalyzer from "@/components/reports/VolumeAnalyzer";
+import PerformanceDashboard from "@/components/reports/PerformanceDashboard";
+import AIInsights from "@/components/reports/AIInsights";
 
 export default function Reports() {
   const [disputes, setDisputes] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    base44.entities.Dispute.list("-created_date", 500)
+    base44.entities.Dispute.list("-created_date", 1000)
       .then(d => { setDisputes(d); setLoading(false); })
       .catch(() => setLoading(false));
   }, []);
 
-  const statusData = ["new","in_progress","submitted","awaiting_decision","won","lost","not_fought"].map(s => ({
-    name: STATUS_LABEL[s],
-    count: disputes.filter(d => d.status === s).length,
-  })).filter(s => s.count > 0);
-
-  const reasonData = disputes.reduce((acc, d) => {
-    if (d.reason_category) acc[d.reason_category] = (acc[d.reason_category] || 0) + 1;
-    return acc;
-  }, {});
-  const reasonChartData = Object.entries(reasonData).sort((a,b) => b[1]-a[1]).slice(0,8).map(([name,value]) => ({name,value}));
-
-  const won = disputes.filter(d => d.status === "won").length;
-  const lost = disputes.filter(d => d.status === "lost").length;
-  const winRate = (won + lost) > 0 ? Math.round((won / (won + lost)) * 100) : 0;
+  const tabs = [
+    { id: "volume", label: "Volume Analyzer", icon: BarChart2, desc: "Trends, YoY comparison & forecast" },
+    { id: "performance", label: "Performance Dashboard", icon: TrendingUp, desc: "Win rates, recovery & benchmarks" },
+    { id: "ai", label: "AI Insights & Predictions", icon: Sparkles, desc: "Smart analysis & recommendations" },
+  ];
 
   return (
-    <div className="p-6 space-y-5">
+    <div className="p-6 space-y-5 min-h-screen">
       <div>
         <h1 className="text-2xl font-bold text-slate-800">Performance Dashboard</h1>
-        <p className="text-slate-500 text-sm mt-1">Analytics and performance insights</p>
+        <p className="text-slate-400 text-sm mt-1">Analytics, insights, and forecasting across all disputes</p>
       </div>
 
       {loading ? (
-        <p className="text-slate-400 py-8 text-center">Loading...</p>
-      ) : (
-        <div className="space-y-6">
-          {/* Win rate summary */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {[
-              { label: "Total Disputes", value: disputes.length, color: "text-slate-800" },
-              { label: "Won", value: won, color: "text-emerald-600" },
-              { label: "Lost", value: lost, color: "text-red-600" },
-              { label: "Win Rate", value: `${winRate}%`, color: "text-[#0D50B8]" },
-            ].map(s => (
-              <Card key={s.label} className="border-slate-100">
-                <CardContent className="p-5">
-                  <p className={`text-3xl font-bold ${s.color}`}>{s.value}</p>
-                  <p className="text-xs text-slate-500 mt-1">{s.label}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          <div className="grid gap-6 lg:grid-cols-2">
-            <Card className="border-slate-100">
-              <CardHeader><CardTitle className="text-base font-semibold text-slate-800">Disputes by Status</CardTitle></CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={250}>
-                  <BarChart data={statusData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                    <XAxis dataKey="name" tick={{ fontSize: 10 }} />
-                    <YAxis tick={{ fontSize: 11 }} />
-                    <Tooltip />
-                    <Bar dataKey="count" fill="#0D50B8" radius={[4,4,0,0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-
-            <Card className="border-slate-100">
-              <CardHeader><CardTitle className="text-base font-semibold text-slate-800">Disputes by Reason Category</CardTitle></CardHeader>
-              <CardContent>
-                {reasonChartData.length === 0 ? (
-                  <p className="text-slate-400 text-center py-8 text-sm">No data available</p>
-                ) : (
-                  <ResponsiveContainer width="100%" height={250}>
-                    <PieChart>
-                      <Pie data={reasonChartData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={90}
-                        label={({ name, percent }) => `${(percent*100).toFixed(0)}%`} labelLine={false} fontSize={10}>
-                        {reasonChartData.map((_,i) => <Cell key={i} fill={COLORS[i%COLORS.length]} />)}
-                      </Pie>
-                      <Tooltip />
-                    </PieChart>
-                  </ResponsiveContainer>
-                )}
-              </CardContent>
-            </Card>
+        <div className="flex items-center justify-center h-64">
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+            <p className="text-slate-400 text-sm">Loading dispute data…</p>
           </div>
         </div>
+      ) : (
+        <Tabs defaultValue="volume" className="space-y-5">
+          <TabsList className="bg-white border border-slate-200 shadow-sm rounded-2xl p-1 h-auto gap-1 flex flex-wrap">
+            {tabs.map(t => (
+              <TabsTrigger key={t.id} value={t.id}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium data-[state=active]:bg-[#0D50B8] data-[state=active]:text-white data-[state=active]:shadow-md text-slate-500 hover:text-slate-700 transition-all">
+                <t.icon className="w-4 h-4" />
+                <span>{t.label}</span>
+              </TabsTrigger>
+            ))}
+          </TabsList>
+
+          <TabsContent value="volume" className="mt-0">
+            <VolumeAnalyzer disputes={disputes} />
+          </TabsContent>
+          <TabsContent value="performance" className="mt-0">
+            <PerformanceDashboard disputes={disputes} />
+          </TabsContent>
+          <TabsContent value="ai" className="mt-0">
+            <AIInsights disputes={disputes} />
+          </TabsContent>
+        </Tabs>
       )}
     </div>
   );
