@@ -77,7 +77,7 @@ function LoadingSkeleton() {
 }
 
 export default function AIAssistantPanel({ dispute, evidenceTypes, evidence, onApplyCoverLetter, onTabSwitch, cachedAnalysis, onAnalysisComplete }) {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const [loadingInsights, setLoadingInsights] = useState(false);
   const [loadingLetter, setLoadingLetter] = useState(false);
   const [insights, setInsights] = useState(cachedAnalysis ? {
