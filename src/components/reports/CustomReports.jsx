@@ -194,6 +194,87 @@ export default function CustomReports({ disputes }) {
 
   const tooltipFormatter = (val) => [formatValue(val, runConfig?.metric || "volume"), metricLabel];
 
+  const renderWinRateChart = () => {
+    if (chartData.length === 0) return <p className="text-slate-400 text-sm text-center py-16">No data</p>;
+    const ct = runConfig?.wrChartType || "bar";
+
+    const isHorizontal = ct === "bar";
+    if (isHorizontal) {
+      return (
+        <ResponsiveContainer width="100%" height={Math.max(200, chartData.length * 45)}>
+          <BarChart data={chartData} layout="vertical" barCategoryGap="25%" barGap={3}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
+            <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 10, fill: "#94a3b8" }} axisLine={false} tickLine={false} tickFormatter={v => `${v}%`} />
+            <YAxis type="category" dataKey="name" tick={{ fontSize: 10, fill: "#64748b" }} axisLine={false} tickLine={false} width={140} />
+            <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8 }}
+              formatter={(v, name) => [`${v}%`, name === "winRate" ? "Win Rate (Count)" : "Win Rate (Amount)"]} />
+            <Legend wrapperStyle={{ fontSize: 11 }} formatter={v => v === "winRate" ? "Win Rate % (Count)" : "Win Rate % (Amount)"} />
+            <Bar dataKey="winRate" name="winRate" radius={[0, 3, 3, 0]} maxBarSize={14}>
+              {chartData.map((entry, i) => (
+                <Cell key={i} fill={entry.winRate >= 60 ? "#22c55e" : entry.winRate >= 40 ? "#f59e0b" : "#ef4444"} />
+              ))}
+            </Bar>
+            <Bar dataKey="winRateAmt" name="winRateAmt" radius={[0, 3, 3, 0]} maxBarSize={14}>
+              {chartData.map((entry, i) => (
+                <Cell key={i} fill={entry.winRateAmt >= 60 ? "#6366f1" : entry.winRateAmt >= 40 ? "#8b5cf6" : "#a855f7"} />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      );
+    }
+    if (ct === "line") {
+      return (
+        <ResponsiveContainer width="100%" height={280}>
+          <LineChart data={chartData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+            <XAxis dataKey="name" tick={{ fontSize: 10, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
+            <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: "#94a3b8" }} axisLine={false} tickLine={false} tickFormatter={v => `${v}%`} />
+            <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8 }} formatter={(v, n) => [`${v}%`, n === "winRate" ? "Win Rate (Count)" : "Win Rate (Amount)"]} />
+            <Legend wrapperStyle={{ fontSize: 11 }} formatter={v => v === "winRate" ? "Win Rate % (Count)" : "Win Rate % (Amount)"} />
+            <Line dataKey="winRate" stroke="#0D50B8" strokeWidth={2.5} dot={{ r: 4 }} />
+            <Line dataKey="winRateAmt" stroke="#6366f1" strokeWidth={2.5} dot={{ r: 4 }} strokeDasharray="5 3" />
+          </LineChart>
+        </ResponsiveContainer>
+      );
+    }
+    if (ct === "area") {
+      return (
+        <ResponsiveContainer width="100%" height={280}>
+          <AreaChart data={chartData}>
+            <defs>
+              <linearGradient id="wrGrad1" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#0D50B8" stopOpacity={0.15} /><stop offset="95%" stopColor="#0D50B8" stopOpacity={0} />
+              </linearGradient>
+              <linearGradient id="wrGrad2" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#6366f1" stopOpacity={0.15} /><stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+            <XAxis dataKey="name" tick={{ fontSize: 10, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
+            <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: "#94a3b8" }} axisLine={false} tickLine={false} tickFormatter={v => `${v}%`} />
+            <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8 }} formatter={(v, n) => [`${v}%`, n === "winRate" ? "Win Rate (Count)" : "Win Rate (Amount)"]} />
+            <Legend wrapperStyle={{ fontSize: 11 }} formatter={v => v === "winRate" ? "Win Rate % (Count)" : "Win Rate % (Amount)"} />
+            <Area dataKey="winRate" stroke="#0D50B8" strokeWidth={2} fill="url(#wrGrad1)" />
+            <Area dataKey="winRateAmt" stroke="#6366f1" strokeWidth={2} fill="url(#wrGrad2)" />
+          </AreaChart>
+        </ResponsiveContainer>
+      );
+    }
+    // pie — show count win rate only
+    return (
+      <ResponsiveContainer width="100%" height={300}>
+        <PieChart>
+          <Pie data={chartData} dataKey="winRate" nameKey="name" cx="50%" cy="50%" outerRadius={110}
+            label={({ name, value }) => `${name}: ${value}%`} labelLine={true} fontSize={11}>
+            {chartData.map((entry, i) => <Cell key={i} fill={entry.winRate >= 60 ? "#22c55e" : entry.winRate >= 40 ? "#f59e0b" : "#ef4444"} />)}
+          </Pie>
+          <Tooltip formatter={(v) => [`${v}%`, "Win Rate (Count)"]} contentStyle={{ fontSize: 11, borderRadius: 8 }} />
+        </PieChart>
+      </ResponsiveContainer>
+    );
+  };
+
   const renderChart = () => {
     if (chartData.length === 0) return <p className="text-slate-400 text-sm text-center py-16">No data for selected criteria</p>;
 
