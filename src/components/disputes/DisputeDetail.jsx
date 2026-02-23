@@ -608,7 +608,7 @@ Provide your response in this exact JSON format:
                     <Badge className={`${statusColors[child.status] || "bg-slate-100"} border-0 text-xs`}>{child.status?.replace("_"," ")}</Badge>
                   </div>
                   <Button size="sm" variant="outline" className="border-amber-300 text-amber-800 text-xs hover:bg-amber-100"
-                    onClick={() => { onUpdate(child); }}>
+                    onClick={() => { setCurrentDispute(child); onUpdate(child); }}>
                     Open
                   </Button>
                 </div>
