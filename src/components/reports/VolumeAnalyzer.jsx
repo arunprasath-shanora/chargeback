@@ -401,6 +401,71 @@ export default function VolumeAnalyzer({ disputes }) {
         </CardContent>
       </Card>
 
+      {/* ── Anomaly Detection Section ── */}
+      <Card className="border-slate-100 shadow-sm">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-500" />
+            Anomaly Detection — Volume & CB Amount (12 Months)
+          </CardTitle>
+          <p className="text-[11px] text-slate-400 mt-0.5">Red bars = statistical outliers (z-score &gt; 1.8σ). Dashed line = 12-month average.</p>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Volume anomaly chart */}
+          <div>
+            <p className="text-[10px] font-semibold text-slate-500 mb-1">Dispute Volume</p>
+            <ResponsiveContainer width="100%" height={160}>
+              <ComposedChart data={anomalyData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                <XAxis dataKey="label" tick={{ fontSize: 9, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 9, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
+                <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8 }} formatter={(v, n) => [v, "Count"]} />
+                <ReferenceLine y={parseFloat(meanCount12.toFixed(1))} stroke="#94a3b8" strokeDasharray="4 4" />
+                <Bar dataKey="count" radius={[3, 3, 0, 0]}
+                  shape={(props) => <rect {...props} fill={props.payload.countAnomaly ? "#ef4444" : "#0D50B8"} rx={3} />} />
+              </ComposedChart>
+            </ResponsiveContainer>
+          </div>
+          {/* Amount anomaly chart */}
+          <div>
+            <p className="text-[10px] font-semibold text-slate-500 mb-1">CB Amount ($K)</p>
+            <ResponsiveContainer width="100%" height={160}>
+              <ComposedChart data={anomalyData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                <XAxis dataKey="label" tick={{ fontSize: 9, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 9, fill: "#94a3b8" }} axisLine={false} tickLine={false} tickFormatter={v => `$${v}K`} />
+                <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8 }} formatter={(v, n) => [`$${v}K`, "Amount"]} />
+                <ReferenceLine y={parseFloat(meanAmount12.toFixed(1))} stroke="#94a3b8" strokeDasharray="4 4" />
+                <Bar dataKey="amount" radius={[3, 3, 0, 0]}
+                  shape={(props) => <rect {...props} fill={props.payload.amountAnomaly ? "#ef4444" : "#8b5cf6"} rx={3} />} />
+              </ComposedChart>
+            </ResponsiveContainer>
+          </div>
+          {/* Anomaly events */}
+          {volumeAnomalyEvents.length > 0 ? (
+            <div className="space-y-2 pt-1">
+              {volumeAnomalyEvents.map((ev, i) => (
+                <div key={i} className="flex items-center gap-3 p-2.5 rounded-xl bg-red-50 border border-red-100">
+                  <div className={`w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 ${ev.type === "spike" ? "bg-red-100" : "bg-amber-100"}`}>
+                    {ev.type === "spike" ? <TrendingUp className="w-3 h-3 text-red-600" /> : <TrendingDown className="w-3 h-3 text-amber-600" />}
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-semibold text-slate-700">{ev.label} · {ev.metric}</span>
+                    <span className={`ml-2 text-[9px] font-bold px-1.5 py-0.5 rounded-full ${ev.type === "spike" ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700"}`}>{ev.type === "spike" ? "Spike" : "Drop"}</span>
+                    <p className="text-[10px] text-slate-500">Observed: <strong>{ev.value}</strong> vs avg <strong>{ev.mean}</strong></p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 p-2.5 rounded-xl bg-emerald-50 border border-emerald-100">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+              <p className="text-[11px] text-emerald-700 font-medium">No anomalies detected in the last 12 months</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* ── Volume Insights (after forecast) ── */}
       {volumeInsights.length > 0 && (
         <Card className="border-slate-100 shadow-sm">
