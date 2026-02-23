@@ -513,15 +513,6 @@ Provide your response in this exact JSON format:
         </div>
       )}
 
-      {/* AI Win Prediction Panel */}
-      {isFought && (
-        <WinPredictionPanel
-          dispute={currentDispute}
-          evidence={evidence}
-          evidenceTypes={allEvidenceTypes}
-        />
-      )}
-
       {/* AI Assistant Panel - shown when dispute has a fought decision */}
       {isFought && (
         <AIAssistantPanel
