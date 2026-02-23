@@ -10,6 +10,7 @@ import { ChevronLeft, Pencil, Upload, FileText, Trash2, Shield, ShieldOff, Pause
 import DisputeForm from "./DisputeForm";
 import CoverLetterEditor from "./CoverLetterEditor";
 import AIAssistantPanel from "./AIAssistantPanel";
+import WinPredictionPanel from "./WinPredictionPanel";
 import jsPDF from "jspdf";
 
 const statusColors = {
