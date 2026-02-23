@@ -360,10 +360,45 @@ export default function MasterData() {
                           {/* Case */}
                           <td className="px-3 py-2.5 font-medium text-[#0D50B8] whitespace-nowrap">{d.case_id}</td>
                           <td className="px-3 py-2.5">
-                            <Badge className={`${DISPUTE_STATUS_COLORS[d.status] || "bg-slate-100 text-slate-600"} text-xs border-0 whitespace-nowrap`}>
-                              {DISPUTE_STATUS_LABEL[d.status] || d.status}
-                            </Badge>
+                           <Badge className={`${DISPUTE_STATUS_COLORS[d.status] || "bg-slate-100 text-slate-600"} text-xs border-0 whitespace-nowrap`}>
+                             {DISPUTE_STATUS_LABEL[d.status] || d.status}
+                           </Badge>
                           </td>
+                          {/* Final Status */}
+                          <td className="px-3 py-2.5">
+                           {(() => {
+                             const fs = getFinalStatus(d);
+                             return <Badge className={`${DISPUTE_STATUS_COLORS[fs] || "bg-slate-100 text-slate-600"} text-xs border-0 whitespace-nowrap`}>{DISPUTE_STATUS_LABEL[fs] || fs}</Badge>;
+                           })()}
+                          </td>
+                          {/* Next Case (child dispute) */}
+                          {(() => {
+                           const children = childMap[d.id] || [];
+                           const ORDER = ["Second Chargeback", "Pre-Arbitration", "Arbitration"];
+                           const child = children.sort((a, b) => ORDER.indexOf(a.case_type) - ORDER.indexOf(b.case_type))[0];
+                           return (
+                             <>
+                               <td className="px-3 py-2.5 whitespace-nowrap">
+                                 {child ? (
+                                   <button
+                                     onClick={e => { e.stopPropagation(); setSelectedDispute(child); }}
+                                     className="text-xs font-semibold text-indigo-600 hover:underline flex items-center gap-1"
+                                   >
+                                     <span className="text-[9px] text-slate-400 mr-0.5">{child.case_type?.replace(" Chargeback","CB").replace("Pre-Arbitration","Pre-Arb")}</span>
+                                     {child.case_id}
+                                   </button>
+                                 ) : <span className="text-slate-300 text-xs">—</span>}
+                               </td>
+                               <td className="px-3 py-2.5">
+                                 {child ? (
+                                   <Badge className={`${DISPUTE_STATUS_COLORS[child.status] || "bg-slate-100 text-slate-600"} text-xs border-0 whitespace-nowrap`}>
+                                     {DISPUTE_STATUS_LABEL[child.status] || child.status}
+                                   </Badge>
+                                 ) : <span className="text-slate-300 text-xs">—</span>}
+                               </td>
+                             </>
+                           );
+                          })()}
                           <td className="px-3 py-2.5 text-slate-600 whitespace-nowrap">{projects.find(p => p.id === d.project_id)?.name || "—"}</td>
                           <td className="px-3 py-2.5 text-slate-600 whitespace-nowrap">{d.business_unit || "—"}</td>
                           <td className="px-3 py-2.5 text-slate-600 whitespace-nowrap">{d.sub_unit_name || "—"}</td>
