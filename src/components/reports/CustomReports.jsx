@@ -184,11 +184,13 @@ export default function CustomReports({ disputes }) {
 
   const chartData = useMemo(() => {
     if (!runConfig) return [];
+    if (runConfig.mode === "winrate") return buildWinRateInfluencerData(disputes, runConfig.wrField);
     return buildChartData(disputes, runConfig.metric, runConfig.groupBy);
   }, [disputes, runConfig]);
 
   const metricLabel = METRICS.find(m => m.value === runConfig?.metric)?.label || "";
   const groupLabel = GROUP_BY.find(g => g.value === runConfig?.groupBy)?.label || "";
+  const wrFieldLabel = WIN_RATE_INFLUENCER_FIELDS.find(f => f.value === runConfig?.wrField)?.label || "";
 
   const tooltipFormatter = (val) => [formatValue(val, runConfig?.metric || "volume"), metricLabel];
 
