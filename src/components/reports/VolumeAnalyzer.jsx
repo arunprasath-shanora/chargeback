@@ -4,7 +4,16 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   ComposedChart, Area, Line, ReferenceLine, Legend, Cell
 } from "recharts";
-import { TrendingUp, TrendingDown, Lightbulb } from "lucide-react";
+import { TrendingUp, TrendingDown, Lightbulb, AlertTriangle, CheckCircle2 } from "lucide-react";
+
+// ── Z-score anomaly detection ──
+function detectAnomalies(values, threshold = 1.8) {
+  const n = values.length;
+  if (n < 3) return values.map(() => false);
+  const mean = values.reduce((s, v) => s + v, 0) / n;
+  const std = Math.sqrt(values.reduce((s, v) => s + (v - mean) ** 2, 0) / n);
+  return values.map(v => std > 0 ? Math.abs((v - mean) / std) > threshold : false);
+}
 
 const COLORS = ["#0D50B8", "#22c55e", "#f59e0b", "#8b5cf6", "#06b6d4"];
 

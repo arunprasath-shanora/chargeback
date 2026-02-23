@@ -18,6 +18,28 @@ const METRICS = [
   { value: "recovery", label: "Recovered Amount ($)" },
 ];
 
+// Fields that influence win rate — used in win rate analysis mode
+const WIN_RATE_INFLUENCER_FIELDS = [
+  { value: "reason_category", label: "Reason Category" },
+  { value: "processor", label: "Processor" },
+  { value: "card_network", label: "Card Network" },
+  { value: "card_type", label: "Card Type" },
+  { value: "status", label: "Status" },
+  { value: "business_unit", label: "Business Unit" },
+  { value: "case_type", label: "Case Type" },
+  { value: "fought_decision", label: "Fought Decision" },
+  { value: "not_fought_reason", label: "Not Fought Reason" },
+  { value: "authorization_type", label: "Authorization Type" },
+  { value: "product_type", label: "Product Type" },
+  { value: "avs_match", label: "AVS Match" },
+  { value: "cvv_match", label: "CVV Match" },
+  { value: "three_d_secure", label: "3D Secure" },
+  { value: "transaction_country", label: "Transaction Country" },
+  { value: "customer_type", label: "Customer Type" },
+  { value: "sale_type", label: "Sale Type" },
+  { value: "missing_evidence", label: "Missing Evidence" },
+];
+
 const GROUP_BY = [
   { value: "month", label: "Month" },
   { value: "quarter", label: "Quarter" },
@@ -27,6 +49,11 @@ const GROUP_BY = [
   { value: "card_network", label: "Card Network" },
   { value: "card_type", label: "Card Type" },
   { value: "status", label: "Status" },
+  { value: "business_unit", label: "Business Unit" },
+  { value: "case_type", label: "Case Type" },
+  { value: "fought_decision", label: "Fought Decision" },
+  { value: "product_type", label: "Product Type" },
+  { value: "transaction_country", label: "Transaction Country" },
 ];
 
 const CHART_TYPES = [
