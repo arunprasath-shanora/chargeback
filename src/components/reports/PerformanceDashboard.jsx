@@ -212,15 +212,35 @@ export default function PerformanceDashboard({ disputes }) {
     const by = {};
     disputes.forEach(d => {
       const p = d.processor || "Unknown";
-      if (!by[p]) by[p] = { won: 0, total: 0, amount: 0 };
+      if (!by[p]) by[p] = { won: 0, total: 0, amount: 0, recovered: 0 };
       by[p].total++;
       by[p].amount += d.chargeback_amount_usd || d.chargeback_amount || 0;
+      by[p].recovered += d.recovery_amount || 0;
       if (d.status === "won") by[p].won++;
     });
     return Object.entries(by).map(([name, v]) => ({
       name, winRate: v.total > 0 ? Math.round((v.won / v.total) * 100) : 0,
       total: v.total, amount: Math.round(v.amount / 1000),
+      recovered: parseFloat((v.recovered / 1000).toFixed(1)),
     })).sort((a, b) => b.total - a.total).slice(0, 6);
+  }, [disputes]);
+
+  const networkData = useMemo(() => {
+    const nets = {};
+    disputes.forEach(d => {
+      const n = d.card_network || "Other";
+      if (!nets[n]) nets[n] = { won: 0, lost: 0, total: 0, amount: 0, recovered: 0 };
+      nets[n].total++;
+      nets[n].amount += d.chargeback_amount_usd || d.chargeback_amount || 0;
+      nets[n].recovered += d.recovery_amount || 0;
+      if (d.status === "won") nets[n].won++;
+      if (d.status === "lost") nets[n].lost++;
+    });
+    return Object.entries(nets).map(([name, v]) => ({
+      name, volume: v.total, amount: Math.round(v.amount / 1000),
+      recovered: parseFloat((v.recovered / 1000).toFixed(1)),
+      winRate: v.won + v.lost > 0 ? Math.round((v.won / (v.won + v.lost)) * 100) : 0,
+    })).sort((a, b) => b.volume - a.volume);
   }, [disputes]);
 
   const foughtPieData = [{ name: "Fought", value: fought }, { name: "Not Fought", value: notFought }];
