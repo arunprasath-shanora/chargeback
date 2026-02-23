@@ -58,6 +58,7 @@ export default function DisputeDetail({ dispute, projects, onBack, onUpdate, cur
   const [savingStatus, setSavingStatus] = useState(false);
   const [activeTab, setActiveTab] = useState("details");
   const [aiAnalysisCache, setAiAnalysisCache] = useState(null);
+  const [childDisputes, setChildDisputes] = useState([]);
   const aiRunning = useRef(false);
 
   const prefetchAiAnalysis = async (disputeData, evTypes, ev) => {
