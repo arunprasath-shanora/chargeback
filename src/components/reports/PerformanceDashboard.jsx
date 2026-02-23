@@ -2,15 +2,46 @@ import React, { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  LineChart, Line, ComposedChart, ReferenceLine, Legend, PieChart, Pie, Cell, RadialBarChart, RadialBar
+  ComposedChart, Line, Legend, PieChart, Pie, Cell
 } from "recharts";
 import { TrendingUp, TrendingDown, Award, Target, AlertTriangle, CheckCircle2 } from "lucide-react";
 
-const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const COLORS = ["#0D50B8", "#22c55e", "#f59e0b", "#8b5cf6", "#06b6d4", "#ec4899", "#ef4444", "#14b8a6"];
-const RC_GROUPS = ["Fraudulent Transaction","Pre-Arbitration","Cancelled Services","Authorization","Services Not Provided","Not As Described","Duplicate Processing","Credit Not Processed","Incorrect Amount","Others"];
+
+function fmtMonthYear(date) {
+  const m = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  return `${m[date.getMonth()]}-${String(date.getFullYear()).slice(2)}`;
+}
+
+function getLast6Months() {
+  const now = new Date();
+  const months = [];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    months.push({ label: fmtMonthYear(d), year: d.getFullYear(), month: d.getMonth() });
+  }
+  return months;
+}
+
+function getDelta(curr, prev) {
+  if (!prev || prev === 0) return null;
+  return parseFloat(((curr - prev) / prev * 100).toFixed(1));
+}
+
+function MoMBadge({ delta }) {
+  if (delta === null) return <span className="text-[10px] text-slate-400">—</span>;
+  const pos = delta >= 0;
+  return (
+    <span className={`inline-flex items-center gap-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded-full ${pos ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-600"}`}>
+      {pos ? <TrendingUp className="w-2.5 h-2.5" /> : <TrendingDown className="w-2.5 h-2.5" />}
+      {pos ? "+" : ""}{delta}%
+    </span>
+  );
+}
 
 export default function PerformanceDashboard({ disputes }) {
+  const sixMonths = useMemo(() => getLast6Months(), []);
+
   const won = disputes.filter(d => d.status === "won").length;
   const lost = disputes.filter(d => d.status === "lost").length;
   const fought = disputes.filter(d => d.fought_decision === "fought").length;
@@ -20,38 +51,44 @@ export default function PerformanceDashboard({ disputes }) {
   const wonAmt = disputes.filter(d => d.status === "won").reduce((s, d) => s + (d.chargeback_amount_usd || d.chargeback_amount || 0), 0);
   const recoveredAmt = disputes.reduce((s, d) => s + (d.recovery_amount || 0), 0);
 
-  // Monthly win rate trend
+  // Monthly win rate — last 6 months with MoM delta
   const monthlyWinRate = useMemo(() => {
-    const now = new Date();
-    const byMonth = {};
+    const byKey = {};
     disputes.forEach(d => {
       const date = new Date(d.chargeback_date || d.created_date);
-      if (!date || date.getFullYear() !== now.getFullYear()) return;
-      const m = date.getMonth();
-      if (!byMonth[m]) byMonth[m] = { won: 0, lost: 0, fought: 0, notFought: 0, wonAmt: 0, totalAmt: 0 };
-      if (d.status === "won") { byMonth[m].won++; byMonth[m].wonAmt += d.chargeback_amount_usd || d.chargeback_amount || 0; }
-      if (d.status === "lost") byMonth[m].lost++;
-      if (d.fought_decision === "fought") byMonth[m].fought++;
-      if (d.fought_decision === "not_fought") byMonth[m].notFought++;
-      byMonth[m].totalAmt += d.chargeback_amount_usd || d.chargeback_amount || 0;
+      if (!date || isNaN(date)) return;
+      const key = `${date.getFullYear()}-${date.getMonth()}`;
+      if (!byKey[key]) byKey[key] = { won: 0, lost: 0, wonAmt: 0, totalAmt: 0 };
+      if (d.status === "won") { byKey[key].won++; byKey[key].wonAmt += d.chargeback_amount_usd || d.chargeback_amount || 0; }
+      if (d.status === "lost") byKey[key].lost++;
+      byKey[key].totalAmt += d.chargeback_amount_usd || d.chargeback_amount || 0;
     });
-    return MONTHS.slice(0, now.getMonth() + 1).map((month, i) => {
-      const m = byMonth[i] || { won: 0, lost: 0, fought: 0, notFought: 0, wonAmt: 0, totalAmt: 0 };
+
+    return sixMonths.map(({ label, year, month }, idx) => {
+      const m = byKey[`${year}-${month}`] || { won: 0, lost: 0, wonAmt: 0, totalAmt: 0 };
       const total = m.won + m.lost;
+      const wr = total > 0 ? parseFloat(((m.won / total) * 100).toFixed(1)) : 0;
+
+      let prevWR = 0;
+      if (idx > 0) {
+        const { year: py, month: pm } = sixMonths[idx - 1];
+        const prev = byKey[`${py}-${pm}`] || { won: 0, lost: 0 };
+        const prevTotal = prev.won + prev.lost;
+        prevWR = prevTotal > 0 ? parseFloat(((prev.won / prevTotal) * 100).toFixed(1)) : 0;
+      }
+
       return {
-        month,
-        winRate: total > 0 ? parseFloat(((m.won / total) * 100).toFixed(1)) : 0,
-        fought: m.fought,
-        notFought: m.notFought,
-        wonAmt: Math.round(m.wonAmt / 1000),
-        totalAmt: Math.round(m.totalAmt / 1000),
+        label,
+        winRate: wr,
         won: m.won,
         lost: m.lost,
+        wonAmt: Math.round(m.wonAmt / 1000),
+        totalAmt: Math.round(m.totalAmt / 1000),
+        wrDelta: idx > 0 ? parseFloat((wr - prevWR).toFixed(1)) : null,
       };
     });
-  }, [disputes]);
+  }, [disputes, sixMonths]);
 
-  // By reason code group
   const rcWinRate = useMemo(() => {
     const byRC = {};
     disputes.forEach(d => {
@@ -65,7 +102,6 @@ export default function PerformanceDashboard({ disputes }) {
       .sort((a, b) => b.total - a.total).slice(0, 8);
   }, [disputes]);
 
-  // By card type
   const cardTypeData = useMemo(() => {
     const by = {};
     disputes.forEach(d => {
@@ -82,7 +118,6 @@ export default function PerformanceDashboard({ disputes }) {
     })).sort((a, b) => b.total - a.total);
   }, [disputes]);
 
-  // By processor
   const processorData = useMemo(() => {
     const by = {};
     disputes.forEach(d => {
@@ -104,10 +139,6 @@ export default function PerformanceDashboard({ disputes }) {
     { name: "Fought", value: fought },
     { name: "Not Fought", value: notFought },
   ];
-  const wonLostPie = [
-    { name: "Won", value: won },
-    { name: "Lost", value: lost },
-  ];
 
   const KPI = ({ label, value, sub, icon: Icon, color, bg }) => (
     <div className={`${bg} rounded-2xl p-4 border border-opacity-20`}>
@@ -117,43 +148,57 @@ export default function PerformanceDashboard({ disputes }) {
           <p className={`text-2xl font-bold mt-0.5 ${color}`}>{value}</p>
           {sub && <p className="text-[11px] text-slate-400 mt-0.5">{sub}</p>}
         </div>
-        <div className={`w-9 h-9 rounded-xl ${bg.replace("bg-", "bg-").replace("50", "100")} flex items-center justify-center`}>
-          <Icon className={`w-4.5 h-4.5 ${color}`} />
+        <div className={`w-9 h-9 rounded-xl ${bg} flex items-center justify-center`}>
+          <Icon className={`w-4 h-4 ${color}`} />
         </div>
       </div>
     </div>
   );
 
+  const lastMonth = monthlyWinRate[monthlyWinRate.length - 1];
+  const prevMonth = monthlyWinRate[monthlyWinRate.length - 2];
+  const wrMoM = lastMonth && prevMonth ? getDelta(lastMonth.winRate, prevMonth.winRate) : null;
+
   return (
     <div className="space-y-5">
       {/* Top KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <KPI label="Overall Win Rate" value={`${winRate}%`} sub={`${won} won / ${lost} lost`} icon={Award} color="text-blue-700" bg="bg-blue-50" />
+        <KPI label="Overall Win Rate" value={`${winRate}%`} sub={wrMoM !== null ? `MoM: ${wrMoM >= 0 ? "+" : ""}${wrMoM}pp` : `${won} won / ${lost} lost`} icon={Award} color="text-blue-700" bg="bg-blue-50" />
         <KPI label="Disputes Fought" value={fought.toLocaleString()} sub={`${notFought} not fought`} icon={Target} color="text-violet-700" bg="bg-violet-50" />
         <KPI label="Total CB Amount" value={`$${(totalAmt/1000).toFixed(1)}K`} sub={`$${(wonAmt/1000).toFixed(1)}K won value`} icon={TrendingUp} color="text-emerald-700" bg="bg-emerald-50" />
         <KPI label="Recovered" value={`$${(recoveredAmt/1000).toFixed(1)}K`} sub="Recovery amount logged" icon={CheckCircle2} color="text-amber-700" bg="bg-amber-50" />
       </div>
 
-      {/* Win rate trend + Fought vs Not Fought */}
+      {/* Win rate trend + donut */}
       <div className="grid lg:grid-cols-3 gap-5">
         <Card className="border-slate-100 shadow-sm lg:col-span-2">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-semibold text-slate-700">Win Rate Trend — Monthly</CardTitle>
+            <CardTitle className="text-sm font-semibold text-slate-700">Win Rate Trend — Last 6 Months (MoM)</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={220}>
               <ComposedChart data={monthlyWinRate}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-                <XAxis dataKey="month" tick={{ fontSize: 10, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
+                <XAxis dataKey="label" tick={{ fontSize: 10, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
                 <YAxis yAxisId="left" tick={{ fontSize: 10, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
                 <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 10, fill: "#94a3b8" }} axisLine={false} tickLine={false} tickFormatter={v => `${v}%`} domain={[0, 100]} />
-                <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8, border: "1px solid #e2e8f0" }} />
-                <Legend wrapperStyle={{ fontSize: 11 }} />
-                <Bar yAxisId="left" dataKey="won" name="Won" fill="#22c55e" radius={[3, 3, 0, 0]} stackId="a" />
-                <Bar yAxisId="left" dataKey="lost" name="Lost" fill="#fca5a5" radius={[0, 0, 0, 0]} stackId="a" />
-                <Line yAxisId="right" dataKey="winRate" name="Win Rate %" stroke="#0D50B8" strokeWidth={2.5} dot={{ r: 4, fill: "#0D50B8" }} />
+                <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8, border: "1px solid #e2e8f0" }}
+                  formatter={(v, name) => [name === "winRate" ? `${v}%` : v, name === "winRate" ? "Win Rate" : name === "won" ? "Won" : "Lost"]} />
+                <Legend wrapperStyle={{ fontSize: 11 }} formatter={v => v === "winRate" ? "Win Rate %" : v === "won" ? "Won" : "Lost"} />
+                <Bar yAxisId="left" dataKey="won" name="won" fill="#22c55e" radius={[3, 3, 0, 0]} stackId="a" />
+                <Bar yAxisId="left" dataKey="lost" name="lost" fill="#fca5a5" radius={[0, 0, 0, 0]} stackId="a" />
+                <Line yAxisId="right" dataKey="winRate" name="winRate" stroke="#0D50B8" strokeWidth={2.5} dot={{ r: 4, fill: "#0D50B8" }} />
               </ComposedChart>
             </ResponsiveContainer>
+            {/* MoM delta badges */}
+            <div className="flex gap-1 mt-2 flex-wrap justify-center">
+              {monthlyWinRate.map(d => (
+                <div key={d.label} className="flex flex-col items-center gap-0.5 min-w-[52px]">
+                  <span className="text-[9px] text-slate-400">{d.label}</span>
+                  <MoMBadge delta={d.wrDelta} />
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
 
@@ -191,7 +236,7 @@ export default function PerformanceDashboard({ disputes }) {
         </CardHeader>
         <CardContent>
           <div className="space-y-2.5">
-            {rcWinRate.map((rc, i) => (
+            {rcWinRate.map((rc) => (
               <div key={rc.name} className="flex items-center gap-3">
                 <span className="text-xs text-slate-500 w-44 truncate">{rc.name}</span>
                 <div className="flex-1 bg-slate-100 rounded-full h-5 relative overflow-hidden">
@@ -208,7 +253,7 @@ export default function PerformanceDashboard({ disputes }) {
         </CardContent>
       </Card>
 
-      {/* By card type + processor */}
+      {/* Card type + processor */}
       <div className="grid lg:grid-cols-2 gap-5">
         <Card className="border-slate-100 shadow-sm">
           <CardHeader className="pb-2">
@@ -258,16 +303,16 @@ export default function PerformanceDashboard({ disputes }) {
         </Card>
       </div>
 
-      {/* Won value trend */}
+      {/* Won $ vs Total $ — last 6 months MoM */}
       <Card className="border-slate-100 shadow-sm">
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-semibold text-slate-700">$ Value Won vs Total CB Amount — Monthly</CardTitle>
+          <CardTitle className="text-sm font-semibold text-slate-700">$ Value Won vs Total CB Amount — Last 6 Months</CardTitle>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={200}>
             <ComposedChart data={monthlyWinRate}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-              <XAxis dataKey="month" tick={{ fontSize: 10, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
+              <XAxis dataKey="label" tick={{ fontSize: 10, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 10, fill: "#94a3b8" }} axisLine={false} tickLine={false} tickFormatter={v => `$${v}K`} />
               <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8 }} formatter={v => [`$${v}K`, ""]} />
               <Legend wrapperStyle={{ fontSize: 11 }} />
