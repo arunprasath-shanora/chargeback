@@ -461,14 +461,16 @@ export default function PerformanceDashboard({ disputes }) {
             <div className="space-y-3">
               {processorData.map((p, i) => (
                 <div key={p.name} className="flex items-center gap-3">
-                  <span className="text-xs text-slate-500 w-24 truncate font-medium">{p.name}</span>
+                  <span className="text-xs text-slate-600 w-28 truncate font-medium">{p.name}</span>
                   <div className="flex-1 bg-slate-100 rounded-full h-5 overflow-hidden">
                     <div className="h-full rounded-full flex items-center px-2"
                       style={{ width: `${Math.max(8, (p.total / processorData[0]?.total) * 100)}%`, background: COLORS[i % COLORS.length] }}>
-                      <span className="text-[10px] text-white font-bold">{p.total}</span>
+                      <span className="text-[10px] text-white font-bold whitespace-nowrap">
+                        {p.total}{p.recovered > 0 ? ` ($${p.recovered}K)` : ""}
+                      </span>
                     </div>
                   </div>
-                  <span className="text-[10px] font-semibold w-16 text-right"
+                  <span className="text-[10px] font-semibold w-14 text-right"
                     style={{ color: p.winRate >= 60 ? "#16a34a" : p.winRate >= 40 ? "#d97706" : "#dc2626" }}>
                     {p.winRate}% WR
                   </span>
@@ -479,6 +481,35 @@ export default function PerformanceDashboard({ disputes }) {
           </CardContent>
         </Card>
       </div>
+
+      {/* Volume by Card Network */}
+      <Card className="border-slate-100 shadow-sm">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-semibold text-slate-700">Volume by Card Network</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {networkData.map((n, i) => (
+              <div key={n.name} className="flex items-center gap-3">
+                <span className="text-xs text-slate-600 w-28 truncate font-medium">{n.name}</span>
+                <div className="flex-1 bg-slate-100 rounded-full h-5 overflow-hidden">
+                  <div className="h-full rounded-full flex items-center px-2"
+                    style={{ width: `${Math.max(8, (n.volume / networkData[0]?.volume) * 100)}%`, background: COLORS[i % COLORS.length] }}>
+                    <span className="text-[10px] text-white font-bold whitespace-nowrap">
+                      {n.volume}{n.recovered > 0 ? ` ($${n.recovered}K)` : ""}
+                    </span>
+                  </div>
+                </div>
+                <span className="text-[10px] font-semibold w-14 text-right"
+                  style={{ color: n.winRate >= 60 ? "#16a34a" : n.winRate >= 40 ? "#d97706" : "#dc2626" }}>
+                  {n.winRate}% WR
+                </span>
+              </div>
+            ))}
+            {networkData.length === 0 && <p className="text-slate-400 text-sm text-center py-6">No data</p>}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
