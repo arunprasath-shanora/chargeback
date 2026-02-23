@@ -1,8 +1,9 @@
 import React, { useMemo } from "react";
+import React, { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  ComposedChart, Line, Legend, PieChart, Pie, Cell
+  ComposedChart, Line, Legend, PieChart, Pie, Cell, ReferenceLine
 } from "recharts";
 import { TrendingUp, TrendingDown, Award, Target, CheckCircle2, Lightbulb, AlertTriangle, Activity } from "lucide-react";
 
