@@ -12,7 +12,6 @@ import CoverLetterEditor from "./CoverLetterEditor";
 import AIAssistantPanel from "./AIAssistantPanel";
 import jsPDF from "jspdf";
 import CaseHistoryPanel from "./CaseHistoryPanel";
-import WorkflowTaskPanel from "@/components/workflow/WorkflowTaskPanel";
 
 const statusColors = {
   new: "bg-yellow-100 text-yellow-800",
@@ -430,9 +429,6 @@ Provide your response in this exact JSON format:
           </Button>
         )}
       </div>
-
-      {/* ── Workflow Tasks Panel ── */}
-      <WorkflowTaskPanel dispute={currentDispute} currentUser={currentUser} />
 
       {/* ── Case Chain Panel ── */}
       <CaseHistoryPanel

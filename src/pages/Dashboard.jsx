@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { FileText, TrendingUp, TrendingDown, Clock, CheckCircle, AlertCircle, Package, DollarSign } from "lucide-react";
-import WorkflowSummaryWidget from "@/components/dashboard/WorkflowSummaryWidget";
 
 const STATUS_COLORS = {
   new:         { pill: "bg-amber-50 text-amber-700 ring-1 ring-amber-200",  dot: "bg-amber-400" },
@@ -90,9 +89,6 @@ export default function Dashboard() {
           </div>
         ))}
       </div>
-
-      {/* Workflow Summary */}
-      <WorkflowSummaryWidget />
 
       {/* Win Rate Banner */}
       {!loading && (stats.won + stats.lost) > 0 && (
