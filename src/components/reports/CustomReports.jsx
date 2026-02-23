@@ -353,44 +353,71 @@ export default function CustomReports({ disputes }) {
             <FileText className="w-4 h-4 text-blue-600" />
             Custom Report Builder
           </CardTitle>
-          <p className="text-[11px] text-slate-400 mt-0.5">Select a metric, grouping, and chart type — then run the report</p>
+          <p className="text-[11px] text-slate-400 mt-0.5">Build a standard metric report or analyze win rate by any influencing field</p>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-            <div>
-              <label className="text-[10px] text-slate-400 font-medium block mb-1.5">Metric</label>
-              <Select value={metric} onValueChange={setMetric}>
-                <SelectTrigger className="h-9 text-xs border-slate-200">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {METRICS.map(m => <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <label className="text-[10px] text-slate-400 font-medium block mb-1.5">Group By</label>
-              <Select value={groupBy} onValueChange={setGroupBy}>
-                <SelectTrigger className="h-9 text-xs border-slate-200">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {GROUP_BY.map(g => <SelectItem key={g.value} value={g.value}>{g.label}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <label className="text-[10px] text-slate-400 font-medium block mb-1.5">Chart Type</label>
-              <Select value={chartType} onValueChange={setChartType}>
-                <SelectTrigger className="h-9 text-xs border-slate-200">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {CHART_TYPES.map(c => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </div>
+          {/* Mode toggle */}
+          <div className="flex gap-2 mb-4">
+            <button onClick={() => setMode("standard")}
+              className={`px-4 py-1.5 rounded-xl text-xs font-semibold transition-all ${mode === "standard" ? "bg-[#0D50B8] text-white shadow" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}>
+              Standard Report
+            </button>
+            <button onClick={() => setMode("winrate")}
+              className={`px-4 py-1.5 rounded-xl text-xs font-semibold transition-all ${mode === "winrate" ? "bg-[#0D50B8] text-white shadow" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}>
+              Win Rate Influencer Analysis
+            </button>
           </div>
+
+          {mode === "standard" ? (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+              <div>
+                <label className="text-[10px] text-slate-400 font-medium block mb-1.5">Metric</label>
+                <Select value={metric} onValueChange={setMetric}>
+                  <SelectTrigger className="h-9 text-xs border-slate-200"><SelectValue /></SelectTrigger>
+                  <SelectContent>{METRICS.map(m => <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-[10px] text-slate-400 font-medium block mb-1.5">Group By</label>
+                <Select value={groupBy} onValueChange={setGroupBy}>
+                  <SelectTrigger className="h-9 text-xs border-slate-200"><SelectValue /></SelectTrigger>
+                  <SelectContent>{GROUP_BY.map(g => <SelectItem key={g.value} value={g.value}>{g.label}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-[10px] text-slate-400 font-medium block mb-1.5">Chart Type</label>
+                <Select value={chartType} onValueChange={setChartType}>
+                  <SelectTrigger className="h-9 text-xs border-slate-200"><SelectValue /></SelectTrigger>
+                  <SelectContent>{CHART_TYPES.map(c => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+              <div>
+                <label className="text-[10px] text-slate-400 font-medium block mb-1.5">Influencer Field</label>
+                <Select value={wrField} onValueChange={setWrField}>
+                  <SelectTrigger className="h-9 text-xs border-slate-200"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {WIN_RATE_INFLUENCER_FIELDS.map(f => <SelectItem key={f.value} value={f.value}>{f.label}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-[10px] text-slate-400 font-medium block mb-1.5">Chart Type</label>
+                <Select value={wrChartType} onValueChange={setWrChartType}>
+                  <SelectTrigger className="h-9 text-xs border-slate-200"><SelectValue /></SelectTrigger>
+                  <SelectContent>{CHART_TYPES.map(c => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+              <div className="sm:col-span-2">
+                <p className="text-[11px] text-slate-400 bg-blue-50 rounded-xl px-3 py-2 border border-blue-100">
+                  Shows Win Rate % (Count) and Win Rate % (Amount) for each value of the selected field. Color: 🟢 ≥60% · 🟡 40–60% · 🔴 &lt;40%
+                </p>
+              </div>
+            </div>
+          )}
+
           <button onClick={handleRun}
             className="flex items-center gap-2 px-5 py-2 bg-[#0D50B8] text-white text-sm font-medium rounded-xl hover:bg-blue-700 transition-all shadow-sm">
             <Play className="w-3.5 h-3.5" />
