@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   Sparkles, ChevronDown, ChevronUp, Loader2,
-  Tag, FileSearch, FileEdit, Zap, CheckCircle, RefreshCw, X
+  Tag, FileSearch, FileEdit, CheckCircle, RefreshCw, X,
+  Target, TrendingUp, TrendingDown, Minus, ShieldCheck,
+  AlertTriangle, CheckCircle2, Lightbulb, BarChart2, Info
 } from "lucide-react";
 
 // ── helpers ────────────────────────────────────────────────────────────────
