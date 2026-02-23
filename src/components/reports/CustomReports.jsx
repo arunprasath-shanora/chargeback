@@ -432,32 +432,54 @@ export default function CustomReports({ disputes }) {
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between flex-wrap gap-2">
               <CardTitle className="text-sm font-semibold text-slate-700">
-                {metricLabel} — by {groupLabel}
+                {runConfig.mode === "winrate"
+                  ? `Win Rate by ${wrFieldLabel}`
+                  : `${metricLabel} — by ${groupLabel}`}
               </CardTitle>
-              <div className="flex gap-2 items-center">
-                <span className="text-[10px] bg-blue-50 text-blue-700 font-semibold px-2 py-0.5 rounded-full">{chartData.length} groups · {disputes.length} disputes</span>
-              </div>
+              <span className="text-[10px] bg-blue-50 text-blue-700 font-semibold px-2 py-0.5 rounded-full">{chartData.length} groups · {disputes.length} disputes</span>
             </div>
           </CardHeader>
           <CardContent>
-            {renderChart()}
+            {runConfig.mode === "winrate" ? renderWinRateChart() : renderChart()}
             {/* Summary table */}
             {chartData.length > 0 && (
               <div className="mt-4 overflow-x-auto">
                 <table className="w-full text-xs">
                   <thead>
                     <tr className="border-b border-slate-100">
-                      <th className="text-left py-2 px-2 text-slate-500 font-semibold">{groupLabel}</th>
-                      <th className="text-right py-2 px-2 text-slate-500 font-semibold">{metricLabel}</th>
-                      <th className="text-right py-2 px-2 text-slate-500 font-semibold">Dispute Count</th>
+                      <th className="text-left py-2 px-2 text-slate-500 font-semibold">{runConfig.mode === "winrate" ? wrFieldLabel : groupLabel}</th>
+                      {runConfig.mode === "winrate" ? (
+                        <>
+                          <th className="text-right py-2 px-2 text-slate-500 font-semibold">Win Rate (Count %)</th>
+                          <th className="text-right py-2 px-2 text-slate-500 font-semibold">Win Rate (Amount %)</th>
+                          <th className="text-right py-2 px-2 text-slate-500 font-semibold">Disputes</th>
+                          <th className="text-right py-2 px-2 text-slate-500 font-semibold">Won</th>
+                        </>
+                      ) : (
+                        <>
+                          <th className="text-right py-2 px-2 text-slate-500 font-semibold">{metricLabel}</th>
+                          <th className="text-right py-2 px-2 text-slate-500 font-semibold">Dispute Count</th>
+                        </>
+                      )}
                     </tr>
                   </thead>
                   <tbody>
                     {chartData.map((row, i) => (
                       <tr key={i} className="border-b border-slate-50 hover:bg-slate-50">
                         <td className="py-1.5 px-2 text-slate-700 font-medium">{row.name}</td>
-                        <td className="py-1.5 px-2 text-right text-slate-600">{formatValue(row.value, runConfig.metric)}</td>
-                        <td className="py-1.5 px-2 text-right text-slate-400">{row.count.toLocaleString()}</td>
+                        {runConfig.mode === "winrate" ? (
+                          <>
+                            <td className="py-1.5 px-2 text-right font-semibold" style={{ color: row.winRate >= 60 ? "#16a34a" : row.winRate >= 40 ? "#d97706" : "#dc2626" }}>{row.winRate}%</td>
+                            <td className="py-1.5 px-2 text-right font-semibold" style={{ color: row.winRateAmt >= 60 ? "#4f46e5" : row.winRateAmt >= 40 ? "#7c3aed" : "#a21caf" }}>{row.winRateAmt}%</td>
+                            <td className="py-1.5 px-2 text-right text-slate-400">{row.count}</td>
+                            <td className="py-1.5 px-2 text-right text-slate-400">{row.won}</td>
+                          </>
+                        ) : (
+                          <>
+                            <td className="py-1.5 px-2 text-right text-slate-600">{formatValue(row.value, runConfig.metric)}</td>
+                            <td className="py-1.5 px-2 text-right text-slate-400">{row.count.toLocaleString()}</td>
+                          </>
+                        )}
                       </tr>
                     ))}
                   </tbody>
