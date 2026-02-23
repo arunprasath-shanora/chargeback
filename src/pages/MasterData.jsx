@@ -115,6 +115,29 @@ export default function MasterData() {
 
 
 
+  // ── Build child map: parentId → [child disputes] ────────────────────
+  const childMap = useMemo(() => {
+    const map = {};
+    disputes.forEach(d => {
+      if (d.parent_dispute_id) {
+        if (!map[d.parent_dispute_id]) map[d.parent_dispute_id] = [];
+        map[d.parent_dispute_id].push(d);
+      }
+    });
+    return map;
+  }, [disputes]);
+
+  // Compute "Final Status" = deepest resolved child status, or own status if no children
+  const getFinalStatus = (d) => {
+    const children = childMap[d.id] || [];
+    if (children.length === 0) return d.status;
+    // Sort children by case type depth
+    const ORDER = ["Second Chargeback", "Pre-Arbitration", "Arbitration"];
+    const sorted = [...children].sort((a, b) => ORDER.indexOf(b.case_type) - ORDER.indexOf(a.case_type));
+    // Recurse to deepest
+    return getFinalStatus(sorted[0]);
+  };
+
   // ── Status summary counts (from filtered disputes) ──────────────────
   const statusCounts = useMemo(() => {
     const counts = {};
