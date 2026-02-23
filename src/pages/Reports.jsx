@@ -222,10 +222,7 @@ export default function Reports() {
             <CustomReports disputes={filteredDisputes} />
           </TabsContent>
 
-          <TabsContent value="anomaly" className="mt-0 space-y-4">
-            <FilterBar />
-            <AnomalyDetection disputes={filteredDisputes} />
-          </TabsContent>
+
         </Tabs>
       )}
     </div>
