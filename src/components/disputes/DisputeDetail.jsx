@@ -133,7 +133,9 @@ Provide your response in this exact JSON format:
       base44.entities.EvidenceType.list(),
       base44.entities.CoverLetterTemplate.list(),
       base44.entities.ReasonCode.list(),
-    ]).then(([ev, et, ct, rc]) => {
+      base44.entities.Dispute.filter({ parent_dispute_id: dispute.id }),
+    ]).then(([ev, et, ct, rc, children]) => {
+      setChildDisputes(children || []);
       setAllEvidenceTypes(et);
       setAllCoverTemplates(ct);
       setAllReasonCodes(rc);
