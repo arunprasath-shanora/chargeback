@@ -426,6 +426,15 @@ Provide your response in this exact JSON format:
         )}
       </div>
 
+      {/* ── Case Chain Panel ── */}
+      <CaseHistoryPanel
+        dispute={currentDispute}
+        onNavigate={(d) => {
+          setCurrentDispute(d);
+          onUpdate(d);
+        }}
+      />
+
       {/* ── Fought / Not Fought Decision Panel ── */}
       <Card className={`border-2 ${currentDispute.fought_decision === "fought" ? "border-blue-200 bg-blue-50/40" : currentDispute.fought_decision === "not_fought" ? "border-red-100 bg-red-50/40" : "border-dashed border-amber-300 bg-amber-50/40"}`}>
         <CardContent className="p-4">
