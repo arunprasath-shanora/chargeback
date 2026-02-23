@@ -431,6 +431,9 @@ Provide your response in this exact JSON format:
         )}
       </div>
 
+      {/* ── Workflow Tasks Panel ── */}
+      <WorkflowTaskPanel dispute={currentDispute} currentUser={currentUser} />
+
       {/* ── Case Chain Panel ── */}
       <CaseHistoryPanel
         dispute={currentDispute}

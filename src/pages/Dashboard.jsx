@@ -91,6 +91,9 @@ export default function Dashboard() {
         ))}
       </div>
 
+      {/* Workflow Summary */}
+      <WorkflowSummaryWidget />
+
       {/* Win Rate Banner */}
       {!loading && (stats.won + stats.lost) > 0 && (
         <div className="rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
