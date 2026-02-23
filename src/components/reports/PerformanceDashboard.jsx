@@ -341,32 +341,6 @@ export default function PerformanceDashboard({ disputes }) {
         </CardContent>
       </Card>
 
-      {/* ── Recovered $ Trend ── */}
-      <Card className="border-slate-100 shadow-sm">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-semibold text-slate-700">Recovered $ Value — Monthly Trend</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={180}>
-            <ComposedChart data={monthlyData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-              <XAxis dataKey="label" tick={{ fontSize: 10, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 10, fill: "#94a3b8" }} axisLine={false} tickLine={false} tickFormatter={v => `$${v}K`} />
-              <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8 }} formatter={v => [`$${v}K`, "Recovered"]} />
-              <Bar dataKey="recovered" name="Recovered ($K)" fill="#f59e0b" radius={[3, 3, 0, 0]} />
-            </ComposedChart>
-          </ResponsiveContainer>
-          <div className="flex gap-1 mt-2 flex-wrap justify-center">
-            {monthlyData.map(d => (
-              <div key={d.label} className="flex flex-col items-center gap-0.5 min-w-[52px]">
-                <span className="text-[9px] text-slate-400">{d.label}</span>
-                <MoMBadge delta={d.recovDelta} />
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Win rate by RC group (count + $) */}
       <Card className="border-slate-100 shadow-sm">
         <CardHeader className="pb-2">
