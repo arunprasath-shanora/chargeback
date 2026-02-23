@@ -12,6 +12,7 @@ import CoverLetterEditor from "./CoverLetterEditor";
 import AIAssistantPanel from "./AIAssistantPanel";
 import jsPDF from "jspdf";
 import CaseHistoryPanel from "./CaseHistoryPanel";
+import WorkflowTaskPanel from "@/components/workflow/WorkflowTaskPanel";
 
 const statusColors = {
   new: "bg-yellow-100 text-yellow-800",
