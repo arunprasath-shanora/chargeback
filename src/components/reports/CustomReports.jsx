@@ -5,7 +5,7 @@ import {
   BarChart, Bar, LineChart, Line, AreaChart, Area, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
 } from "recharts";
-import { FileText, Play, RefreshCw } from "lucide-react";
+import { FileText, Play, TrendingUp as TrendingUpIcon } from "lucide-react";
 
 const COLORS = ["#0D50B8", "#22c55e", "#f59e0b", "#8b5cf6", "#06b6d4", "#ec4899", "#ef4444", "#14b8a6"];
 
