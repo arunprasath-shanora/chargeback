@@ -11,6 +11,7 @@ import DisputeForm from "./DisputeForm";
 import CoverLetterEditor from "./CoverLetterEditor";
 import AIAssistantPanel from "./AIAssistantPanel";
 import jsPDF from "jspdf";
+import CaseHistoryPanel from "./CaseHistoryPanel";
 
 const statusColors = {
   new: "bg-yellow-100 text-yellow-800",
