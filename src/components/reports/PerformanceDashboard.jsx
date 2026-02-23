@@ -341,41 +341,38 @@ export default function PerformanceDashboard({ disputes }) {
         </CardContent>
       </Card>
 
-      {/* Win rate by RC group (count + $) */}
+      {/* Win rate by RC group — grouped bar chart */}
       <Card className="border-slate-100 shadow-sm">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-semibold text-slate-700">Win Rate by Reason Code Group — Count % & Amount %</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-2.5">
-            {rcWinRate.map((rc) => (
-              <div key={rc.name} className="space-y-1">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-slate-600 font-medium truncate max-w-[180px]">{rc.name}</span>
-                  <span className="text-[10px] text-slate-400">{rc.won}/{rc.total} cases · ${rc.wonAmt}K/${rc.totalAmt}K</span>
-                </div>
-                <div className="flex gap-2 items-center">
-                  <span className="text-[9px] text-slate-400 w-12">Count</span>
-                  <div className="flex-1 bg-slate-100 rounded-full h-4 overflow-hidden">
-                    <div className="h-full rounded-full flex items-center px-1.5"
-                      style={{ width: `${Math.max(8, rc.winRate)}%`, background: rc.winRate >= 60 ? "#22c55e" : rc.winRate >= 40 ? "#f59e0b" : "#ef4444" }}>
-                      <span className="text-[9px] text-white font-bold">{rc.winRate}%</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex gap-2 items-center">
-                  <span className="text-[9px] text-slate-400 w-12">Amount</span>
-                  <div className="flex-1 bg-slate-100 rounded-full h-4 overflow-hidden">
-                    <div className="h-full rounded-full flex items-center px-1.5"
-                      style={{ width: `${Math.max(8, rc.winRateAmt)}%`, background: rc.winRateAmt >= 60 ? "#6366f1" : rc.winRateAmt >= 40 ? "#8b5cf6" : "#a855f7" }}>
-                      <span className="text-[9px] text-white font-bold">{rc.winRateAmt}%</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-            {rcWinRate.length === 0 && <p className="text-slate-400 text-sm text-center py-6">No data</p>}
-          </div>
+          {rcWinRate.length === 0 ? (
+            <p className="text-slate-400 text-sm text-center py-6">No data</p>
+          ) : (
+            <ResponsiveContainer width="100%" height={Math.max(200, rcWinRate.length * 42)}>
+              <BarChart data={rcWinRate} layout="vertical" barCategoryGap="25%" barGap={3}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
+                <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 10, fill: "#94a3b8" }} axisLine={false} tickLine={false} tickFormatter={v => `${v}%`} />
+                <YAxis type="category" dataKey="name" tick={{ fontSize: 10, fill: "#64748b" }} axisLine={false} tickLine={false} width={130} />
+                <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8 }}
+                  formatter={(v, name) => [`${v}%`, name === "winRate" ? "Win Rate (Count)" : "Win Rate (Amount)"]}
+                  labelFormatter={label => `${label}`}
+                />
+                <Legend wrapperStyle={{ fontSize: 11 }} formatter={v => v === "winRate" ? "Win Rate % (Count)" : "Win Rate % (Amount)"} />
+                <Bar dataKey="winRate" name="winRate" radius={[0, 3, 3, 0]} maxBarSize={14}>
+                  {rcWinRate.map((entry, i) => (
+                    <Cell key={i} fill={entry.winRate >= 60 ? "#22c55e" : entry.winRate >= 40 ? "#f59e0b" : "#ef4444"} />
+                  ))}
+                </Bar>
+                <Bar dataKey="winRateAmt" name="winRateAmt" radius={[0, 3, 3, 0]} maxBarSize={14}>
+                  {rcWinRate.map((entry, i) => (
+                    <Cell key={i} fill={entry.winRateAmt >= 60 ? "#6366f1" : entry.winRateAmt >= 40 ? "#8b5cf6" : "#a855f7"} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          )}
         </CardContent>
       </Card>
 
