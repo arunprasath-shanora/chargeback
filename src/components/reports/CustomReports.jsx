@@ -139,15 +139,46 @@ function formatValue(val, metric) {
   return val.toLocaleString();
 }
 
+// ── Win Rate by influencer field ──
+function buildWinRateInfluencerData(disputes, field) {
+  const grouped = {};
+  disputes.forEach(d => {
+    const key = d[field] || "Unknown";
+    if (!grouped[key]) grouped[key] = { won: 0, lost: 0, wonAmt: 0, totalAmt: 0, count: 0 };
+    grouped[key].count++;
+    const amt = d.chargeback_amount_usd || d.chargeback_amount || 0;
+    grouped[key].totalAmt += amt;
+    if (d.status === "won") { grouped[key].won++; grouped[key].wonAmt += amt; }
+    if (d.status === "lost") grouped[key].lost++;
+  });
+  return Object.entries(grouped)
+    .map(([name, v]) => {
+      const total = v.won + v.lost;
+      return {
+        name,
+        winRate: total > 0 ? parseFloat(((v.won / total) * 100).toFixed(1)) : 0,
+        winRateAmt: v.totalAmt > 0 ? parseFloat(((v.wonAmt / v.totalAmt) * 100).toFixed(1)) : 0,
+        count: v.count,
+        won: v.won,
+      };
+    })
+    .filter(r => r.count >= 1)
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 15);
+}
+
 export default function CustomReports({ disputes }) {
+  const [mode, setMode] = useState("standard"); // "standard" | "winrate"
   const [metric, setMetric] = useState("volume");
   const [groupBy, setGroupBy] = useState("month");
   const [chartType, setChartType] = useState("bar");
+  const [wrField, setWrField] = useState("reason_category");
+  const [wrChartType, setWrChartType] = useState("bar");
   const [hasRun, setHasRun] = useState(false);
   const [runConfig, setRunConfig] = useState(null);
 
   const handleRun = () => {
-    setRunConfig({ metric, groupBy, chartType });
+    setRunConfig({ metric, groupBy, chartType, mode, wrField, wrChartType });
     setHasRun(true);
   };
 
