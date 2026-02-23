@@ -137,6 +137,7 @@ Provide your response in this exact JSON format:
     ]).then(([ev, et, ct, rc, children]) => {
       setChildDisputes(children || []);
       setAllEvidenceTypes(et);
+
       setAllCoverTemplates(ct);
       setAllReasonCodes(rc);
       setEvidence(ev);
