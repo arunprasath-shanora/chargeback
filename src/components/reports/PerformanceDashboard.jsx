@@ -269,6 +269,59 @@ export default function PerformanceDashboard({ disputes }) {
     </div>
   );
 
+  // ── Win Rate Anomaly Detection (12 months) ──
+  const months12 = useMemo(() => {
+    const now = new Date();
+    return Array.from({ length: 12 }, (_, i) => {
+      const d = new Date(now.getFullYear(), now.getMonth() - (11 - i), 1);
+      return { label: fmtMonthYear(d), year: d.getFullYear(), month: d.getMonth() };
+    });
+  }, []);
+
+  const winRateMonthly12 = useMemo(() => {
+    const map = {};
+    disputes.forEach(d => {
+      const date = new Date(d.chargeback_date || d.created_date);
+      if (!date || isNaN(date)) return;
+      const key = `${date.getFullYear()}-${date.getMonth()}`;
+      if (!map[key]) map[key] = { won: 0, lost: 0, wonAmt: 0, totalAmt: 0 };
+      const amt = d.chargeback_amount_usd || d.chargeback_amount || 0;
+      if (d.status === "won") { map[key].won++; map[key].wonAmt += amt; }
+      if (d.status === "lost") map[key].lost++;
+      map[key].totalAmt += amt;
+    });
+    return months12.map(({ label, year, month }) => {
+      const m = map[`${year}-${month}`] || { won: 0, lost: 0, wonAmt: 0, totalAmt: 0 };
+      const total = m.won + m.lost;
+      return {
+        label,
+        winRate: total > 0 ? parseFloat(((m.won / total) * 100).toFixed(1)) : 0,
+        winRateAmt: m.totalAmt > 0 ? parseFloat(((m.wonAmt / m.totalAmt) * 100).toFixed(1)) : 0,
+      };
+    });
+  }, [disputes, months12]);
+
+  const wrAnomalies = useMemo(() => detectAnomalies(winRateMonthly12.map(m => m.winRate)), [winRateMonthly12]);
+  const wrAmtAnomalies = useMemo(() => detectAnomalies(winRateMonthly12.map(m => m.winRateAmt)), [winRateMonthly12]);
+
+  const winRateAnomalyData = useMemo(() => winRateMonthly12.map((m, i) => ({
+    ...m,
+    wrAnomaly: wrAnomalies[i],
+    wrAmtAnomaly: wrAmtAnomalies[i],
+  })), [winRateMonthly12, wrAnomalies, wrAmtAnomalies]);
+
+  const meanWR = winRateMonthly12.reduce((s, m) => s + m.winRate, 0) / Math.max(1, winRateMonthly12.length);
+  const meanWRAmt = winRateMonthly12.reduce((s, m) => s + m.winRateAmt, 0) / Math.max(1, winRateMonthly12.length);
+
+  const wrAnomalyEvents = useMemo(() => {
+    const events = [];
+    winRateAnomalyData.forEach(m => {
+      if (m.wrAnomaly) events.push({ label: m.label, metric: "Win Rate (Count)", value: `${m.winRate}%`, mean: `${meanWR.toFixed(1)}%`, type: m.winRate > meanWR ? "spike" : "drop" });
+      if (m.wrAmtAnomaly) events.push({ label: m.label, metric: "Win Rate (Amount)", value: `${m.winRateAmt}%`, mean: `${meanWRAmt.toFixed(1)}%`, type: m.winRateAmt > meanWRAmt ? "spike" : "drop" });
+    });
+    return events.reverse();
+  }, [winRateAnomalyData, meanWR, meanWRAmt]);
+
   const lastM = monthlyData[monthlyData.length - 1];
 
   return (
