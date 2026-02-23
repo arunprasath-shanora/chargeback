@@ -74,6 +74,8 @@ export default function Reports() {
     { id: "volume", label: "Volume Analyzer", icon: BarChart2 },
     { id: "performance", label: "Performance Dashboard", icon: TrendingUp },
     { id: "ai", label: "AI Insights & Predictions", icon: Sparkles },
+    { id: "custom", label: "Custom Reports", icon: FileText },
+    { id: "anomaly", label: "Anomaly Detection", icon: AlertTriangle },
   ];
 
   const FilterBar = () => (
