@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { createPageUrl } from "@/utils";
+import FeatureGallery from "@/components/landing/FeatureGallery";
 
 const ROI_CALCULATOR_URL = "https://chargeback-recover-pro.base44.app";
 
