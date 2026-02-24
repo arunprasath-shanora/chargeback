@@ -57,6 +57,9 @@ const steps = [
 
 export default function Landing() {
   const [scrolled, setScrolled] = useState(false);
+  const [contactForm, setContactForm] = useState(INITIAL_FORM);
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
