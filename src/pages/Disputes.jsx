@@ -147,13 +147,13 @@ export default function Disputes() {
                         {d.status?.replace("_", " ")}
                       </Badge>
                     </td>
-                    <td className="px-4 py-3 text-slate-600">{d.card_network || "—"}</td>
-                    <td className="px-4 py-3 text-slate-500 text-xs font-medium">{d.chargeback_currency || "—"}</td>
-                    <td className="px-4 py-3 text-slate-700 font-medium">{d.chargeback_amount?.toLocaleString() || "—"}</td>
-                    <td className="px-4 py-3 text-emerald-700 font-medium">{d.chargeback_amount_usd ? `$${d.chargeback_amount_usd?.toLocaleString()}` : "—"}</td>
-                    <td className="px-4 py-3 text-slate-500">{d.reason_code || "—"}</td>
-                    <td className="px-4 py-3 text-slate-500">{d.sla_deadline || "—"}</td>
-                    <td className="px-4 py-3 text-slate-500">{d.assigned_to || "—"}</td>
+                    <td className="px-4 py-3 text-slate-600 whitespace-nowrap">{d.card_network || "—"}</td>
+                    <td className="px-4 py-3 text-slate-500 text-xs font-medium whitespace-nowrap">{d.chargeback_currency || "—"}</td>
+                    <td className="px-4 py-3 text-slate-700 font-medium whitespace-nowrap">{d.chargeback_amount?.toLocaleString() || "—"}</td>
+                    <td className="px-4 py-3 text-emerald-700 font-medium whitespace-nowrap">{d.chargeback_amount_usd ? `$${d.chargeback_amount_usd?.toLocaleString()}` : "—"}</td>
+                    <td className="px-4 py-3 text-slate-500 whitespace-nowrap">{d.reason_code || "—"}</td>
+                    <td className="px-4 py-3 text-slate-500 whitespace-nowrap">{d.sla_deadline || "—"}</td>
+                    <td className="px-4 py-3 text-slate-500 whitespace-nowrap">{d.assigned_to || "—"}</td>
                     <td className="px-4 py-3">
                       <Button size="icon" variant="ghost" className="h-7 w-7" onClick={e => { e.stopPropagation(); setSelectedDispute(d); }}>
                         <Eye className="w-3.5 h-3.5" />
