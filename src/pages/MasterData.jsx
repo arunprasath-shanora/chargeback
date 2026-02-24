@@ -172,7 +172,7 @@ export default function MasterData() {
     const cfHeaders = customFields.map(cf => cf.field_name);
     const dHeaders = [
       // Case
-      "Case ID","Status","Project","Business Unit","Sub Unit","Processor","Merchant ID","DBA Name","Merchant Alias","Fought Decision","Not Fought Reason","Not Fought Notes","Missing Evidence","Assigned To","SLA Deadline","Resolution Date","Recovery Amount","Case Type",
+      "Case ID","Status","Final Status","Parent Case ID","Case Type","2nd CB Case ID","2nd CB Status","Arb Case ID","Arb Status","Net Recovery (USD)","Project","Business Unit","Sub Unit","Processor","Merchant ID","DBA Name","Merchant Alias","Fought Decision","Not Fought Reason","Not Fought Notes","Missing Evidence","Assigned To","SLA Deadline","Resolution Date","Recovery Amount",
       // Chargeback
       "CB Date","CB Amount","CB Currency","CB Amount USD","Reason Code","Reason Category","ARN Number","Cardholder Name",
       // Card & Auth
