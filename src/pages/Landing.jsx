@@ -157,9 +157,9 @@ export default function Landing() {
               >
                 Get Started — Sign In →
               </button>
-              <a href="#roi-calculator" className="text-white/80 font-semibold px-6 py-4 rounded-2xl border border-white/20 hover:bg-white/10 transition-all text-sm w-full sm:w-auto text-center">
-                🧮 Try ROI Calculator
-              </a>
+              <Link to={createPageUrl("Features")} className="text-white/80 font-semibold px-6 py-4 rounded-2xl border border-white/20 hover:bg-white/10 transition-all text-sm w-full sm:w-auto text-center">
+                🖼️ See All Features
+              </Link>
             </div>
           </div>
 
