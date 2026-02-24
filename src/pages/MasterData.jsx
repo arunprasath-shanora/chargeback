@@ -356,7 +356,7 @@ export default function MasterData() {
                     <thead>
                       <tr className="border-b border-slate-100 bg-slate-50">
                         {/* Case */}
-                        {["Case ID","Status","Final Status","Next Case","Next Case Status","Project","Business Unit","Sub Unit","Processor","Merchant ID","DBA Name","Decision","Not Fought Reason","Missing Evid.","Assigned To","SLA Deadline","Resolution Date","Recovery Amt","Case Type",
+                        {["Case ID","Status","Final Status","Case Type","Parent Case","2nd CB Case","2nd CB Status","Arb Case","Arb Status","Net Recovery","Project","Business Unit","Sub Unit","Processor","Merchant ID","DBA Name","Decision","Not Fought Reason","Missing Evid.","Assigned To","SLA Deadline","Resolution Date","Recovery Amt",
                         // Chargeback
                         "CB Date","CB Amount","CB Currency","CB USD","Reason Code","Reason Category","ARN","Cardholder",
                         // Card & Auth
