@@ -130,11 +130,11 @@ export default function Disputes() {
                   <tr><td colSpan={9} className="px-4 py-10 text-center text-slate-400">No disputes found</td></tr>
                 ) : filtered.map(d => (
                   <tr key={d.id} className="border-b border-slate-50 hover:bg-slate-50 transition-colors cursor-pointer" onClick={() => setSelectedDispute(d)}>
-                    <td className="px-4 py-3 font-medium text-[#0D50B8]">{d.case_id}</td>
-                    <td className="px-4 py-3 text-slate-500 font-mono text-xs">{d.arn_number || "—"}</td>
-                    <td className="px-4 py-3 text-slate-600">{d.case_type || "—"}</td>
-                    <td className="px-4 py-3 text-slate-600">{d.sub_unit_name || "—"}</td>
-                    <td className="px-4 py-3 text-slate-600">{d.processor || "—"}</td>
+                    <td className="px-4 py-3 font-medium text-[#0D50B8] whitespace-nowrap">{d.case_id}</td>
+                    <td className="px-4 py-3 text-slate-500 font-mono text-xs whitespace-nowrap">{d.arn_number || "—"}</td>
+                    <td className="px-4 py-3 text-slate-600 whitespace-nowrap">{d.case_type || "—"}</td>
+                    <td className="px-4 py-3 text-slate-600 whitespace-nowrap">{d.sub_unit_name || "—"}</td>
+                    <td className="px-4 py-3 text-slate-600 whitespace-nowrap">{d.processor || "—"}</td>
                     <td className="px-4 py-3">
                       {d.fought_decision ? (
                         <Badge className={`${foughtColors[d.fought_decision]} text-xs border-0`}>

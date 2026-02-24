@@ -50,6 +50,7 @@
 import AuditLog from './pages/AuditLog';
 import Dashboard from './pages/Dashboard';
 import Disputes from './pages/Disputes';
+import Features from './pages/Features';
 import Inventory from './pages/Inventory';
 import Landing from './pages/Landing';
 import MasterData from './pages/MasterData';
@@ -57,7 +58,6 @@ import MasterSetup from './pages/MasterSetup';
 import Projects from './pages/Projects';
 import Reports from './pages/Reports';
 import Users from './pages/Users';
-import Features from './pages/Features';
 import __Layout from './Layout.jsx';
 
 
@@ -65,6 +65,7 @@ export const PAGES = {
     "AuditLog": AuditLog,
     "Dashboard": Dashboard,
     "Disputes": Disputes,
+    "Features": Features,
     "Inventory": Inventory,
     "Landing": Landing,
     "MasterData": MasterData,
@@ -72,7 +73,6 @@ export const PAGES = {
     "Projects": Projects,
     "Reports": Reports,
     "Users": Users,
-    "Features": Features,
 }
 
 export const pagesConfig = {
