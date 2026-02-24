@@ -46,6 +46,8 @@ const stats = [
   { value: "99.9%", label: "Uptime SLA" },
 ];
 
+const INITIAL_FORM = { name: "", company: "", email: "", phone: "", message: "" };
+
 const steps = [
   { num: "01", title: "Import Your Cases", desc: "Upload via CSV, webhook, or API from Fiserv, Stripe, Worldpay and more." },
   { num: "02", title: "AI Enriches & Analyses", desc: "Our AI fetches evidence, scores win probability, and drafts your cover letter." },
