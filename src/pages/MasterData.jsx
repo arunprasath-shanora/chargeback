@@ -396,34 +396,60 @@ export default function MasterData() {
                              return <Badge className={`${DISPUTE_STATUS_COLORS[fs] || "bg-slate-100 text-slate-600"} text-xs border-0 whitespace-nowrap`}>{DISPUTE_STATUS_LABEL[fs] || fs}</Badge>;
                            })()}
                           </td>
-                          {/* Next Case (child dispute) */}
+                          {/* Case Type */}
+                          <td className="px-3 py-2.5 text-slate-500 whitespace-nowrap text-xs">{d.case_type || "—"}</td>
+                          {/* Parent Case */}
+                          <td className="px-3 py-2.5 whitespace-nowrap">
+                            {d.parent_dispute_id ? (() => {
+                              const parent = disputes.find(p => p.id === d.parent_dispute_id);
+                              return parent ? (
+                                <button onClick={e => { e.stopPropagation(); setSelectedDispute(parent); }}
+                                  className="text-xs font-semibold text-slate-500 hover:underline">
+                                  {parent.case_id}
+                                </button>
+                              ) : <span className="text-xs text-slate-400">{d.parent_dispute_id.slice(-8)}</span>;
+                            })() : <span className="text-slate-300 text-xs">—</span>}
+                          </td>
+                          {/* 2nd CB Case & Status */}
                           {(() => {
-                           const children = childMap[d.id] || [];
-                           const ORDER = ["Second Chargeback", "Pre-Arbitration", "Arbitration"];
-                           const child = children.sort((a, b) => ORDER.indexOf(a.case_type) - ORDER.indexOf(b.case_type))[0];
-                           return (
-                             <>
-                               <td className="px-3 py-2.5 whitespace-nowrap">
-                                 {child ? (
-                                   <button
-                                     onClick={e => { e.stopPropagation(); setSelectedDispute(child); }}
-                                     className="text-xs font-semibold text-indigo-600 hover:underline flex items-center gap-1"
-                                   >
-                                     <span className="text-[9px] text-slate-400 mr-0.5">{child.case_type?.replace(" Chargeback","CB").replace("Pre-Arbitration","Pre-Arb")}</span>
-                                     {child.case_id}
-                                   </button>
-                                 ) : <span className="text-slate-300 text-xs">—</span>}
-                               </td>
-                               <td className="px-3 py-2.5">
-                                 {child ? (
-                                   <Badge className={`${DISPUTE_STATUS_COLORS[child.status] || "bg-slate-100 text-slate-600"} text-xs border-0 whitespace-nowrap`}>
-                                     {DISPUTE_STATUS_LABEL[child.status] || child.status}
-                                   </Badge>
-                                 ) : <span className="text-slate-300 text-xs">—</span>}
-                               </td>
-                             </>
-                           );
+                            const secondCB = (childMap[d.id] || []).find(c => c.case_type === "Second Chargeback");
+                            return (
+                              <>
+                                <td className="px-3 py-2.5 whitespace-nowrap">
+                                  {secondCB ? (
+                                    <button onClick={e => { e.stopPropagation(); setSelectedDispute(secondCB); }}
+                                      className="text-xs font-semibold text-indigo-600 hover:underline">{secondCB.case_id}</button>
+                                  ) : <span className="text-slate-300 text-xs">—</span>}
+                                </td>
+                                <td className="px-3 py-2.5">
+                                  {secondCB ? <Badge className={`${DISPUTE_STATUS_COLORS[secondCB.status] || "bg-slate-100"} text-xs border-0 whitespace-nowrap`}>{DISPUTE_STATUS_LABEL[secondCB.status] || secondCB.status}</Badge>
+                                    : <span className="text-slate-300 text-xs">—</span>}
+                                </td>
+                              </>
+                            );
                           })()}
+                          {/* Arb Case & Status */}
+                          {(() => {
+                            const arb = (childMap[d.id] || []).find(c => c.case_type === "Arbitration");
+                            return (
+                              <>
+                                <td className="px-3 py-2.5 whitespace-nowrap">
+                                  {arb ? (
+                                    <button onClick={e => { e.stopPropagation(); setSelectedDispute(arb); }}
+                                      className="text-xs font-semibold text-purple-600 hover:underline">{arb.case_id}</button>
+                                  ) : <span className="text-slate-300 text-xs">—</span>}
+                                </td>
+                                <td className="px-3 py-2.5">
+                                  {arb ? <Badge className={`${DISPUTE_STATUS_COLORS[arb.status] || "bg-slate-100"} text-xs border-0 whitespace-nowrap`}>{DISPUTE_STATUS_LABEL[arb.status] || arb.status}</Badge>
+                                    : <span className="text-slate-300 text-xs">—</span>}
+                                </td>
+                              </>
+                            );
+                          })()}
+                          {/* Net Recovery */}
+                          <td className="px-3 py-2.5 font-semibold text-emerald-700 whitespace-nowrap">
+                            ${getNetRecovery(d).toLocaleString()}
+                          </td>
                           <td className="px-3 py-2.5 text-slate-600 whitespace-nowrap">{projects.find(p => p.id === d.project_id)?.name || "—"}</td>
                           <td className="px-3 py-2.5 text-slate-600 whitespace-nowrap">{d.business_unit || "—"}</td>
                           <td className="px-3 py-2.5 text-slate-600 whitespace-nowrap">{d.sub_unit_name || "—"}</td>
