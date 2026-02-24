@@ -117,6 +117,10 @@ export default function Layout({ children, currentPageName }) {
     </div>
   );
 
+  if (currentPageName === "Landing") {
+    return <>{children}</>;
+  }
+
   return (
     <div className="flex h-screen overflow-hidden bg-[#F4F6FB]">
       <style>{`
