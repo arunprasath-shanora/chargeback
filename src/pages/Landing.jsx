@@ -222,6 +222,8 @@ export default function Landing() {
         </div>
       </section>
 
+      <FeatureGallery />
+
       {/* ROI Calculator */}
       <section id="roi-calculator" className="py-24 bg-[#F4F6FB]">
         <div className="max-w-5xl mx-auto px-6">
