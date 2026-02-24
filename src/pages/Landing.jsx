@@ -93,6 +93,7 @@ export default function Landing() {
           <div className="flex items-center gap-3">
             <a href="#features" className={`hidden md:block text-sm font-medium transition-colors ${scrolled ? "text-slate-600 hover:text-[#0D50B8]" : "text-white/80 hover:text-white"}`}>Features</a>
             <a href="#how-it-works" className={`hidden md:block text-sm font-medium transition-colors ${scrolled ? "text-slate-600 hover:text-[#0D50B8]" : "text-white/80 hover:text-white"}`}>How it works</a>
+            <a href="#roi-calculator" className={`hidden md:block text-sm font-medium transition-colors ${scrolled ? "text-slate-600 hover:text-[#0D50B8]" : "text-white/80 hover:text-white"}`}>ROI Calculator</a>
             <button
               onClick={handleLogin}
               className="btn-primary text-white text-sm font-semibold px-5 py-2.5 rounded-xl"
