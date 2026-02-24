@@ -191,12 +191,23 @@ export default function MasterData() {
     const dRows = filteredDisputes.map(d => {
       const evList = evidenceMap[d.id] || [];
       const cfValues = customFields.map(cf => d.custom_fields?.[cf.field_key] ?? "");
+      const finalStatus = getFinalStatus(d);
+      const children = childMap[d.id] || [];
+      const secondCB = children.find(c => c.case_type === "Second Chargeback");
+      const arb = children.find(c => c.case_type === "Arbitration");
+      const netRecovery = getNetRecovery(d);
       return [
         d.case_id, DISPUTE_STATUS_LABEL[d.status] || d.status,
+        DISPUTE_STATUS_LABEL[finalStatus] || finalStatus,
+        d.parent_dispute_id ? disputes.find(p => p.id === d.parent_dispute_id)?.case_id || d.parent_dispute_id : "",
+        d.case_type,
+        secondCB?.case_id || "", secondCB ? (DISPUTE_STATUS_LABEL[secondCB.status] || secondCB.status) : "",
+        arb?.case_id || "", arb ? (DISPUTE_STATUS_LABEL[arb.status] || arb.status) : "",
+        netRecovery,
         projects.find(p => p.id === d.project_id)?.name || "",
         d.business_unit, d.sub_unit_name, d.processor, d.merchant_id, d.dba_name, d.merchant_alias,
         d.fought_decision, d.not_fought_reason, d.not_fought_notes, d.missing_evidence,
-        d.assigned_to, d.sla_deadline, d.resolution_date, d.recovery_amount, d.case_type,
+        d.assigned_to, d.sla_deadline, d.resolution_date, d.recovery_amount,
         d.chargeback_date, d.chargeback_amount, d.chargeback_currency, d.chargeback_amount_usd,
         d.reason_code, d.reason_category, d.arn_number, d.cardholder_name,
         d.card_network, d.card_type, d.card_bin_first6, d.card_last4,
