@@ -127,15 +127,29 @@ export default function MasterData() {
     return map;
   }, [disputes]);
 
+  const CHAIN_ORDER = ["Second Chargeback", "Pre-Arbitration", "Arbitration"];
+
   // Compute "Final Status" = deepest resolved child status, or own status if no children
   const getFinalStatus = (d) => {
     const children = childMap[d.id] || [];
     if (children.length === 0) return d.status;
-    // Sort children by case type depth
-    const ORDER = ["Second Chargeback", "Pre-Arbitration", "Arbitration"];
-    const sorted = [...children].sort((a, b) => ORDER.indexOf(b.case_type) - ORDER.indexOf(a.case_type));
-    // Recurse to deepest
+    const sorted = [...children].sort((a, b) => CHAIN_ORDER.indexOf(b.case_type) - CHAIN_ORDER.indexOf(a.case_type));
     return getFinalStatus(sorted[0]);
+  };
+
+  // Get the deepest child in the chain
+  const getDeepestChild = (d) => {
+    const children = childMap[d.id] || [];
+    if (children.length === 0) return null;
+    const sorted = [...children].sort((a, b) => CHAIN_ORDER.indexOf(b.case_type) - CHAIN_ORDER.indexOf(a.case_type));
+    return sorted[0];
+  };
+
+  // Net Recovery = sum of recovery_amount across entire chain (own + all children recursively)
+  const getNetRecovery = (d) => {
+    let total = d.recovery_amount || 0;
+    (childMap[d.id] || []).forEach(child => { total += getNetRecovery(child); });
+    return total;
   };
 
   // ── Status summary counts (from filtered disputes) ──────────────────
