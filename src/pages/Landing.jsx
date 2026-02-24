@@ -220,6 +220,117 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* ROI Calculator */}
+      <section id="roi-calculator" className="py-24 bg-[#F4F6FB]">
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="text-center mb-10">
+            <p className="text-[#0D50B8] text-sm font-bold tracking-widest uppercase mb-3">ROI Calculator</p>
+            <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-4">See your potential recovery</h2>
+            <p className="text-slate-500 text-lg max-w-xl mx-auto mb-6">Use our free ROI calculator to estimate how much revenue you could recover with Shanora Systems — no login required.</p>
+            <a
+              href={ROI_CALCULATOR_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-primary inline-flex items-center gap-2 text-white font-bold px-8 py-4 rounded-2xl text-base"
+            >
+              🧮 Open ROI Calculator →
+            </a>
+          </div>
+          <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-lg" style={{ height: "520px" }}>
+            <iframe
+              src={ROI_CALCULATOR_URL}
+              title="ROI Calculator"
+              className="w-full h-full border-0"
+              sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Contact / Lead Form */}
+      <section id="contact" className="py-24 bg-white">
+        <div className="max-w-3xl mx-auto px-6">
+          <div className="text-center mb-10">
+            <p className="text-[#0D50B8] text-sm font-bold tracking-widest uppercase mb-3">Get In Touch</p>
+            <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-4">Talk to our team</h2>
+            <p className="text-slate-500 text-lg max-w-xl mx-auto">Curious how Shanora Systems can transform your dispute recovery? Drop us a message and we'll get back to you within 24 hours.</p>
+          </div>
+
+          <div className="bg-[#F4F6FB] rounded-2xl p-8 border border-slate-100">
+            {sent ? (
+              <div className="text-center py-10">
+                <div className="text-5xl mb-4">✅</div>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">Message sent!</h3>
+                <p className="text-slate-500">Thank you — our team will reach out to you shortly.</p>
+              </div>
+            ) : (
+              <form onSubmit={handleContactSubmit} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-600 mb-1.5">Full Name *</label>
+                    <input
+                      required
+                      value={contactForm.name}
+                      onChange={e => setContactForm(f => ({ ...f, name: e.target.value }))}
+                      placeholder="Jane Smith"
+                      className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#0D50B8]/30"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-600 mb-1.5">Company *</label>
+                    <input
+                      required
+                      value={contactForm.company}
+                      onChange={e => setContactForm(f => ({ ...f, company: e.target.value }))}
+                      placeholder="Acme Corp"
+                      className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#0D50B8]/30"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-600 mb-1.5">Work Email *</label>
+                    <input
+                      required
+                      type="email"
+                      value={contactForm.email}
+                      onChange={e => setContactForm(f => ({ ...f, email: e.target.value }))}
+                      placeholder="jane@company.com"
+                      className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#0D50B8]/30"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-600 mb-1.5">Phone</label>
+                    <input
+                      value={contactForm.phone}
+                      onChange={e => setContactForm(f => ({ ...f, phone: e.target.value }))}
+                      placeholder="+1 (555) 000-0000"
+                      className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#0D50B8]/30"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">Message</label>
+                  <textarea
+                    rows={4}
+                    value={contactForm.message}
+                    onChange={e => setContactForm(f => ({ ...f, message: e.target.value }))}
+                    placeholder="Tell us about your current dispute volume and challenges..."
+                    className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#0D50B8]/30 resize-none"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={sending}
+                  className="btn-primary w-full text-white font-bold py-4 rounded-2xl text-base disabled:opacity-60"
+                >
+                  {sending ? "Sending..." : "Send Message →"}
+                </button>
+                <p className="text-center text-xs text-slate-400">Your information is never shared. We'll only use it to contact you about Shanora Systems.</p>
+              </form>
+            )}
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="hero-gradient py-24">
         <div className="max-w-4xl mx-auto px-6 text-center">
