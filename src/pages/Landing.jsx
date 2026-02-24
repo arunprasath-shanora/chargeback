@@ -352,6 +352,10 @@ export default function Landing() {
             <img src={LOGO_URL} alt="Shanora" className="w-8 h-8 rounded-full object-cover" />
             <span className="text-white font-bold text-sm">Shanora Systems</span>
           </div>
+          <div className="flex items-center gap-6">
+            <a href="#roi-calculator" className="text-slate-400 text-xs hover:text-white transition-colors">ROI Calculator</a>
+            <a href="#contact" className="text-slate-400 text-xs hover:text-white transition-colors">Contact</a>
+          </div>
           <p className="text-slate-500 text-xs">© 2026 Shanora Systems. All rights reserved.</p>
           <button onClick={handleLogin} className="text-[#0D50B8] text-sm font-semibold hover:text-blue-400 transition-colors">Sign In →</button>
         </div>
