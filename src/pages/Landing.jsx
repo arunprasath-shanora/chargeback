@@ -71,6 +71,20 @@ export default function Landing() {
     base44.auth.redirectToLogin(createPageUrl("Dashboard"));
   };
 
+  const handleContactSubmit = async (e) => {
+    e.preventDefault();
+    setSending(true);
+    await base44.integrations.Core.SendEmail({
+      to: "info@shanora-systems.com",
+      subject: `New Lead from Shanora Landing Page — ${contactForm.name} (${contactForm.company})`,
+      body: `New contact form submission:\n\nName: ${contactForm.name}\nCompany: ${contactForm.company}\nEmail: ${contactForm.email}\nPhone: ${contactForm.phone}\n\nMessage:\n${contactForm.message}`
+    });
+    setSending(false);
+    setSent(true);
+    setContactForm(INITIAL_FORM);
+    setTimeout(() => setSent(false), 5000);
+  };
+
   return (
     <div className="min-h-screen bg-white font-sans">
       <style>{`
