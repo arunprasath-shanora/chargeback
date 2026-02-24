@@ -469,7 +469,6 @@ export default function MasterData() {
                           <td className="px-3 py-2.5 text-slate-500 whitespace-nowrap">{d.sla_deadline || "—"}</td>
                           <td className="px-3 py-2.5 text-slate-500 whitespace-nowrap">{d.resolution_date || "—"}</td>
                           <td className="px-3 py-2.5 text-emerald-700 font-medium whitespace-nowrap">{d.recovery_amount != null ? `$${d.recovery_amount.toLocaleString()}` : "—"}</td>
-                          <td className="px-3 py-2.5 text-slate-500 whitespace-nowrap text-xs">{d.case_type || "—"}</td>
                           {/* Chargeback */}
                           <td className="px-3 py-2.5 text-slate-500 whitespace-nowrap">{d.chargeback_date || "—"}</td>
                           <td className="px-3 py-2.5 text-slate-700 font-medium whitespace-nowrap">{d.chargeback_amount?.toLocaleString() || "—"}</td>
