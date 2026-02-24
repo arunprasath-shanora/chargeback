@@ -1,23 +1,16 @@
 import React, { useEffect, useRef, useState } from "react";
 import { base44 } from "@/api/base44Client";
+import { Upload, ImagePlus } from "lucide-react";
 
 const GALLERY_ITEMS = [
-  { label: "Production Dashboard", sub: "Live KPIs, win rates, SLA alerts", bg: "from-blue-700 to-indigo-800", emoji: "📊",
-    prompt: "A modern dark-themed web application dashboard screenshot showing chargeback dispute management KPI cards with win rate 85%, total disputes 1240, recovered $2.1M. Blue and indigo color scheme. Line chart of monthly win rate trends. Clean professional SaaS UI with sidebar navigation. Photorealistic UI screenshot." },
-  { label: "AI Win Prediction", sub: "Probability score, factor analysis", bg: "from-violet-700 to-purple-800", emoji: "🤖",
-    prompt: "A modern SaaS web app panel screenshot showing AI-powered win probability analyzer for chargeback disputes. Circular gauge at 78% win probability, confidence HIGH. Key factors with green checkmarks for AVS Match, CVV Match, 3D Secure and red warnings for fraud signals. Purple color scheme. Photorealistic UI screenshot." },
-  { label: "Dispute Detail View", sub: "Evidence, cover letter, case history", bg: "from-slate-700 to-slate-800", emoji: "📋",
-    prompt: "A modern web app screenshot of a chargeback dispute case detail page with tabs for Case Details, Evidence, Cover Letter, Case History. Transaction data fields on left, uploaded evidence files list on right. Clean slate professional SaaS UI. Photorealistic UI screenshot." },
-  { label: "Inventory Manager", sub: "SLA tracking, bulk assignment", bg: "from-emerald-700 to-teal-800", emoji: "📦",
-    prompt: "A modern SaaS web application screenshot showing a chargeback inventory management table with case IDs, processor names, amounts, SLA countdown badges in red/orange/green, status chips, filter dropdowns and search bar. Green teal accents. Photorealistic UI screenshot." },
-  { label: "Analytics & Reports", sub: "Anomaly detection, trend charts", bg: "from-cyan-700 to-blue-800", emoji: "📈",
-    prompt: "A modern analytics dashboard screenshot for chargeback dispute management. Bar chart of win rates by reason code, line chart of monthly trends, donut chart of dispute outcomes. Cyan and blue color scheme. Professional SaaS reporting UI. Photorealistic UI screenshot." },
-  { label: "Case Chain Tracking", sub: "1CB → 2CB → Arb with net recovery", bg: "from-orange-700 to-red-800", emoji: "🔗",
-    prompt: "A modern web app screenshot showing dispute case chain timeline: First Chargeback -> Second Chargeback -> Pre-Arbitration -> Arbitration nodes connected by arrows. Each node shows status badge, amount, date. Net recovery shown at end. Orange red accents. Photorealistic UI screenshot." },
-  { label: "Automation Pipeline", sub: "Zero-touch end-to-end processing", bg: "from-pink-700 to-rose-800", emoji: "⚡",
-    prompt: "A modern SaaS web app screenshot showing automation pipeline configuration for chargeback disputes. Vertical flow: Import -> Enrich -> Evidence -> Cover Letter -> Submit steps with toggles and status indicators. Pink rose accents. Photorealistic UI screenshot." },
-  { label: "Master Data Export", sub: "Full chain columns, CSV export", bg: "from-amber-700 to-yellow-800", emoji: "🗄️",
-    prompt: "A modern web application screenshot showing a master data management table for chargeback disputes. Wide data table with columns: Case ID, Status, Merchant, Amount, Final Status, Net Recovery. Filters at top, export CSV button. Amber yellow accents. Professional SaaS data grid. Photorealistic UI screenshot." },
+  { label: "Production Dashboard", sub: "Live KPIs, win rates, SLA alerts", bg: "from-blue-700 to-indigo-800", emoji: "📊" },
+  { label: "AI Win Prediction", sub: "Probability score, factor analysis", bg: "from-violet-700 to-purple-800", emoji: "🤖" },
+  { label: "Dispute Detail View", sub: "Evidence, cover letter, case history", bg: "from-slate-700 to-slate-800", emoji: "📋" },
+  { label: "Inventory Manager", sub: "SLA tracking, bulk assignment", bg: "from-emerald-700 to-teal-800", emoji: "📦" },
+  { label: "Analytics & Reports", sub: "Anomaly detection, trend charts", bg: "from-cyan-700 to-blue-800", emoji: "📈" },
+  { label: "Case Chain Tracking", sub: "1CB → 2CB → Arb with net recovery", bg: "from-orange-700 to-red-800", emoji: "🔗" },
+  { label: "Automation Pipeline", sub: "Zero-touch end-to-end processing", bg: "from-pink-700 to-rose-800", emoji: "⚡" },
+  { label: "Master Data Export", sub: "Full chain columns, CSV export", bg: "from-amber-700 to-yellow-800", emoji: "🗄️" },
 ];
 
 // Duplicate for seamless loop
@@ -27,34 +20,25 @@ export default function FeatureGallery() {
   const trackRef = useRef(null);
   const [paused, setPaused] = useState(false);
   const [images, setImages] = useState({});
-  const [generating, setGenerating] = useState(false);
-  const [generated, setGenerated] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [uploading, setUploading] = useState(null); // label being uploaded
 
   useEffect(() => {
-    const cached = sessionStorage.getItem("gallery_images_v2");
-    if (cached) {
-      setImages(JSON.parse(cached));
-      setGenerated(true);
-    }
+    base44.auth.me().then(setCurrentUser).catch(() => {});
+    const cached = localStorage.getItem("gallery_images_v3");
+    if (cached) setImages(JSON.parse(cached));
   }, []);
 
-  const generateImages = async () => {
-    setGenerating(true);
-    const results = {};
-    await Promise.all(
-      GALLERY_ITEMS.map(async (item) => {
-        try {
-          const { url } = await base44.integrations.Core.GenerateImage({ prompt: item.prompt });
-          results[item.label] = url;
-        } catch {
-          results[item.label] = null;
-        }
-      })
-    );
-    sessionStorage.setItem("gallery_images_v2", JSON.stringify(results));
-    setImages(results);
-    setGenerating(false);
-    setGenerated(true);
+  const isAdmin = currentUser?.role === "admin" || currentUser?.role === "super_admin";
+
+  const handleUpload = async (label, file) => {
+    if (!file) return;
+    setUploading(label);
+    const { file_url } = await base44.integrations.Core.UploadFile({ file });
+    const updated = { ...images, [label]: file_url };
+    setImages(updated);
+    localStorage.setItem("gallery_images_v3", JSON.stringify(updated));
+    setUploading(null);
   };
 
   useEffect(() => {
@@ -76,42 +60,14 @@ export default function FeatureGallery() {
 
     animationId = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(animationId);
-  }, [paused, generated]);
+  }, [paused]);
 
   return (
     <section className="py-20 bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 mb-10 text-center">
         <p className="text-[#0D50B8] text-sm font-bold tracking-widest uppercase mb-3">Platform Gallery</p>
         <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-4">See the platform in action</h2>
-        <p className="text-slate-500 text-lg max-w-xl mx-auto mb-6">A live preview of every major screen — hover to pause.</p>
-
-        {!generated && (
-          <button
-            onClick={generateImages}
-            disabled={generating}
-            className="inline-flex items-center gap-2 bg-[#0D50B8] text-white font-semibold px-6 py-3 rounded-xl hover:bg-[#0a3e90] transition-colors disabled:opacity-60 text-sm"
-          >
-            {generating ? (
-              <>
-                <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
-                Generating screenshots... (~30s)
-              </>
-            ) : (
-              <>🖼️ Generate AI Screenshots</>
-            )}
-          </button>
-        )}
-        {generated && (
-          <button
-            onClick={() => { sessionStorage.removeItem("gallery_images_v2"); setImages({}); setGenerated(false); }}
-            className="text-xs text-slate-400 hover:text-slate-600 underline"
-          >
-            Regenerate screenshots
-          </button>
-        )}
+        <p className="text-slate-500 text-lg max-w-xl mx-auto">A live preview of every major screen — hover to pause.</p>
       </div>
 
       <div
@@ -143,9 +99,37 @@ export default function FeatureGallery() {
                     />
                   ) : (
                     <div className="text-center">
-                      <div className="text-6xl mb-1 group-hover:scale-110 transition-transform duration-300">{item.emoji}</div>
-                      {generating && <div className="text-white/60 text-xs mt-1">Generating...</div>}
+                      <div className="text-6xl group-hover:scale-110 transition-transform duration-300">{item.emoji}</div>
                     </div>
+                  )}
+
+                  {/* Admin upload overlay — only on first set (idx < GALLERY_ITEMS.length) to avoid duplicate inputs */}
+                  {isAdmin && idx < GALLERY_ITEMS.length && (
+                    <label
+                      className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer z-10"
+                      onClick={e => e.stopPropagation()}
+                    >
+                      {uploading === item.label ? (
+                        <div className="flex flex-col items-center gap-2">
+                          <svg className="animate-spin w-6 h-6 text-white" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                          </svg>
+                          <span className="text-white text-xs font-semibold">Uploading...</span>
+                        </div>
+                      ) : (
+                        <>
+                          <ImagePlus className="w-7 h-7 text-white mb-1" />
+                          <span className="text-white text-xs font-semibold">{images[item.label] ? "Replace Image" : "Upload Image"}</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={e => handleUpload(item.label, e.target.files[0])}
+                          />
+                        </>
+                      )}
+                    </label>
                   )}
                 </div>
                 <div className="p-4 bg-white">
@@ -157,6 +141,12 @@ export default function FeatureGallery() {
           </div>
         </div>
       </div>
+
+      {isAdmin && (
+        <p className="text-center text-xs text-slate-400 mt-6">
+          🔒 Admin: hover over a card to upload a screenshot
+        </p>
+      )}
     </section>
   );
 }
