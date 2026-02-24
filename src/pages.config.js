@@ -56,6 +56,7 @@ import MasterSetup from './pages/MasterSetup';
 import Projects from './pages/Projects';
 import Reports from './pages/Reports';
 import Users from './pages/Users';
+import Landing from './pages/Landing';
 import __Layout from './Layout.jsx';
 
 
@@ -69,6 +70,7 @@ export const PAGES = {
     "Projects": Projects,
     "Reports": Reports,
     "Users": Users,
+    "Landing": Landing,
 }
 
 export const pagesConfig = {
