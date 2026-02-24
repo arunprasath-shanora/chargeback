@@ -357,6 +357,7 @@ export default function Landing() {
             <span className="text-white font-bold text-sm">Shanora Systems</span>
           </div>
           <div className="flex items-center gap-6">
+            <Link to={createPageUrl("Features")} className="text-slate-400 text-xs hover:text-white transition-colors">Features & Gallery</Link>
             <a href="#roi-calculator" className="text-slate-400 text-xs hover:text-white transition-colors">ROI Calculator</a>
             <a href="#contact" className="text-slate-400 text-xs hover:text-white transition-colors">Contact</a>
           </div>
