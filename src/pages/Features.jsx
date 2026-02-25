@@ -266,12 +266,39 @@ export default function Features() {
                   ))}
                 </ul>
               </div>
-              <div className={`rounded-2xl ${activeSection.screenColor} p-8 min-h-[320px] flex items-center justify-center`}>
-                <div className="text-center">
-                  <div className="text-8xl mb-4">{activeSection.icon}</div>
-                  <p className="text-slate-700 font-bold text-lg">{activeSection.badge}</p>
-                  <p className="text-slate-500 text-sm mt-1">{activeSection.title}</p>
-                </div>
+              <div className={`relative rounded-2xl ${activeSection.screenColor} min-h-[320px] flex items-center justify-center overflow-hidden group`}>
+                {featureImages[`feature_${activeSection.id}`] ? (
+                  <img
+                    src={featureImages[`feature_${activeSection.id}`]}
+                    alt={activeSection.badge}
+                    className="w-full h-full object-cover rounded-2xl"
+                  />
+                ) : (
+                  <div className="text-center p-8">
+                    <div className="text-8xl mb-4">{activeSection.icon}</div>
+                    <p className="text-slate-700 font-bold text-lg">{activeSection.badge}</p>
+                    <p className="text-slate-500 text-sm mt-1">{activeSection.title}</p>
+                  </div>
+                )}
+                {isAdmin && (
+                  <label className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer rounded-2xl z-10">
+                    {uploading === `feature_${activeSection.id}` ? (
+                      <div className="flex flex-col items-center gap-2">
+                        <svg className="animate-spin w-6 h-6 text-white" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        </svg>
+                        <span className="text-white text-xs font-semibold">Uploading...</span>
+                      </div>
+                    ) : (
+                      <>
+                        <ImagePlus className="w-7 h-7 text-white mb-1" />
+                        <span className="text-white text-xs font-semibold">{featureImages[`feature_${activeSection.id}`] ? "Replace Image" : "Upload Image"}</span>
+                        <input type="file" accept="image/*" className="hidden" onChange={e => handleUpload(`feature_${activeSection.id}`, e.target.files[0])} />
+                      </>
+                    )}
+                  </label>
+                )}
               </div>
             </div>
           )}
