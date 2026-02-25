@@ -54,6 +54,16 @@ export default function Layout({ children, currentPageName }) {
     base44.auth.me().then(u => {
       setCurrentUser(u);
       const publicPages = ["Landing", "Features"];
+      // Skip redirects when inside the Base44 editor/preview
+      const isEditorPreview = window.self !== window.top;
+      if (isEditorPreview) {
+        if (u && !canAccessPage(u.role, currentPageName)) {
+          setAccessDenied(true);
+        } else {
+          setAccessDenied(false);
+        }
+        return;
+      }
       // Logged-in user visiting Landing → send to Dashboard
       if (u && currentPageName === "Landing") {
         window.location.href = createPageUrl("Dashboard");
