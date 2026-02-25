@@ -154,7 +154,7 @@ export default function Layout({ children, currentPageName }) {
     </div>
   );
 
-  if (currentPageName === "Landing") {
+  if (currentPageName === "Landing" || currentPageName === "Features") {
     return <>{children}</>;
   }
 
