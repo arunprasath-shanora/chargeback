@@ -150,7 +150,7 @@ export default function Landing() {
               Shanora Systems transforms how you manage chargebacks — from inventory intake to AI-driven responses to full chain tracking. Stop losing revenue to disputes you should be winning.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 flex-wrap">
               <button
                 onClick={handleLogin}
                 className="btn-primary text-white font-bold px-8 py-4 rounded-2xl text-base w-full sm:w-auto"
@@ -160,6 +160,9 @@ export default function Landing() {
               <Link to={createPageUrl("Features")} className="text-white/80 font-semibold px-6 py-4 rounded-2xl border border-white/20 hover:bg-white/10 transition-all text-sm w-full sm:w-auto text-center">
                 🖼️ See All Features
               </Link>
+              <a href="#roi-calculator" className="text-white/80 font-semibold px-6 py-4 rounded-2xl border border-white/20 hover:bg-white/10 transition-all text-sm w-full sm:w-auto text-center">
+                🧮 ROI Calculator
+              </a>
             </div>
           </div>
 
