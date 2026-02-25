@@ -32,8 +32,14 @@ export default function Layout({ children, currentPageName }) {
   useEffect(() => {
     base44.auth.me().then(u => {
       setCurrentUser(u);
+      // Logged-in user visiting Landing → send to Dashboard
+      if (u && currentPageName === "Landing") {
+        window.location.href = createPageUrl("Dashboard");
+        return;
+      }
+      // Not logged in and not on Landing → send to Landing
       if (!u && currentPageName !== "Landing") {
-        base44.auth.redirectToLogin(window.location.href);
+        window.location.href = createPageUrl("Landing");
         return;
       }
       if (u && !canAccessPage(u.role, currentPageName)) {
@@ -44,7 +50,7 @@ export default function Layout({ children, currentPageName }) {
       }
     }).catch(() => {
       if (currentPageName !== "Landing") {
-        base44.auth.redirectToLogin(window.location.href);
+        window.location.href = createPageUrl("Landing");
       }
     });
   }, [currentPageName]);
