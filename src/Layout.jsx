@@ -23,11 +23,32 @@ const navItems = [
   { label: "Audit Log",            icon: ShieldCheck,      page: "AuditLog" },
 ];
 
+const INACTIVITY_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
+
 export default function Layout({ children, currentPageName }) {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [accessDenied, setAccessDenied] = useState(false);
+
+  // Auto-logout on inactivity
+  useEffect(() => {
+    if (currentPageName === "Landing") return;
+    let timer;
+    const resetTimer = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        base44.auth.logout(createPageUrl("Landing"));
+      }, INACTIVITY_TIMEOUT_MS);
+    };
+    const events = ["mousemove", "mousedown", "keydown", "touchstart", "scroll", "click"];
+    events.forEach(e => window.addEventListener(e, resetTimer));
+    resetTimer();
+    return () => {
+      clearTimeout(timer);
+      events.forEach(e => window.removeEventListener(e, resetTimer));
+    };
+  }, [currentPageName]);
 
   useEffect(() => {
     base44.auth.me().then(u => {
