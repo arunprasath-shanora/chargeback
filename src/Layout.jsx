@@ -53,13 +53,14 @@ export default function Layout({ children, currentPageName }) {
   useEffect(() => {
     base44.auth.me().then(u => {
       setCurrentUser(u);
+      const publicPages = ["Landing", "Features"];
       // Logged-in user visiting Landing → send to Dashboard
       if (u && currentPageName === "Landing") {
         window.location.href = createPageUrl("Dashboard");
         return;
       }
-      // Not logged in and not on Landing → send to Landing
-      if (!u && currentPageName !== "Landing") {
+      // Not logged in and not on a public page → send to Landing
+      if (!u && !publicPages.includes(currentPageName)) {
         window.location.href = createPageUrl("Landing");
         return;
       }
