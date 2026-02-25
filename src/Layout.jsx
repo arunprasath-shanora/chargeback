@@ -32,13 +32,21 @@ export default function Layout({ children, currentPageName }) {
   useEffect(() => {
     base44.auth.me().then(u => {
       setCurrentUser(u);
+      if (!u && currentPageName !== "Landing") {
+        base44.auth.redirectToLogin(window.location.href);
+        return;
+      }
       if (u && !canAccessPage(u.role, currentPageName)) {
         setAccessDenied(true);
         auditLog({ action: "view", resource_type: currentPageName, status: "denied", details: `Role ${u.role} attempted to access ${currentPageName}` });
       } else {
         setAccessDenied(false);
       }
-    }).catch(() => {});
+    }).catch(() => {
+      if (currentPageName !== "Landing") {
+        base44.auth.redirectToLogin(window.location.href);
+      }
+    });
   }, [currentPageName]);
 
   const handleLogout = () => {
