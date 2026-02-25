@@ -314,14 +314,40 @@ export default function Features() {
             <p className="text-slate-500 text-lg max-w-xl mx-auto">A preview of every key screen — from the production dashboard to the AI assistant.</p>
           </div>
 
+          {isAdmin && (
+            <p className="text-center text-xs text-slate-400 mb-6">🔒 Admin: hover over a card to upload a screenshot</p>
+          )}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {galleryScreenshots.map(s => (
               <div key={s.label} className="group rounded-2xl overflow-hidden border border-slate-100 shadow hover:shadow-xl transition-all hover:-translate-y-1">
-                <div className={`bg-gradient-to-br ${s.bg} h-48 flex items-center justify-center`}>
-                  <div className="text-center">
-                    <div className="text-7xl mb-2">{s.emoji}</div>
-                    <div className="w-32 h-1 bg-white/20 rounded-full mx-auto" />
-                  </div>
+                <div className={`relative bg-gradient-to-br ${s.bg} h-48 flex items-center justify-center overflow-hidden`}>
+                  {galleryImages[s.label] ? (
+                    <img src={galleryImages[s.label]} alt={s.label} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                  ) : (
+                    <div className="text-center">
+                      <div className="text-7xl mb-2">{s.emoji}</div>
+                      <div className="w-32 h-1 bg-white/20 rounded-full mx-auto" />
+                    </div>
+                  )}
+                  {isAdmin && (
+                    <label className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer z-10">
+                      {uploading === s.label ? (
+                        <div className="flex flex-col items-center gap-2">
+                          <svg className="animate-spin w-6 h-6 text-white" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                          </svg>
+                          <span className="text-white text-xs font-semibold">Uploading...</span>
+                        </div>
+                      ) : (
+                        <>
+                          <ImagePlus className="w-7 h-7 text-white mb-1" />
+                          <span className="text-white text-xs font-semibold">{galleryImages[s.label] ? "Replace Image" : "Upload Image"}</span>
+                          <input type="file" accept="image/*" className="hidden" onChange={e => handleUpload(s.label, e.target.files[0])} />
+                        </>
+                      )}
+                    </label>
+                  )}
                 </div>
                 <div className="p-5 bg-white">
                   <p className="font-bold text-slate-900 text-sm">{s.label}</p>
