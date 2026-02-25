@@ -21,12 +21,16 @@ export default function FeatureGallery() {
   const [paused, setPaused] = useState(false);
   const [images, setImages] = useState({});
   const [currentUser, setCurrentUser] = useState(null);
-  const [uploading, setUploading] = useState(null); // label being uploaded
+  const [uploading, setUploading] = useState(null);
 
   useEffect(() => {
     base44.auth.me().then(setCurrentUser).catch(() => {});
-    const cached = localStorage.getItem("gallery_images_v3");
-    if (cached) setImages(JSON.parse(cached));
+    // Load images from database
+    base44.entities.GalleryImage.filter({ page: "landing" }).then(records => {
+      const map = {};
+      records.forEach(r => { map[r.label] = r.file_url; });
+      setImages(map);
+    }).catch(() => {});
   }, []);
 
   const isAdmin = currentUser?.role === "admin" || currentUser?.role === "super_admin";
@@ -35,9 +39,14 @@ export default function FeatureGallery() {
     if (!file) return;
     setUploading(label);
     const { file_url } = await base44.integrations.Core.UploadFile({ file });
-    const updated = { ...images, [label]: file_url };
-    setImages(updated);
-    localStorage.setItem("gallery_images_v3", JSON.stringify(updated));
+    // Check if record exists
+    const existing = await base44.entities.GalleryImage.filter({ page: "landing", label });
+    if (existing && existing.length > 0) {
+      await base44.entities.GalleryImage.update(existing[0].id, { file_url });
+    } else {
+      await base44.entities.GalleryImage.create({ label, page: "landing", file_url });
+    }
+    setImages(prev => ({ ...prev, [label]: file_url }));
     setUploading(null);
   };
 
