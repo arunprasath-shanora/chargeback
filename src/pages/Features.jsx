@@ -131,7 +131,45 @@ const galleryScreenshots = [
 
 export default function Features() {
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [galleryImages, setGalleryImages] = useState({});
+  const [featureImages, setFeatureImages] = useState({});
+  const [uploading, setUploading] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
   const activeSection = featureSections.find(s => s.id === activeTab);
+
+  useEffect(() => {
+    base44.auth.me().then(setCurrentUser).catch(() => {});
+    base44.entities.GalleryImage.filter({ page: "features" }).then(records => {
+      const galleryMap = {};
+      const featureMap = {};
+      records.forEach(r => {
+        if (r.label.startsWith("feature_")) featureMap[r.label] = r.file_url;
+        else galleryMap[r.label] = r.file_url;
+      });
+      setGalleryImages(galleryMap);
+      setFeatureImages(featureMap);
+    }).catch(() => {});
+  }, []);
+
+  const isAdmin = currentUser?.role === "admin" || currentUser?.role === "super_admin";
+
+  const handleUpload = async (label, file) => {
+    if (!file) return;
+    setUploading(label);
+    const { file_url } = await base44.integrations.Core.UploadFile({ file });
+    const existing = await base44.entities.GalleryImage.filter({ page: "features", label });
+    if (existing && existing.length > 0) {
+      await base44.entities.GalleryImage.update(existing[0].id, { file_url });
+    } else {
+      await base44.entities.GalleryImage.create({ label, page: "features", file_url });
+    }
+    if (label.startsWith("feature_")) {
+      setFeatureImages(prev => ({ ...prev, [label]: file_url }));
+    } else {
+      setGalleryImages(prev => ({ ...prev, [label]: file_url }));
+    }
+    setUploading(null);
+  };
 
   const handleLogin = () => {
     base44.auth.redirectToLogin(createPageUrl("Dashboard"));
