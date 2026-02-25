@@ -71,7 +71,8 @@ export default function Layout({ children, currentPageName }) {
         setAccessDenied(false);
       }
     }).catch(() => {
-      if (currentPageName !== "Landing") {
+      const publicPages = ["Landing", "Features"];
+      if (!publicPages.includes(currentPageName)) {
         window.location.href = createPageUrl("Landing");
       }
     });
