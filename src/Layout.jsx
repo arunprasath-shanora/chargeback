@@ -34,6 +34,7 @@ export default function Layout({ children, currentPageName }) {
   // Auto-logout on inactivity
   useEffect(() => {
     if (currentPageName === "Landing") return;
+    if (window.self !== window.top) return; // skip in editor preview
     let timer;
     const resetTimer = () => {
       clearTimeout(timer);
