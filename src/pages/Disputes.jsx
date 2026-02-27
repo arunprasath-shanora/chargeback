@@ -121,7 +121,7 @@ export default function Disputes() {
 
       return matchSearch && matchStatus && matchProject && matchFought &&
         matchProcessor && matchNetwork && matchReason && matchAnalyst &&
-        matchDeadlineFrom && matchDeadlineTo && matchSelf;
+        matchDeadline && matchSelf;
     });
 
     // Sorting
