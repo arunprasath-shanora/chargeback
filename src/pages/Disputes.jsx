@@ -114,8 +114,7 @@ export default function Disputes() {
       const matchNetwork = cardNetworkFilter === "all" || d.card_network === cardNetworkFilter;
       const matchReason = reasonCodeFilter === "all" || d.reason_code === reasonCodeFilter;
       const matchAnalyst = analystFilter === "all" || d.assigned_to === analystFilter;
-      const matchDeadlineFrom = !deadlineFrom || (d.sla_deadline && d.sla_deadline >= deadlineFrom);
-      const matchDeadlineTo = !deadlineTo || (d.sla_deadline && d.sla_deadline <= deadlineTo);
+      const matchDeadline = !deadlineFilter || d.sla_deadline === deadlineFilter;
 
       // Analysts only see their own disputes
       const matchSelf = !isAnalyst || d.assigned_to === currentUser?.email;
