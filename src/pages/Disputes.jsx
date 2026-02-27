@@ -139,7 +139,7 @@ export default function Disputes() {
     });
 
     return result;
-  }, [disputes, search, statusFilter, projectFilter, foughtFilter, processorFilter, cardNetworkFilter, reasonCodeFilter, analystFilter, deadlineFrom, deadlineTo, sortField, sortDir, isAnalyst, currentUser]);
+  }, [disputes, search, statusFilter, projectFilter, foughtFilter, processorFilter, cardNetworkFilter, reasonCodeFilter, analystFilter, deadlineFilter, sortField, sortDir, isAnalyst, currentUser]);
 
   const activeFilterCount = [
     statusFilter !== "all", projectFilter !== "all", foughtFilter !== "all",
