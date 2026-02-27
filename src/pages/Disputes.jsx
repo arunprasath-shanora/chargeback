@@ -144,7 +144,7 @@ export default function Disputes() {
   const activeFilterCount = [
     statusFilter !== "all", projectFilter !== "all", foughtFilter !== "all",
     processorFilter !== "all", cardNetworkFilter !== "all", reasonCodeFilter !== "all",
-    analystFilter !== "all", deadlineFrom, deadlineTo
+    analystFilter !== "all", deadlineFilter
   ].filter(Boolean).length;
 
   const clearFilters = () => {
