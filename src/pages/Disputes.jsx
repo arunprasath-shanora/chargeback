@@ -290,21 +290,11 @@ export default function Disputes() {
           </div>
 
           <div>
-            <label className="text-xs font-semibold text-slate-500 mb-1 block">SLA Deadline From</label>
+            <label className="text-xs font-semibold text-slate-500 mb-1 block">SLA Deadline</label>
             <input
               type="date"
-              value={deadlineFrom}
-              onChange={e => setDeadlineFrom(e.target.value)}
-              className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#0D50B8]/30"
-            />
-          </div>
-
-          <div>
-            <label className="text-xs font-semibold text-slate-500 mb-1 block">SLA Deadline To</label>
-            <input
-              type="date"
-              value={deadlineTo}
-              onChange={e => setDeadlineTo(e.target.value)}
+              value={deadlineFilter}
+              onChange={e => setDeadlineFilter(e.target.value)}
               className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#0D50B8]/30"
             />
           </div>
