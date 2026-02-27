@@ -43,8 +43,7 @@ export default function Disputes() {
   const [cardNetworkFilter, setCardNetworkFilter] = useState("all");
   const [reasonCodeFilter, setReasonCodeFilter] = useState("all");
   const [analystFilter, setAnalystFilter] = useState("all");
-  const [deadlineFrom, setDeadlineFrom] = useState("");
-  const [deadlineTo, setDeadlineTo] = useState("");
+  const [deadlineFilter, setDeadlineFilter] = useState("");
 
   // Sorting
   const [sortField, setSortField] = useState("created_date");
