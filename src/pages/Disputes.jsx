@@ -150,7 +150,7 @@ export default function Disputes() {
   const clearFilters = () => {
     setStatusFilter("all"); setProjectFilter("all"); setFoughtFilter("all");
     setProcessorFilter("all"); setCardNetworkFilter("all"); setReasonCodeFilter("all");
-    setAnalystFilter("all"); setDeadlineFrom(""); setDeadlineTo("");
+    setAnalystFilter("all"); setDeadlineFilter("");
   };
 
   const thClass = "text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase tracking-wide whitespace-nowrap cursor-pointer select-none hover:text-[#0D50B8] transition-colors";
