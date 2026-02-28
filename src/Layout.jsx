@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import {
   LayoutDashboard, FolderOpen, FileText, Settings,
-  ChevronLeft, ChevronRight, LogOut, Package, BookOpen, Users, Menu, Bell, ShieldOff, ShieldCheck, Database
+  ChevronLeft, ChevronRight, LogOut, Package, BookOpen, Users, Menu, Bell, ShieldOff, ShieldCheck, Database, Activity
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { canAccessPage, getAllowedPages } from "@/components/security/roleAccess";
