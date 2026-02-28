@@ -110,6 +110,12 @@ export default function VampImportModal({ onClose, onSaved }) {
         <div className="flex gap-2 px-6 pt-4 pb-2">
           <button className={tabClass("manual")} onClick={() => setTab("manual")}>✏️ Manual Entry</button>
           <button className={tabClass("csv")} onClick={() => setTab("csv")}>📄 CSV Upload</button>
+          <button className={tabClass("stripe")} onClick={() => setTab("stripe")}>
+            <span className="inline-flex items-center gap-1.5">
+              <span className="w-4 h-4 rounded bg-[#635BFF] inline-flex items-center justify-center text-white text-[9px] font-bold">S</span>
+              Stripe Auto-Fetch
+            </span>
+          </button>
           <button className={tabClass("api")} onClick={() => setTab("api")}>🔌 API Import</button>
         </div>
 
