@@ -2,11 +2,12 @@ import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BarChart2, TrendingUp, Sparkles, RefreshCw, Filter, X, FileText } from "lucide-react";
+import { BarChart2, TrendingUp, Sparkles, RefreshCw, Filter, X, FileText, Activity } from "lucide-react";
 import VolumeAnalyzer from "@/components/reports/VolumeAnalyzer";
 import PerformanceDashboard from "@/components/reports/PerformanceDashboard";
 import AIInsights from "@/components/reports/AIInsights";
 import CustomReports from "@/components/reports/CustomReports";
+import MidHealthReport from "@/components/reports/MidHealthReport";
 
 const REFRESH_INTERVAL_MS = 4 * 60 * 60 * 1000; // 4 hours
 
