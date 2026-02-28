@@ -469,6 +469,7 @@ export default function ProjectForm({ project, onSave, onCancel }) {
           <TabsTrigger value="inventory_automation" className="text-xs">Inventory Automation</TabsTrigger>
           <TabsTrigger value="evidence_connectors" className="text-xs">Evidence Connectors</TabsTrigger>
           <TabsTrigger value="e2e_automation" className="text-xs">End-to-End Automation</TabsTrigger>
+          <TabsTrigger value="stripe_integration" className="text-xs">Stripe Integration</TabsTrigger>
           <TabsTrigger value="notes" className="text-xs">Notes</TabsTrigger>
         </TabsList>
 
