@@ -2,6 +2,7 @@ import React, { useState, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import { Upload, Plus, X, FileText, Loader2, CheckCircle, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import VampStripeImport from "./VampStripeImport";
 
 const BLANK_ROW = {
   merchant_id: "", merchant_alias: "", period_month: "",
