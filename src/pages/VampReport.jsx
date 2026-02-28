@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { base44 } from "@/api/base44Client";
-import VampTable from "@/components/vamp/VampTable";
-import VampSummaryCards from "@/components/vamp/VampSummaryCards";
-import VampChart from "@/components/vamp/VampChart";
-import VampImportModal from "@/components/vamp/VampImportModal";
-import VampInfoBanner from "@/components/vamp/VampInfoBanner";
+import VampTable from "@/components/vamp/VampTable.jsx";
+import VampSummaryCards from "@/components/vamp/VampSummaryCards.jsx";
+import VampChart from "@/components/vamp/VampChart.jsx";
+import VampImportModal from "@/components/vamp/VampImportModal.jsx";
+import VampInfoBanner from "@/components/vamp/VampInfoBanner.jsx";
 import { Download, RefreshCw, Upload, Plus, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
