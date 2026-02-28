@@ -224,6 +224,10 @@ export default function Reports() {
             <CustomReports disputes={filteredDisputes} />
           </TabsContent>
 
+          <TabsContent value="mid" className="mt-0 space-y-4">
+            <FilterBar />
+            <MidHealthReport disputes={filteredDisputes} projects={projects} />
+          </TabsContent>
 
         </Tabs>
       )}
