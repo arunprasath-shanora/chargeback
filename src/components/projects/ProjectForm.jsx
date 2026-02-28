@@ -13,6 +13,7 @@ import ProjectCoverLetterTab from "./ProjectCoverLetterTab";
 import ProjectInventoryAutomationTab from "./ProjectInventoryAutomationTab";
 import ProjectEvidenceConnectorsTab from "./ProjectEvidenceConnectorsTab";
 import ProjectEndToEndAutomationTab from "./ProjectEndToEndAutomationTab";
+import ProjectStripeIntegrationTab from "./ProjectStripeIntegrationTab";
 
 const PROCESSORS = ["Fiserv","American Express","Visa","Mastercard","Stripe","PayPal","Adyen","Worldpay","Other"];
 const CURRENCIES = ["USD","EUR","GBP","AUD","CAD","NZD","INR","SGD","AED","Other"];
