@@ -94,6 +94,8 @@ export default function VampImportModal({ onClose, onSaved }) {
 
   const tabClass = (t) => `px-4 py-2 text-sm font-medium rounded-xl transition-all ${tab === t ? "bg-[#0D50B8] text-white shadow" : "text-slate-500 hover:bg-slate-100"}`;
 
+  const handleStripeDone = () => { onSaved(); };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
       <div className="bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
