@@ -535,6 +535,17 @@ export default function ProjectForm({ project, onSave, onCancel }) {
           </Card>
         </TabsContent>
 
+        <TabsContent value="stripe_integration" className="mt-4">
+          <Card className="border-slate-100">
+            <CardContent className="p-5">
+              <ProjectStripeIntegrationTab
+                stripeConfig={form.stripe_integration}
+                onChange={v => set("stripe_integration", v)}
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         <TabsContent value="notes" className="mt-4">
           <Card className="border-slate-100">
             <CardContent className="p-5">
