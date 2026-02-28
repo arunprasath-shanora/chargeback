@@ -21,6 +21,7 @@ const navItems = [
   { label: "Master Data",          icon: Database,         page: "MasterData" },
   { label: "Users",                icon: Users,            page: "Users" },
   { label: "Audit Log",            icon: ShieldCheck,      page: "AuditLog" },
+  { label: "VAMP Report",          icon: Activity,         page: "VampReport" },
 ];
 
 const INACTIVITY_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
