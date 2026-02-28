@@ -75,6 +75,7 @@ export default function Reports() {
     { id: "performance", label: "Performance Dashboard", icon: TrendingUp },
     { id: "ai", label: "AI Insights & Predictions", icon: Sparkles },
     { id: "custom", label: "Custom Reports", icon: FileText },
+    { id: "mid", label: "MID Health (VAMP)", icon: Activity },
   ];
 
   const FilterBar = () => (
