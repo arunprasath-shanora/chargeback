@@ -229,6 +229,10 @@ export default function VampImportModal({ onClose, onSaved }) {
             </div>
           )}
 
+          {tab === "stripe" && (
+            <VampStripeImport onSaved={handleStripeDone} />
+          )}
+
           {tab === "api" && (
             <div className="space-y-4 mt-2">
               <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-800">
