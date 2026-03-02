@@ -400,30 +400,31 @@ export default function Inventory() {
                           <Checkbox checked={selectedIds.has(i.id)} onCheckedChange={() => toggleSelect(i.id)} />
                         )}
                       </td>
-                      <td className="px-4 py-3 font-medium text-slate-800 whitespace-nowrap">{i.case_id}</td>
-                      <td className="px-4 py-3 text-slate-600 text-xs whitespace-nowrap">{i.case_type || "—"}</td>
-                      <td className="px-4 py-3 text-slate-500 text-xs font-mono">{i.arn_number || "—"}</td>
-                      <td className="px-4 py-3">
-                        <div className="text-xs"><span className="font-medium text-slate-700">{i.reason_code || "—"}</span>{i.reason_category && <span className="block text-slate-400 text-[11px]">{i.reason_category}</span>}</div>
+                      <td className="px-4 py-3 text-sm font-medium text-slate-800 whitespace-nowrap">{i.case_id}</td>
+                      <td className="px-4 py-3 text-sm text-slate-600 whitespace-nowrap">{i.case_type || "—"}</td>
+                      <td className="px-4 py-3 text-sm text-slate-500 font-mono whitespace-nowrap">{i.arn_number || "—"}</td>
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <span className="text-sm font-medium text-slate-700">{i.reason_code || "—"}</span>
+                        {i.reason_category && <span className="text-sm text-slate-400 ml-1">· {i.reason_category}</span>}
                       </td>
-                      <td className="px-4 py-3 text-slate-600 text-xs whitespace-nowrap">{proj?.name || <span className="text-slate-300 italic">Unassigned</span>}</td>
-                      <td className="px-4 py-3 text-slate-500 text-xs">{i.sub_unit_name || "—"}</td>
-                      <td className="px-4 py-3 text-slate-500 text-xs font-mono">{i.merchant_id || "—"}</td>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 text-sm text-slate-600 whitespace-nowrap">{proj?.name || <span className="text-slate-300 italic">Unassigned</span>}</td>
+                      <td className="px-4 py-3 text-sm text-slate-500 whitespace-nowrap">{i.sub_unit_name || "—"}</td>
+                      <td className="px-4 py-3 text-sm text-slate-500 font-mono whitespace-nowrap">{i.merchant_id || "—"}</td>
+                      <td className="px-4 py-3 whitespace-nowrap">
                         <Badge className={`${statusColors[i.status] || "bg-slate-100 text-slate-700"} text-xs border-0`}>{i.status}</Badge>
                       </td>
-                      <td className="px-4 py-3 text-slate-500 text-xs">{i.source || "—"}</td>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 text-sm text-slate-500 whitespace-nowrap">{i.source || "—"}</td>
+                      <td className="px-4 py-3 whitespace-nowrap">
                         {i.card_network ? (
                           <Badge className={`${networkColors[i.card_network] || "bg-slate-100 text-slate-700"} text-xs border-0`}>{i.card_network}</Badge>
-                        ) : <span className="text-slate-300">—</span>}
+                        ) : <span className="text-sm text-slate-300">—</span>}
                       </td>
-                      <td className="px-4 py-3 text-slate-500 text-xs">{i.card_type || "—"}</td>
-                      <td className="px-4 py-3 text-slate-500 text-xs font-mono">{i.bin_first6 ? `${i.bin_first6}••••${i.bin_last4}` : "—"}</td>
-                      <td className="px-4 py-3 text-slate-700 text-xs font-medium whitespace-nowrap">{i.chargeback_amount?.toLocaleString() || "—"}</td>
-                      <td className="px-4 py-3 text-slate-500 text-xs">{i.currency || "—"}</td>
-                      <td className="px-4 py-3 text-slate-500 text-xs whitespace-nowrap">{i.chargeback_date || "—"}</td>
-                      <td className="px-4 py-3 text-slate-500 text-xs whitespace-nowrap">{i.transaction_date || "—"}</td>
+                      <td className="px-4 py-3 text-sm text-slate-500 whitespace-nowrap">{i.card_type || "—"}</td>
+                      <td className="px-4 py-3 text-sm text-slate-500 font-mono whitespace-nowrap">{i.bin_first6 ? `${i.bin_first6}••••${i.bin_last4}` : "—"}</td>
+                      <td className="px-4 py-3 text-sm text-slate-700 font-medium whitespace-nowrap">{i.chargeback_amount?.toLocaleString() || "—"}</td>
+                      <td className="px-4 py-3 text-sm text-slate-500 whitespace-nowrap">{i.currency || "—"}</td>
+                      <td className="px-4 py-3 text-sm text-slate-500 whitespace-nowrap">{i.chargeback_date || "—"}</td>
+                      <td className="px-4 py-3 text-sm text-slate-500 whitespace-nowrap">{i.transaction_date || "—"}</td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1 group">
                           {i.due_date ? (
