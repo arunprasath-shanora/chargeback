@@ -82,49 +82,49 @@ export default function VampTable({ rows, sortBy, sortDir, onSort, onRefresh }) 
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50">
-            {rows.length === 0 && (
-              <tr>
-                <td colSpan={14} className="px-4 py-12 text-center text-slate-300">
-                  No VAMP records yet. Use "Import / Add Data" to get started.
-                </td>
-              </tr>
-            )}
-            {rows.map(r => {
-              const rc = RISK_CONFIG[r.risk] || RISK_CONFIG.unknown;
-              const RIcon = rc.icon;
-              const isEditing = editing === r.id;
+          {rows.length === 0 && (
+          <tr>
+            <td colSpan={14} className="px-4 py-12 text-center text-slate-300">
+              No VAMP records yet. Use "Import / Add Data" to get started.
+            </td>
+          </tr>
+          )}
+          {rows.map(r => {
+          const rc = RISK_CONFIG[r.risk] || RISK_CONFIG.unknown;
+          const RIcon = rc.icon;
+          const isEditing = editing === r.id;
 
-              return (
-                <tr key={r.id} className={`hover:bg-slate-50 transition-colors ${isEditing ? "bg-blue-50" : ""}`}>
-                  <td className="px-3 py-2.5 font-mono text-xs text-slate-600 whitespace-nowrap">{r.merchant_id}</td>
-                  <td className="px-3 py-2.5 font-medium text-slate-700 whitespace-nowrap">{r.merchant_alias || "—"}</td>
-                  <td className="px-3 py-2.5 text-slate-500 whitespace-nowrap font-mono text-xs">{r.period_month}</td>
-                  <td className="px-3 py-2.5 text-slate-500 whitespace-nowrap">{r.card_network}</td>
-                  <td className="px-3 py-2.5 text-slate-700">
-                    {isEditing ? numInput("settled_txn_count", "TC05 count") : (r.settled_txn_count?.toLocaleString() ?? <span className="text-slate-300 text-xs">—</span>)}
-                  </td>
-                  <td className="px-3 py-2.5 text-slate-700">
-                    {isEditing ? numInput("tc40_count", "TC40 count") : (r.tc40_count?.toLocaleString() ?? <span className="text-slate-300 text-xs">—</span>)}
-                  </td>
-                  <td className="px-3 py-2.5 text-slate-700">
-                    {isEditing ? numInput("tc15_count", "TC15 count") : (r.tc15_count?.toLocaleString() ?? <span className="text-slate-300 text-xs">—</span>)}
-                  </td>
-                  <td className="px-3 py-2.5 text-slate-700">
-                    {isEditing ? numInput("ce30_count", "CE3.0") : (r.ce30_count?.toLocaleString() ?? <span className="text-slate-300 text-xs">0</span>)}
-                  </td>
-                  <td className="px-3 py-2.5 font-bold">
-                    {r.vamp_ratio !== null ? (
-                      <span className={r.risk === "excessive" ? "text-red-600" : r.risk === "standard" ? "text-amber-600" : "text-emerald-600"}>
-                        {(r.vamp_ratio * 100).toFixed(4)}%
-                      </span>
-                    ) : <span className="text-slate-300 text-xs">No TC05 data</span>}
-                  </td>
-                  <td className="px-3 py-2.5 text-slate-600">
-                    {r.fraud_ratio !== null ? `${(r.fraud_ratio * 100).toFixed(4)}%` : <span className="text-slate-300 text-xs">—</span>}
-                  </td>
-                  <td className="px-3 py-2.5 text-slate-600">
-                    {r.cb_ratio !== null ? `${(r.cb_ratio * 100).toFixed(4)}%` : <span className="text-slate-300 text-xs">—</span>}
-                  </td>
+          return (
+            <tr key={r.id} className={`hover:bg-slate-50 transition-colors ${isEditing ? "bg-blue-50" : ""}`}>
+              <td className="px-3 py-2.5 text-sm font-mono text-slate-600 whitespace-nowrap">{r.merchant_id}</td>
+              <td className="px-3 py-2.5 text-sm font-medium text-slate-700 whitespace-nowrap">{r.merchant_alias || "—"}</td>
+              <td className="px-3 py-2.5 text-sm text-slate-500 whitespace-nowrap font-mono">{r.period_month}</td>
+              <td className="px-3 py-2.5 text-sm text-slate-500 whitespace-nowrap">{r.card_network}</td>
+              <td className="px-3 py-2.5 text-sm text-slate-700 whitespace-nowrap">
+                {isEditing ? numInput("settled_txn_count", "TC05 count") : (r.settled_txn_count?.toLocaleString() ?? <span className="text-slate-300">—</span>)}
+              </td>
+              <td className="px-3 py-2.5 text-sm text-slate-700 whitespace-nowrap">
+                {isEditing ? numInput("tc40_count", "TC40 count") : (r.tc40_count?.toLocaleString() ?? <span className="text-slate-300">—</span>)}
+              </td>
+              <td className="px-3 py-2.5 text-sm text-slate-700 whitespace-nowrap">
+                {isEditing ? numInput("tc15_count", "TC15 count") : (r.tc15_count?.toLocaleString() ?? <span className="text-slate-300">—</span>)}
+              </td>
+              <td className="px-3 py-2.5 text-sm text-slate-700 whitespace-nowrap">
+                {isEditing ? numInput("ce30_count", "CE3.0") : (r.ce30_count?.toLocaleString() ?? <span className="text-slate-300">0</span>)}
+              </td>
+              <td className="px-3 py-2.5 text-sm font-bold whitespace-nowrap">
+                {r.vamp_ratio !== null ? (
+                  <span className={r.risk === "excessive" ? "text-red-600" : r.risk === "standard" ? "text-amber-600" : "text-emerald-600"}>
+                    {(r.vamp_ratio * 100).toFixed(4)}%
+                  </span>
+                ) : <span className="text-slate-300">No TC05 data</span>}
+              </td>
+              <td className="px-3 py-2.5 text-sm text-slate-600 whitespace-nowrap">
+                {r.fraud_ratio !== null ? `${(r.fraud_ratio * 100).toFixed(4)}%` : <span className="text-slate-300">—</span>}
+              </td>
+              <td className="px-3 py-2.5 text-sm text-slate-600 whitespace-nowrap">
+                {r.cb_ratio !== null ? `${(r.cb_ratio * 100).toFixed(4)}%` : <span className="text-slate-300">—</span>}
+              </td>
                   <td className="px-3 py-2.5">
                     <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold ${rc.badge}`}>
                       <RIcon className="w-3 h-3" />{rc.label}
