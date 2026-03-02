@@ -148,19 +148,19 @@ export default function Dashboard() {
                 const isUrgent = d.sla_deadline && new Date(d.sla_deadline) < new Date();
                 return (
                   <tr key={d.id}>
-                    <td className="px-6 py-3.5 font-semibold text-slate-800">{d.case_id}</td>
-                    <td className="px-6 py-3.5">
+                    <td className="px-6 py-3.5 text-sm font-semibold text-slate-800 whitespace-nowrap">{d.case_id}</td>
+                    <td className="px-6 py-3.5 whitespace-nowrap">
                       <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold ${sc.pill}`}>
                         <span className={`w-1.5 h-1.5 rounded-full ${sc.dot}`} />
                         {d.status?.replace("_", " ")}
                       </span>
                     </td>
-                    <td className="px-6 py-3.5 font-medium text-slate-700">
+                    <td className="px-6 py-3.5 text-sm font-medium text-slate-700 whitespace-nowrap">
                       {d.chargeback_currency} {d.chargeback_amount?.toLocaleString() || "—"}{d.chargeback_amount_usd ? ` · $${d.chargeback_amount_usd?.toLocaleString()} USD` : ""}
                     </td>
-                    <td className="px-6 py-3.5 text-slate-500">{d.reason_code || "—"}</td>
-                    <td className="px-6 py-3.5">
-                      <span className={`text-xs font-medium ${isUrgent ? "text-red-500 font-semibold" : "text-slate-500"}`}>
+                    <td className="px-6 py-3.5 text-sm text-slate-500 whitespace-nowrap">{d.reason_code || "—"}</td>
+                    <td className="px-6 py-3.5 whitespace-nowrap">
+                      <span className={`text-sm font-medium ${isUrgent ? "text-red-500 font-semibold" : "text-slate-500"}`}>
                         {d.sla_deadline || "—"}
                       </span>
                     </td>
