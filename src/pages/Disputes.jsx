@@ -334,32 +334,32 @@ export default function Disputes() {
                   const isOverdue = d.sla_deadline && d.sla_deadline < new Date().toISOString().split("T")[0];
                   return (
                     <tr key={d.id} className="border-b border-slate-50 hover:bg-slate-50 transition-colors cursor-pointer" onClick={() => setSelectedDispute(d)}>
-                      <td className="px-4 py-3 font-medium text-[#0D50B8] whitespace-nowrap">{d.case_id}</td>
-                      <td className="px-4 py-3 text-slate-500 font-mono text-xs whitespace-nowrap">{d.arn_number || "—"}</td>
-                      <td className="px-4 py-3 text-slate-600 whitespace-nowrap">{d.case_type || "—"}</td>
-                      <td className="px-4 py-3 text-slate-600 whitespace-nowrap">{d.sub_unit_name || "—"}</td>
-                      <td className="px-4 py-3 text-slate-600 whitespace-nowrap">{d.processor || "—"}</td>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 text-sm font-medium text-[#0D50B8] whitespace-nowrap">{d.case_id}</td>
+                      <td className="px-4 py-3 text-sm text-slate-500 font-mono whitespace-nowrap">{d.arn_number || "—"}</td>
+                      <td className="px-4 py-3 text-sm text-slate-600 whitespace-nowrap">{d.case_type || "—"}</td>
+                      <td className="px-4 py-3 text-sm text-slate-600 whitespace-nowrap">{d.sub_unit_name || "—"}</td>
+                      <td className="px-4 py-3 text-sm text-slate-600 whitespace-nowrap">{d.processor || "—"}</td>
+                      <td className="px-4 py-3 whitespace-nowrap">
                         {d.fought_decision ? (
                           <Badge className={`${foughtColors[d.fought_decision]} text-xs border-0`}>
                             {d.fought_decision === "fought" ? "Fought" : "Not Fought"}
                           </Badge>
-                        ) : <span className="text-slate-300 text-xs">—</span>}
+                        ) : <span className="text-sm text-slate-300">—</span>}
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 whitespace-nowrap">
                         <Badge className={`${statusColors[d.status] || "bg-slate-100 text-slate-700"} text-xs border-0`}>
                           {d.status?.replace("_", " ")}
                         </Badge>
                       </td>
-                      <td className="px-4 py-3 text-slate-600 whitespace-nowrap">{d.card_network || "—"}</td>
-                      <td className="px-4 py-3 text-slate-500 text-xs font-medium whitespace-nowrap">{d.chargeback_currency || "—"}</td>
-                      <td className="px-4 py-3 text-slate-700 font-medium whitespace-nowrap">{d.chargeback_amount?.toLocaleString() || "—"}</td>
-                      <td className="px-4 py-3 text-emerald-700 font-medium whitespace-nowrap">{d.chargeback_amount_usd ? `$${d.chargeback_amount_usd?.toLocaleString()}` : "—"}</td>
-                      <td className="px-4 py-3 text-slate-500 whitespace-nowrap">{d.reason_code || "—"}</td>
-                      <td className={`px-4 py-3 whitespace-nowrap font-medium ${isOverdue ? "text-red-600" : "text-slate-500"}`}>
+                      <td className="px-4 py-3 text-sm text-slate-600 whitespace-nowrap">{d.card_network || "—"}</td>
+                      <td className="px-4 py-3 text-sm text-slate-500 font-medium whitespace-nowrap">{d.chargeback_currency || "—"}</td>
+                      <td className="px-4 py-3 text-sm text-slate-700 font-medium whitespace-nowrap">{d.chargeback_amount?.toLocaleString() || "—"}</td>
+                      <td className="px-4 py-3 text-sm text-emerald-700 font-medium whitespace-nowrap">{d.chargeback_amount_usd ? `$${d.chargeback_amount_usd?.toLocaleString()}` : "—"}</td>
+                      <td className="px-4 py-3 text-sm text-slate-500 whitespace-nowrap">{d.reason_code || "—"}</td>
+                      <td className={`px-4 py-3 text-sm whitespace-nowrap font-medium ${isOverdue ? "text-red-600" : "text-slate-500"}`}>
                         {d.sla_deadline || "—"}
                       </td>
-                      <td className="px-4 py-3 text-slate-500 whitespace-nowrap text-xs">{d.assigned_to || "—"}</td>
+                      <td className="px-4 py-3 text-sm text-slate-500 whitespace-nowrap">{d.assigned_to || "—"}</td>
                       <td className="px-4 py-3">
                         <Button size="icon" variant="ghost" className="h-7 w-7" onClick={e => { e.stopPropagation(); setSelectedDispute(d); }}>
                           <Eye className="w-3.5 h-3.5" />
